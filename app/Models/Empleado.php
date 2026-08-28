@@ -10,3 +10,4 @@ class Empleado extends Model
     protected $fillable =['nombre','telefono','activo','Rh','eps'];
 
 }
+ 
