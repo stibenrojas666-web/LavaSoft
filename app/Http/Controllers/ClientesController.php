@@ -4,15 +4,24 @@ namespace App\Http\Controllers;
 
 use App\Models\clientes;
 use Illuminate\Http\Request;
+use App\Services\clienteService;
 
 class ClientesController extends Controller
 {
+    private clienteService $clientesService;
+
+    public function __construct(clienteService $clientesService)
+    {
+        $this->clientesService = $clientesService;
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        //
+        $clientes = $this->clientesService->listarTodo();
+        return view('clientes.index', compact('clientes'));
     }
 
     /**
