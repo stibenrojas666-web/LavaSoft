@@ -13,9 +13,7 @@ return new class extends Migration
     {
         Schema::create('empleados', function (Blueprint $table) {
             $table->id();
-            $table-> string ('Nombre', 100);
             $table-> integer ('telefono');
-            $table-> boolean ('activo');
             $table-> string ('Rh', 5);
             $table-> string ('eps', 50);
             $table->timestamps();
