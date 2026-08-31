@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\clientes;
 use Illuminate\Http\Request;
 use App\Services\clienteService;
+use App\Http\Requests\ClienteStoreRequest;
 
 class ClientesController extends Controller
 {
@@ -29,16 +30,21 @@ class ClientesController extends Controller
      */
     public function create()
     {
-        //
+        return view('clientes.crear');
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store()
+    public function store(ClienteStoreRequest $request)
     {
-        //
+        $datos = $request->validated();
+        $this->clientesService->guardar($datos);
+        return redirect()->route('clientes.index')->with('success', 'Cliente creado correctamente.');
+
     }
+
+    
 
     /**
      * Display the specified resource.
@@ -67,8 +73,9 @@ class ClientesController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy()
+    public function destroy(int $id)
     {
-        //
+        $this->clientesService->eliminar($id);
+        return redirect()->route('clientes.index')->with('success', 'Cliente eliminado correctamente.');
     }
 }
