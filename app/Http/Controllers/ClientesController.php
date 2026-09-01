@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\clientes;
-use Illuminate\Http\Request;
 use App\Services\clienteService;
 use App\Http\Requests\ClienteStoreRequest;
 use App\Http\Requests\ClienteUpdateRequest;
