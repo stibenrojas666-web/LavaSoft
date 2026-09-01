@@ -21,4 +21,10 @@ public function guardar(array $datos){
         return clientes::find($id);
     }
 
+    public function actualizar(int $id, array $datos)
+    {
+        $cliente= clientes::findOrFail($id);
+        $cliente->update($datos);
+        return $cliente;    
+    }
  }
