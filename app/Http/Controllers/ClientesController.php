@@ -6,6 +6,8 @@ use App\Models\clientes;
 use Illuminate\Http\Request;
 use App\Services\clienteService;
 use App\Http\Requests\ClienteStoreRequest;
+use App\Http\Requests\ClienteUpdateRequest;
+
 
 class ClientesController extends Controller
 {
@@ -57,17 +59,20 @@ class ClientesController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit()
+    public function edit(int $id)
     {
-        //
+        $cliente = clientes::findOrFail($id);
+        return view ('clientes.editar', compact('cliente'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update()
-    {
-        //
+    public function update(int $id, clienteUpdateRequest $request){
+        $cliente = clientes::FindOrFail($id);
+         $cliente->update($request->validated());
+        
+        return redirect()->route('clientes.index')->with('success','cliente actualizado');
     }
 
     /**
