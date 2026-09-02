@@ -1,0 +1,64 @@
+@extends('layouts.app')
+
+@section('title')
+    Crear Empleados
+@endsection
+
+@section('content')
+
+<x-card>
+    <h1 class="text-2xl font-bold mb-6 text-pink-600">Nuevo Empleado</h1>
+
+    <form action="{{ route('empleados.store') }}" method="POST" class="space-y-4">
+        @csrf
+
+        {{-- Telefono --}}
+        <div>
+            <label for="telefono" class="block text-gray-700 font-semibold mb-1">Telefono</label>
+            <input type="text" name="telefono" id="telefono"
+                   value="{{ old('telefono') }}"
+                   class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-pink-300
+                          @error('telefono') border-red-500 @enderror">
+            @error('telefono')
+                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+            @enderror
+        </div>
+
+        {{-- Rh --}}
+        <div>
+            <label for="rh" class="block text-gray-700 font-semibold mb-1">rh</label>
+            <input type="text" name="rh" id="rh"
+                   value="{{ old('rh') }}"
+                   class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-pink-300
+                          @error('rh') border-red-500 @enderror">
+            @error('rh')
+                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+            @enderror
+        </div>
+
+        {{-- EPS --}}
+        <div>
+            <label for="eps" class="block text-gray-700 font-semibold mb-1">EPS</label>
+            <input type="text" name="eps" id="eps"
+                   value="{{ old('eps') }}"
+                   class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-pink-300
+                          @error('eps') border-red-500 @enderror">
+            @error('eps')
+                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+            @enderror
+        </div>
+
+        <div class="flex gap-3 mt-6">
+            <button type="submit"
+                class="bg-pink-300 hover:bg-pink-400 text-white font-semibold px-4 py-2 rounded shadow">
+                💾 Guardar
+            </button>
+            <a href="{{ route('empleados.index') }}"
+               class="bg-gray-300 hover:bg-gray-400 text-gray-700 font-semibold px-4 py-2 rounded shadow">
+               ↩️ Cancelar
+            </a>
+        </div>
+    </form>
+</x-card>
+
+@endsection
