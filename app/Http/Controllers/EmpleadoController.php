@@ -66,19 +66,8 @@ class EmpleadoController extends Controller
      */
     public function update(empleadoUpdateRequest $request, int $id)
 {
-    // Forzamos a resolver la clase fresca desde el contenedor
-    $service = app(\App\Services\empleadoService::class);
-    
-    // Si la función del servicio sigue fallando, ejecutamos directo el repositorio
-    if (method_exists($service, 'actualizar')) {
-        $service->actualizar($id, $request->validated());
-    } else {
-        $repo = app(\App\Repositories\empleadoRepository::class);
-        $repo->actualizar($id, $request->validated());
-    }
-
-    return redirect()->route('empleados.index')
-                     ->with('success', 'Empleado actualizado correctamente.');
+    $this->empleadoService->actualizar($id, $request->validated());
+    return redirect()->route('empleados.index')->with('success', 'Empleado actualizado correctamente.');
 }
 
     /**
