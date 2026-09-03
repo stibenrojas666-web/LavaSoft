@@ -1,1 +1,1 @@
-#LavaSoft proyecto que busca la automatización de lavaderos del vehiculos que llevan su registro manualmente
+LavaSoft proyecto que busca la automatización de lavaderos del vehiculos que llevan su registro manualmente

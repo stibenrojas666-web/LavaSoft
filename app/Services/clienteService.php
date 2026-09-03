@@ -15,6 +15,20 @@ class clienteService {
     public function listarTodo(){
         return $this->clienteRepository->listarTodo();
     }
+     public function guardar(array $datos){
+        return $this->clienteRepository->guardar($datos);
+}
 
+public function eliminar(int $id){
+    $this->clienteRepository->eliminar($id);
+    }
+
+    public function buscarPorId(int $id){
+        return $this->clienteRepository->buscarPorId($id);
+    }
+
+    public function actualizar (int $id,array $datos){
+        return $this ->clienteRepository->actualizar ($id, $datos);
+    }
 }
    

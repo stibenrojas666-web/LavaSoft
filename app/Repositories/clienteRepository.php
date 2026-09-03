@@ -8,4 +8,23 @@ class clienteRepository {
 public function listarTodo(){
     return clientes::all();
 }
-}
+
+public function guardar(array $datos){
+    return clientes::create($datos);
+    }
+    
+ public function eliminar(int $id){
+    clientes::destroy($id);
+    }
+
+    public function buscarPorId(int $id){
+        return clientes::find($id);
+    }
+
+    public function actualizar(int $id, array $datos)
+    {
+        $cliente= clientes::findOrFail($id);
+        $cliente->update($datos);
+        return $cliente;    
+    }
+ }
