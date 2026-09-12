@@ -20,7 +20,24 @@
             @csrf
             @method('PUT')
 
-            {{-- Teléfono --}}
+            {{-- IDENTIFICACION --}}
+            <div>
+                <label for="identificacion" class="block text-sm font-medium text-gray-700 mb-1">
+                    Identificacion
+                </label>
+                <input type="text" 
+                       name="identificacion" 
+                       id="identificacion"
+                       inputmode="numeric" pattern="[0-9]*" oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                       value="{{ old('identificacion', (int) $empleado->identificacion) }}"
+                       class="w-full px-4 py-2 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                       required>
+                @error('identificacion')
+                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                @enderror
+            </div>
+
+            {{-- TELEFONO --}}
             <div>
                 <label for="telefono" class="block text-sm font-medium text-gray-700 mb-1">
                     Teléfono
@@ -28,7 +45,8 @@
                 <input type="text" 
                        name="telefono" 
                        id="telefono"
-                       value="{{ old('telefono', $empleado->telefono) }}"
+                       inputmode="numeric" pattern="[0-9]*" oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                      value="{{ old('telefono', (int) $empleado->telefono) }}"
                        class="w-full px-4 py-2 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
                        required>
                 @error('telefono')
@@ -67,6 +85,20 @@
                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                 @enderror
             </div>
+
+            {{-- ESTADO --}}
+            <div>
+            <label for="estado" class="block text-gray-700 font-semibold mb-1">Estado</label>
+            <select name="estado" id="estado"
+                    class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300
+                           @error('estado') border-red-500 @enderror">
+                <option value="1" @selected(old('estado', $empleado->estado) == 1)>Activo</option>
+                <option value="0" @selected(old('estado', $empleado->estado) == 0)>Inactivo</option>
+            </select>
+            @error('estado')
+                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+            @enderror
+        </div>
 
             {{-- Botones --}}
             <div class="flex gap-3 pt-4">
