@@ -8,8 +8,10 @@ class empleado extends Model
 {
     protected $table = 'empleados';
     protected $fillable = [
+        'identificacion',
         'telefono',
         'rh',
         'eps',
+        'estado',
     ];
 }
