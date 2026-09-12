@@ -23,21 +23,17 @@ class servicioUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'Nombre' => 'string|max:255',
-            'Precio' => 'numeric',
-            'Descripcion' => 'string|nullable',
-            'Activo' => 'boolean',
+            'nombre' => 'required|string|max:255',
+            'descripcion' => 'nullable|string',
+            'estado' => 'boolean',
         ];
     }
 
     public function messages(): array
     {
         return [
-            'Nombre.string' => 'El campo Nombre debe ser una cadena de texto.',
-            'Nombre.max' => 'El campo Nombre no debe exceder los 255 caracteres.',
-            'Precio.numeric' => 'El campo Precio debe ser un número.',
-            'Descripcion.string' => 'El campo Descripcion debe ser una cadena de texto.',
-            'Activo.boolean' => 'El campo Activo debe ser verdadero o falso.',
+            'nombre.string' => 'El campo Nombre debe ser una cadena de texto.',
+            'precio.numeric' => 'El campo Precio debe ser un número.',
         ];
     }
 }
