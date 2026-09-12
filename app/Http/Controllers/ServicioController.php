@@ -21,7 +21,8 @@ class ServicioController extends Controller
      */
     public function index()
     {
-
+        $servicios = $this->servicioService->listarTodo();
+        return view('servicios.index', compact('servicios'));
     }
 
     /**
@@ -29,21 +30,23 @@ class ServicioController extends Controller
      */
     public function create()
     {
-        //
+        return view('servicios.crear');
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(servicioStoreRequest $request)
     {
-        //
+        $datos = $request->validated();
+        $this->servicioService->guardar($datos);
+        return redirect()->route('servicios.index')->with('success', 'Servicio creado correctamente.');
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(servicio $servicio)
+    public function show()
     {
         //
     }
@@ -51,24 +54,27 @@ class ServicioController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(servicio $servicio)
+    public function edit(int $id)
     {
-        //
+        $servicio = $this->servicioService->buscarPorId($id);
+        return view('servicios.editar', compact('servicio'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, servicio $servicio)
+    public function update(servicioUpdateRequest $request, int $id)
     {
-        //
+        $this->servicioService->actualizar($id, $request->validated());
+        return redirect()->route('servicios.index')->with('success', 'Servicio actualizado correctamente.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(servicio $servicio)
+    public function destroy(int $id)
     {
-        //
+        $this->servicioService->eliminar($id);
+        return redirect()->route('servicios.index')->with('success', 'Servicio eliminado correctamente');
     }
 }
