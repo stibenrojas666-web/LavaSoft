@@ -20,18 +20,22 @@
         <table class="min-w-full text-left text-gray-700 shadow rounded-lg">
             <thead class="bg-purple-200">
                 <tr>
-                    <th class="px-6 py-3">Teléfono</th>
-                    <th class="px-6 py-3">RH</th>
-                    <th class="px-6 py-3">EPS</th>
+                    <th class="px-6 py-3">Identificacion</th>
+                    <th class="px-6 py-3">Telefono</th>
+                    <th class="px-6 py-3">Rh</th>
+                    <th class="px-6 py-3">Eps</th>
+                    <th class="px-6 py-3">Estado</th>
                     <th class="px-6 py-3">Acciones</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse($empleados as $empleado)
                 <tr class="border-b hover:bg-purple-50">
-                    <td class="px-6 py-3">{{ $empleado->telefono }}</td>
+                    <td class="px-6 py-3">{{(int) $empleado->identificacion }}</td>
+                    <td class="px-6 py-3">{{(int) $empleado->telefono}}</td>
                     <td class="px-6 py-3">{{ $empleado->rh }}</td>
                     <td class="px-6 py-3">{{ $empleado->eps }}</td>
+                    <td class="px-6 py-3">{{ $empleado->estado ? 'Activo' : 'Inactivo'  }}</td>
                     <td class="px-6 py-3 flex gap-2">
                         <a href="{{ route('empleados.edit', $empleado->id) }}"
                            class="bg-blue-300 hover:bg-blue-400 text-white px-3 py-1 rounded">
