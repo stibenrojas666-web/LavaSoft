@@ -13,10 +13,9 @@ return new class extends Migration
     {
         Schema::create('servicios', function (Blueprint $table) {
             $table->id();
-            $table-> string('Nombre', 50);
-            $table-> decimal('Precio', 10, 2);
-            $table-> string('Descripcion', 250);
-            $table-> boolean('Activo')->default(true);
+            $table-> string('nombre', 80);
+            $table-> string('descripcion', 250)->nullable();
+            $table-> boolean('estado');
             $table->timestamps();
         });
     }
