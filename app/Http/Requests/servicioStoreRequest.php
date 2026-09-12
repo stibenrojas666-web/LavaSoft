@@ -23,19 +23,17 @@ class servicioStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'Nombre' => 'required|string|max:255',
-            'Precio' => 'required|numeric',
-            'Descripcion' => 'nullable|string',
-            'Activo' => 'required|boolean',
+            'nombre' => 'required|string|max:255',
+            'descripcion' => 'nullable|string',
+            'estado' => 'boolean',
         ];
     }
 
     public function messages(): array
     {
         return [
-            'Nombre.required' => 'El campo Nombre es obligatorio.',
-            'Precio.required' => 'El campo Precio es obligatorio.',
-            'Activo.required' => 'El campo Activo es obligatorio.',
+            'nombre.required' => 'El campo Nombre es obligatorio.',
+            'precio.required' => 'El campo Precio es obligatorio.',
         ];
     }
 }
