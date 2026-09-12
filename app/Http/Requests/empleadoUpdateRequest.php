@@ -23,18 +23,22 @@ class empleadoUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'identificacion' => 'required|string|max:20',
             'telefono' => 'required|string|max:15',
             'rh' => 'required|string|max:3',
             'eps' => 'required|string|max:50',
+            'estado' => 'required',
         ];
     }
 
     public function messages(): array
     {
         return [
+            'identificacion.required' => 'El campo identificacion es obligatorio.',
             'telefono.required' => 'El campo teléfono es obligatorio.',
             'rh.required' => 'El campo RH es obligatorio.',
             'eps.required' => 'El campo EPS es obligatorio.',
+            'estado' => 'El campo estado es obligatorio.',
         ];
     }
 }
