@@ -29,7 +29,7 @@
                     ['label' => 'Perfiles/Roles', 'route' => 'roles.index',   'icon' => 'shield'],
                     ['label' => 'Clientes',  'route' => 'clientes.index', 'icon' => 'user'],
                     ['label' => 'Empleados',   'route' => 'empleados.index',   'icon' => 'box'],
-                    ['label' => 'Reportes',    'route' => 'reports.index',    'icon' => 'chart'],
+                    ['label' => 'Servicios',    'route' => 'servicios.index',    'icon' => 'chart'],
                     ['label' => 'Configuración', 'route' => 'settings.index', 'icon' => 'cog'],
                 ];
             @endphp
