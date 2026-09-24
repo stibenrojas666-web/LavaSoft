@@ -37,8 +37,7 @@ class empleadoStoreRequest extends FormRequest
             'identificacion.required' => 'El campo identificacion es obligatorio.',
             'telefono.required' => 'El campo teléfono es obligatorio.',
             'rh.required' => 'El campo RH es obligatorio.',
-            'eps.required' => 'El campo EPS es obligatorio.',
-            'estado.required' => 'El compo estado es obligatorio.'
+            'eps.required' => 'El campo EPS es obligatorio.'
         ];
     }
 }
