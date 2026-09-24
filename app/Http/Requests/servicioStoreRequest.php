@@ -32,8 +32,7 @@ class servicioStoreRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'nombre.required' => 'El campo Nombre es obligatorio.',
-            'precio.required' => 'El campo Precio es obligatorio.',
+            'nombre.required' => 'El campo Nombre es obligatorio.'
         ];
     }
 }

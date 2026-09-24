@@ -32,6 +32,7 @@
                     ['label' => 'Servicios',    'route' => 'servicios.index',    'icon' => 'chart'],
                     ['label' => 'Configuración', 'route' => 'settings.index', 'icon' => 'cog'],
                     ['label' => 'Vehiculos',  'route' => 'vehiculos.index', 'icon' => 'user'],
+                    ['label' => 'tipoVehiculo', 'route' => 'tipoVehiculo.index', 'icon' => 'cog'],
                 ];
             @endphp
 

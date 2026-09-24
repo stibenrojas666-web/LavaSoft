@@ -23,7 +23,7 @@ class servicioRepository
 
     public function buscarPorId(int $id)
     {
-        return servicio::find($id);
+        return servicio::findOrFail($id);
     }
 
     public function actualizar(int $id, array $datos)

@@ -23,7 +23,7 @@ class empleadoRepository
 
     public function buscarPorId(int $id)
     {
-        return empleado::find($id);
+        return empleado::findOrFail($id);
     }
 
     public function actualizar(int $id, array $datos)
