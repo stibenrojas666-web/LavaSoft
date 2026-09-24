@@ -31,6 +31,7 @@
                     ['label' => 'Empleados',   'route' => 'empleados.index',   'icon' => 'box'],
                     ['label' => 'Servicios',    'route' => 'servicios.index',    'icon' => 'chart'],
                     ['label' => 'Configuración', 'route' => 'settings.index', 'icon' => 'cog'],
+                    ['label' => 'Vehiculos',  'route' => 'vehiculos.index', 'icon' => 'user'],
                 ];
             @endphp
 

@@ -5,6 +5,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmpleadoController;
 use App\Http\Controllers\ClientesController;
 use App\Http\Controllers\ServicioController;
+use App\Http\Controllers\VehiculoController;
 
 Route::get('/', [DashboardController::class, 'index'])
         ->name('dashboard.index');
@@ -12,3 +13,4 @@ Route::get('/', [DashboardController::class, 'index'])
 Route::resource('empleados',EmpleadoController::class);
 Route::resource('clientes',ClientesController::class);
 Route::resource('servicios',ServicioController::class);
+Route::resource('vehiculos',VehiculoController::class);

@@ -14,4 +14,8 @@ class clientes extends Model
     'emailCliente',
   ];
     
+      public function vehiculo()
+    {
+        return $this->hasMany(clientes::class); /**, 'clienteID' */
+    } 
 }

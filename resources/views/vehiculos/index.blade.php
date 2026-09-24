@@ -41,7 +41,7 @@
                            class="bg-blue-300 hover:bg-blue-400 text-white px-3 py-1 rounded">
                            ✏️ Editar
                         </a>
-                        <form action="{{ route('empleados.destroy', $empleado->id) }}" method="POST">
+                        <form action="{{ route('empleados.destroy', $empleado->id) }}" method="POST" onsubmit="return confirm('¿Está seguro de eliminar este empleado?');">
                             @csrf
                             @method('DELETE')
                             <button type="submit"
@@ -53,8 +53,8 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="6" class="px-6 py-4 text-center text-gray-500">
-                        No hay empleados registrados.
+                    <td colspan="4" class="px-6 py-4 text-center text-gray-500">
+                        
                     </td>
                 </tr>
                 @endforelse
