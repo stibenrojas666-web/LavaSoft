@@ -13,7 +13,13 @@ return new class extends Migration
     {
         Schema::create('precio_servicios', function (Blueprint $table) {
             $table->id();
+            $table->decimal('precio');
             $table->timestamps();
+            $table->unsignedBigInteger('servicioid');
+            $table->unsignedBigInteger('tipoVehiculoid');
+
+            $table->foreign('servicioid')->references('id')->on('servicios');
+            $table->foreign('tipoServicioid')->references('id')->on('tipo_vehiculos');
         });
     }
 
