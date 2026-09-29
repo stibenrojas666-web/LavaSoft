@@ -3,17 +3,16 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Models\clientes;
 
 class vehiculo extends Model
 {
     protected $table = 'vehiculos';
+
     protected $fillable = [
         'clienteID',
         'tipoVehiculoId',
         'placa',
         'modelo',
-        'color',
         'color',
         'estado'
     ];
@@ -25,6 +24,6 @@ class vehiculo extends Model
 
     public function tipoVehiculo()
     {
-        return $this->belongsTo(clientes::class, 'tipoVehiculoId');
+        return $this->belongsTo(tipoVehiculo::class, 'tipoVehiculoId');
     }
 }
