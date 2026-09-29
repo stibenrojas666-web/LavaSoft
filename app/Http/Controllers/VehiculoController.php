@@ -29,7 +29,7 @@ private tipoVehiculoService $tipoVehiculoService;
     {
         $vehiculo = $this->VehiculoService->getAll();
 
-        return view('Vehiculo.index', compact('vehiculo'));
+        return view('Vehiculos.index', compact('vehiculo'));
     }
 
     /**
@@ -50,7 +50,7 @@ private tipoVehiculoService $tipoVehiculoService;
     {
         $datos = $vehiculoStoreRequest->validated();
         $this->VehiculoService->keep($datos);
-        return redirect()->route('vehiculo.index')>with('success','Vehículo creado correctamente.');
+        return redirect()->route('vehiculos.index')->with('success','Vehículo creado correctamente.');
     }
 
     /**
@@ -69,7 +69,7 @@ private tipoVehiculoService $tipoVehiculoService;
         $vehiculo = $this->VehiculoService->findById($id);
         $cliente = $this->clienteService->listarTodo();
         $tipoVehiculo = $this->tipoVehiculoService->listarTodo();
-        return view('Vehiculo.editar',compact('vehiculo','cliente','tipoVehiculo'));
+        return view('Vehiculos.editar',compact('vehiculo','cliente','tipoVehiculo'));
 
         }
 
@@ -80,7 +80,7 @@ private tipoVehiculoService $tipoVehiculoService;
     {
         $datos = $vehiculoUpdateRequest->validated();
         $this->VehiculoService->update($id,$datos);
-        return redirect()->route('vehiculo.index')->with('success', 'Vehículo actualizado correctamente.');      
+        return redirect()->route('vehiculos.index')->with('success', 'Vehículo actualizado correctamente.');      
     }
 
     /**
@@ -91,7 +91,7 @@ private tipoVehiculoService $tipoVehiculoService;
         $this->VehiculoService->delete($id);
 
         return redirect()
-            ->route('vehiculo.index')
+            ->route('vehiculos.index')
             ->with('success', 'Vehículo eliminado correctamente.');
     }
 }
