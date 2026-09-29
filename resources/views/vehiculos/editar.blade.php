@@ -1,117 +1,152 @@
 @extends('layouts.app')
 
 @section('title')
-    Empleados - Editar
+    Editar Vehículo
 @endsection
 
 @section('content')
-    <x-card>
-        <div class="flex items-center justify-between mb-6">
-            <h1 class="text-2xl font-bold text-blue-700">
-                Editar Empleado
-            </h1>
-            <a href="{{ route('empleados.index') }}" 
-               class="text-sm text-blue-600 hover:text-blue-800 font-medium">
-                ← Volver al listado
-            </a>
+
+<x-card>
+
+    <div class="flex items-center justify-between mb-6">
+        <h1 class="text-3xl font-bold text-cyan-700">
+            ✏️ Editar Vehículo
+        </h1>
+
+        <a href="{{ route('vehiculos.index') }}"
+            class="text-sm text-cyan-600 hover:text-cyan-800 font-medium">
+            ← Volver al listado
+        </a>
+    </div>
+
+    <form action="{{ route('vehiculos.update', $vehiculo->id) }}" method="POST">
+        @csrf
+        @method('PUT')
+
+        {{-- Cliente --}}
+        <div class="mb-4">
+            <label for="clienteID" class="block text-gray-700 font-semibold mb-1">Cliente</label>
+
+            <select name="clienteID" id="clienteID"
+                class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-400 @error('clienteID') border-red-500 @enderror">
+
+                <option value="">Seleccione un cliente</option>
+
+                @foreach($cliente as $c)
+                    <option value="{{ $c->id }}"
+                        {{ old('clienteID', $vehiculo->clienteID) == $c->id ? 'selected' : '' }}>
+                        {{ $c->nombreCliente }} {{ $c->apellidoCliente }}
+                    </option>
+                @endforeach
+            </select>
+
+            @error('clienteID')
+                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+            @enderror
         </div>
 
-        <form action="{{ route('empleados.update', $empleado->id) }}" method="POST" class="space-y-5">
-            @csrf
-            @method('PUT')
+        {{-- Tipo de vehículo --}}
+        <div class="mb-4">
+            <label for="tipoVehiculoId" class="block text-gray-700 font-semibold mb-1">Tipo de Vehículo</label>
 
-            {{-- IDENTIFICACION --}}
-            <div>
-                <label for="identificacion" class="block text-sm font-medium text-gray-700 mb-1">
-                    Identificacion
-                </label>
-                <input type="text" 
-                       name="identificacion" 
-                       id="identificacion"
-                       inputmode="numeric" pattern="[0-9]*" oninput="this.value = this.value.replace(/[^0-9]/g, '')"
-                       value="{{ old('identificacion', (int) $empleado->identificacion) }}"
-                       class="w-full px-4 py-2 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
-                       required>
-                @error('identificacion')
-                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                @enderror
-            </div>
+            <select name="tipoVehiculoId" id="tipoVehiculoId"
+                class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-400 @error('tipoVehiculoId') border-red-500 @enderror">
 
-            {{-- TELEFONO --}}
-            <div>
-                <label for="telefono" class="block text-sm font-medium text-gray-700 mb-1">
-                    Teléfono
-                </label>
-                <input type="text" 
-                       name="telefono" 
-                       id="telefono"
-                       inputmode="numeric" pattern="[0-9]*" oninput="this.value = this.value.replace(/[^0-9]/g, '')"
-                      value="{{ old('telefono', (int) $empleado->telefono) }}"
-                       class="w-full px-4 py-2 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
-                       required>
-                @error('telefono')
-                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                @enderror
-            </div>
+                <option value="">Seleccione un tipo</option>
 
-            {{-- RH --}}
-            <div>
-                <label for="rh" class="block text-sm font-medium text-gray-700 mb-1">
-                    RH
-                </label>
-                <input type="text" 
-                       name="rh" 
-                       id="rh"
-                       value="{{ old('rh', $empleado->rh) }}"
-                       class="w-full px-4 py-2 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
-                       required>
-                @error('rh')
-                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                @enderror
-            </div>
-
-            {{-- EPS --}}
-            <div>
-                <label for="eps" class="block text-sm font-medium text-gray-700 mb-1">
-                    EPS
-                </label>
-                <input type="text" 
-                       name="eps" 
-                       id="eps"
-                       value="{{ old('eps', $empleado->eps) }}"
-                       class="w-full px-4 py-2 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
-                       required>
-                @error('eps')
-                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                @enderror
-            </div>
-
-            {{-- ESTADO --}}
-            <div>
-            <label for="estado" class="block text-gray-700 font-semibold mb-1">Estado</label>
-            <select name="estado" id="estado"
-                    class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300
-                           @error('estado') border-red-500 @enderror">
-                <option value="1" @selected(old('estado', $empleado->estado) == 1)>Activo</option>
-                <option value="0" @selected(old('estado', $empleado->estado) == 0)>Inactivo</option>
+                @foreach($tipoVehiculo as $tv)
+                    <option value="{{ $tv->id }}"
+                        {{ old('tipoVehiculoId', $vehiculo->tipoVehiculoId) == $tv->id ? 'selected' : '' }}>
+                        {{ $tv->nombre }}
+                    </option>
+                @endforeach
             </select>
+
+            @error('tipoVehiculoId')
+                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+            @enderror
+        </div>
+
+        {{-- Placa --}}
+        <div class="mb-4">
+            <label for="placa" class="block text-gray-700 font-semibold mb-1">Placa</label>
+
+            <input type="text" name="placa" id="placa"
+                value="{{ old('placa', $vehiculo->placa) }}"
+                placeholder="ABC123"
+                class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-400 @error('placa') border-red-500 @enderror">
+
+            @error('placa')
+                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+            @enderror
+        </div>
+
+        {{-- Modelo --}}
+        <div class="mb-4">
+            <label for="modelo" class="block text-gray-700 font-semibold mb-1">Modelo</label>
+
+            <input type="text" name="modelo" id="modelo"
+                value="{{ old('modelo', $vehiculo->modelo) }}"
+                placeholder="Toyota Corolla"
+                class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-400 @error('modelo') border-red-500 @enderror">
+
+            @error('modelo')
+                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+            @enderror
+        </div>
+
+        {{-- Color --}}
+        <div class="mb-4">
+            <label for="color" class="block text-gray-700 font-semibold mb-1">Color</label>
+
+            <input type="text" name="color" id="color"
+                value="{{ old('color', $vehiculo->color) }}"
+                placeholder="Rojo"
+                class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-400 @error('color') border-red-500 @enderror">
+
+            @error('color')
+                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+            @enderror
+        </div>
+
+        {{-- Estado --}}
+        <div class="mb-6">
+            <label for="estado" class="block text-gray-700 font-semibold mb-1">Estado</label>
+
+            <select name="estado" id="estado"
+                class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-400 @error('estado') border-red-500 @enderror">
+
+                <option value="Activo"
+                    {{ old('estado', $vehiculo->estado) == 'Activo' ? 'selected' : '' }}>
+                    Activo
+                </option>
+
+                <option value="Inactivo"
+                    {{ old('estado', $vehiculo->estado) == 'Inactivo' ? 'selected' : '' }}>
+                    Inactivo
+                </option>
+            </select>
+
             @error('estado')
                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
             @enderror
         </div>
 
-            {{-- Botones --}}
-            <div class="flex gap-3 pt-4">
-                <button type="submit" 
-                        class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm transition duration-200">
-                    Guardar cambios
-                </button>
+        {{-- Botones --}}
+        <div class="flex justify-end gap-2">
+            <a href="{{ route('vehiculos.index') }}"
+                class="bg-gray-500 hover:bg-gray-700 text-white font-semibold px-4 py-2 rounded-lg shadow">
+                Cancelar
+            </a>
 
-                <a href="{{ route('empleados.index') }}" 
-                   class="px-6 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition duration-200">
-                    Cancelar
-                </a>
-            </div>
-        </form>
-    </x-card>
+            <button type="submit"
+                class="bg-cyan-600 hover:bg-cyan-800 text-white font-semibold px-4 py-2 rounded-lg shadow">
+                💾 Guardar cambios
+            </button>
+        </div>
+
+    </form>
+
+</x-card>
+
 @endsection
