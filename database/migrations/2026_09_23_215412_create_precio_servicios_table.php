@@ -13,13 +13,15 @@ return new class extends Migration
     {
         Schema::create('precio_servicios', function (Blueprint $table) {
             $table->id();
-            $table->decimal('precio');
+            $table->unsignedBigInteger('servicio_id');
+            $table->unsignedBigInteger('tipo_vehiculo_id');
+            $table->foreign('servicio_id')->references('id')->on('servicios');
+            $table->foreign('tipo_vehiculo_id')->references('id')->on('tipo_vehiculos');
+            $table->decimal('precio',10,2);
             $table->timestamps();
-            $table->unsignedBigInteger('servicioid');
-            $table->unsignedBigInteger('tipoVehiculoid');
+            
 
-            $table->foreign('servicioid')->references('id')->on('servicios');
-            $table->foreign('tipoServicioid')->references('id')->on('tipo_vehiculos');
+            
         });
     }
 
