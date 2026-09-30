@@ -12,7 +12,7 @@ class precioServicioUpdateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,8 +22,20 @@ class precioServicioUpdateRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            //
+        return[
+            'servicio_id' => 'required|exists:servicios,id',
+            'tipo_vehiculo_id' => 'required|exists:tipo_vehiculos,id',
+            'precio' => 'required|numeric|min:0',
+        ];
+    }
+
+    public function messages(): array
+    {
+        return[
+            'servicio_id.required' => 'Debes seleccionar un servicio.',
+            'tipo_vehiculo_id.required' => 'Debes seleccionar un tipo de vehículo.',
+            'precio.required' => 'El campo Precio es obligatorio.',
+            'precio.numeric' => 'El campo Precio debe ser un número.',
         ];
     }
 }
