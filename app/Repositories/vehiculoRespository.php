@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Repositories;
-Use App\Models\vehiculo;
+use App\Models\vehiculo;
 
 class VehiculoRespository{
     public function getAll(){

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AgendaController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmpleadoController;
@@ -17,3 +18,4 @@ Route::resource('servicios',ServicioController::class);
 Route::resource('vehiculos',VehiculoController::class);
 Route::resource('servicios', ServicioController::class);
 Route::resource('tipoVehiculo', TipoVehiculoController::class);
+Route::resource('agenda',AgendaController::class);
