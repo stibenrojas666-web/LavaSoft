@@ -1,10 +1,12 @@
 <?php
 
+use App\Http\Controllers\AgendaController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmpleadoController;
 use App\Http\Controllers\ClientesController;
 use App\Http\Controllers\ServicioController;
+use App\Http\Controllers\VehiculoController;
 use App\Http\Controllers\TipoVehiculoController;
 
 Route::get('/', [DashboardController::class, 'index'])
@@ -12,5 +14,9 @@ Route::get('/', [DashboardController::class, 'index'])
 
 Route::resource('empleados',EmpleadoController::class);
 Route::resource('clientes',ClientesController::class);
+Route::resource('servicios',ServicioController::class);
+Route::resource('vehiculos',VehiculoController::class);
 Route::resource('servicios', ServicioController::class);
 Route::resource('tipoVehiculo', TipoVehiculoController::class);
+Route::resource('agenda',AgendaController::class);
+

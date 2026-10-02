@@ -14,4 +14,10 @@ class empleado extends Model
         'eps',
         'estado',
     ];
+
+    public function agendas()
+    {
+        return $this->hasMany(agenda::class);
+    }
+
 }
