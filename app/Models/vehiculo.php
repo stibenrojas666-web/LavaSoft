@@ -26,4 +26,9 @@ class vehiculo extends Model
     {
         return $this->belongsTo(tipoVehiculo::class, 'tipoVehiculoId');
     }
+
+    public function agendas()
+    {
+        return $this->hasMany(agenda::class);
+    }
 }

@@ -18,4 +18,9 @@ class clientes extends Model
     {
         return $this->hasMany(clientes::class); /**, 'clienteID' */
     } 
+
+    PUblic function agendas()
+    {
+        return $this->hasMany(agenda::class);
+    }
 }

@@ -19,3 +19,4 @@ Route::resource('vehiculos',VehiculoController::class);
 Route::resource('servicios', ServicioController::class);
 Route::resource('tipoVehiculo', TipoVehiculoController::class);
 Route::resource('agenda',AgendaController::class);
+
