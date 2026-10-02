@@ -32,11 +32,10 @@
                     ['label' => 'Servicios',    'route' => 'servicios.index',    'icon' => 'chart'],
                     ['label' => 'Configuración', 'route' => 'settings.index', 'icon' => 'cog'],
                     ['label' => 'Vehiculos',  'route' => 'vehiculos.index', 'icon' => 'user'],
-                    ['label' => 'tipoVehiculo', 'route' => 'tipoVehiculo.index', 'icon' => 'cog'],
+                    ['label' => 'tipo Vehiculo', 'route' => 'tipoVehiculo.index', 'icon' => 'cog'],
                     ['label' => 'Agenda', 'route' => 'agenda.index', 'icon' => 'calendar'],
-                    ['label' => 'tipoVehiculo', 'route' => 'tipoVehiculo.index', 'icon' => 'cog'],
-                    ['label' => 'precioServicio', 'route' => 'precioServicio.index', 'icon' => 'cog'],
-                    ['label' => 'Configuración', 'route' => 'settings.index', 'icon' => 'cog'],
+                    ['label' => 'precio Servicio', 'route' => 'precioServicio.index', 'icon' => 'calendar'],
+                    ['label' => 'Configuración', 'route' => 'settings.index', 'icon' => 'calendar'],
                     
                 ];
             @endphp
