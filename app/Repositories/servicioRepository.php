@@ -2,34 +2,34 @@
 
 namespace App\Repositories;
 
-use App\Models\empleado;
+use App\Models\servicio;
 
-class empleadoRepository
+class servicioRepository
 {
     public function listarTodo()
     {
-        return empleado::all();
+        return servicio::all();
     }
 
     public function guardar(array $datos)
     {
-        return empleado::create($datos);
+        return servicio::create($datos);
     }
 
     public function eliminar(int $id)
     {
-        empleado::destroy($id);
+        servicio::destroy($id);
     }
 
     public function buscarPorId(int $id)
     {
-        return empleado::findOrFail($id);
+        return servicio::findOrFail($id);
     }
 
     public function actualizar(int $id, array $datos)
     {
-        $empleado = empleado::findOrFail($id);
-        $empleado->update($datos);
-        return $empleado;
+        $servicio = servicio::findOrFail($id);
+        $servicio->update($datos);
+        return $servicio;
     }
 }
