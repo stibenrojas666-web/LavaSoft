@@ -12,7 +12,7 @@ class turnoUpdateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -23,7 +23,18 @@ class turnoUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'empleado_id' => 'required|exists:empleados,id',
+            'dia' => 'required|string|in:lunes,martes,miercoles,jueves,viernes,sabado,domingo',
+            'jornada' => 'required|string|in:mañana,tarde,noche',
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'empleado_id.required' => 'Debes seleccionar un empleado.',
+            'dia.required' => 'Debes seleccionar el día.',
+            'jornada.required' => 'Debes seleccionar la jornada.',
         ];
     }
 }
