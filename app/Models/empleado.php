@@ -8,8 +8,16 @@ class empleado extends Model
 {
     protected $table = 'empleados';
     protected $fillable = [
+        'identificacion',
         'telefono',
         'rh',
         'eps',
+        'estado',
     ];
+
+    public function agendas()
+    {
+        return $this->hasMany(agenda::class);
+    }
+
 }

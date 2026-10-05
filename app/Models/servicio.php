@@ -1,0 +1,20 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class servicio extends Model
+{
+    protected $table = 'servicios';
+    protected $fillable = [
+        'nombre',
+        'descripcion',
+        'estado',
+    ];
+
+    public function pagos()
+    {
+        return $this->hasMany(pago::class, 'servicioId');
+    }
+}
