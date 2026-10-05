@@ -23,6 +23,8 @@ class empleadoUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'nombre' => 'required|string|max:20',
+            'apellido' => 'required|string|max:20',
             'identificacion' => 'required|string|max:20',
             'telefono' => 'required|string|max:15',
             'rh' => 'required|string|max:3',
@@ -34,6 +36,8 @@ class empleadoUpdateRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'nombre.required' => 'El campo Nombre es obligatorio.',
+'apellido.required' => 'El campo Apellido es obligatorio.',
             'identificacion.required' => 'El campo identificacion es obligatorio.',
             'telefono.required' => 'El campo teléfono es obligatorio.',
             'rh.required' => 'El campo RH es obligatorio.',
