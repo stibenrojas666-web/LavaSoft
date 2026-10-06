@@ -12,4 +12,9 @@ class servicio extends Model
         'descripcion',
         'estado',
     ];
+
+    public function pagos()
+    {
+        return $this->hasMany(pago::class, 'servicioId');
+    }
 }

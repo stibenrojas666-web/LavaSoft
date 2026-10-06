@@ -32,4 +32,15 @@ class agenda extends Model
     {
         return $this->belongsTo(vehiculo::class, 'vehiculoId');
     }
+
+    public function pago()
+    {
+        return $this->hasOne(pago::class, 'agendaId');
+    }
+
+    public function agendaServicios()
+    {
+        return $this->hasMany(agendaServicios::class, 'agendaId');
+    }
+
 }
