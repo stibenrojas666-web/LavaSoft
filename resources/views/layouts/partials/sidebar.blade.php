@@ -24,21 +24,37 @@
 
             @php
                 $links = [
-                    ['label' => 'Dashboard',   'route' => 'dashboard.index',  'icon' => 'home'],
-                    ['label' => 'Usuarios',    'route' => 'users.index',      'icon' => 'users'],
-                    ['label' => 'Perfiles/Roles', 'route' => 'roles.index',   'icon' => 'shield'],
-                    ['label' => 'Clientes',  'route' => 'clientes.index', 'icon' => 'users'],
-                    ['label' => 'Empleados',   'route' => 'empleados.index',   'icon' => 'box'],
-                    ['label' => 'Servicios',    'route' => 'servicios.index',    'icon' => 'chart'],
-                    ['label' => 'Configuración', 'route' => 'settings.index', 'icon' => 'cog'],
-                    ['label' => 'Vehiculos',  'route' => 'vehiculos.index', 'icon' => 'user'],
-                    ['label' => 'tipo Vehiculo', 'route' => 'tipoVehiculo.index', 'icon' => 'cog'],
-                    ['label' => 'Agenda', 'route' => 'agenda.index', 'icon' => 'calendar'],
-                    ['label' => 'precio Servicio', 'route' => 'precioServicio.index', 'icon' => 'calendar'],
-                    ['label' => 'Configuración', 'route' => 'settings.index', 'icon' => 'calendar'],
-                    ['label' => 'Servicios por Cita', 'route' => 'agendaServicio.index', 'icon' => 'calendar'],
-                    ['label' => 'Pagos', 'route' => 'pagos.index', 'icon' => 'calendar'],
-                    ['label' => 'Turnos', 'route' => 'turnos.index', 'icon' => 'calendar'],
+                    
+                // Dashboard
+                ['label' => 'Dashboard', 'route' => 'dashboard.index', 'icon' => 'home'],
+
+                // Seguridad
+                ['label' => 'Usuarios', 'route' => 'users.index', 'icon' => 'users'],
+                ['label' => 'Perfiles / Roles', 'route' => 'roles.index', 'icon' => 'shield'],
+
+                // Clientes y personal
+                ['label' => 'Clientes', 'route' => 'clientes.index', 'icon' => 'users'],
+                ['label' => 'Empleados', 'route' => 'empleados.index', 'icon' => 'users'],
+
+                // Vehículos
+                ['label' => 'Vehículos', 'route' => 'vehiculos.index', 'icon' => 'truck'],
+                ['label' => 'Tipos de Vehículo', 'route' => 'tipoVehiculo.index', 'icon' => 'truck'],
+
+                // Servicios
+                ['label' => 'Servicios', 'route' => 'servicios.index', 'icon' => 'briefcase'],
+                ['label' => 'Precios de Servicios', 'route' => 'precioServicio.index', 'icon' => 'dollar-sign'],
+
+                // Agenda y operaciones
+                ['label' => 'Agenda', 'route' => 'agenda.index', 'icon' => 'calendar'],
+                ['label' => 'Servicios por Cita', 'route' => 'agendaServicio.index', 'icon' => 'clipboard'],
+                ['label' => 'Turnos', 'route' => 'turnos.index', 'icon' => 'clock'],
+
+                // Facturación
+                ['label' => 'Pagos', 'route' => 'pagos.index', 'icon' => 'credit-card'],
+
+                // Sistema
+                ['label' => 'Configuración', 'route' => 'settings.index', 'icon' => 'cog'],
+
                     
                 ];
             @endphp
