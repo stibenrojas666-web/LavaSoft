@@ -12,6 +12,7 @@ use App\Http\Controllers\TipoVehiculoController;
 use App\Http\Controllers\PrecioServicioController;
 use App\Http\Controllers\PagoController;
 
+use App\Http\Controllers\TurnoController;
 
 Route::get('/', [DashboardController::class, 'index'])
         ->name('dashboard.index');
@@ -25,4 +26,6 @@ Route::resource('tipoVehiculo', TipoVehiculoController::class);
 Route::resource('agenda',AgendaController::class);
 Route::resource('precioServicio',PrecioServicioController::class);
 Route::resource('agendaServicio',AgendaServiciosController::class);
-Route::resource('pagos', PagoController::class);
+Route::resource('pagos',PagoController::class);
+Route::resource('turnos',TurnoController::class);
+

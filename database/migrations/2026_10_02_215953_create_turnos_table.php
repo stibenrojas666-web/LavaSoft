@@ -11,15 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('empleados', function (Blueprint $table) {
+        Schema::create('turnos', function (Blueprint $table) {
             $table->id();
-            $table->string('nombre' ,20);
-            $table->string('apellido' ,20);
-            $table->string('identificacion' , 20);
-            $table->string('telefono', 15);
-            $table->string('rh', 5);
-            $table->string('eps', 50);
-            $table->boolean('estado');
+            $table->unsignedBigInteger('empleado_id');
+            $table->foreign('empleado_id')->references('id')->on('empleados');
+            $table->string('dia', 10);
+            $table->string('jornada', 10);
             $table->timestamps();
         });
     }
@@ -29,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('empleados');
+        Schema::dropIfExists('turnos');
     }
 };

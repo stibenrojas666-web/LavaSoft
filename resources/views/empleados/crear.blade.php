@@ -7,19 +7,44 @@
 @section('content')
 
 <x-card>
-    <h1 class="text-2xl font-bold mb-6 text-pink-600">Nuevo Empleado</h1>
+    <h1 class="text-3xl font-bold mb-6 text-cyan-700">
+        👷 Registrar Nuevo Empleado
+    </h1>
 
-    <form action="{{ route('empleados.store') }}" method="POST" class="space-y-4">
+    <form action="{{ route('empleados.store') }}" method="POST">
         @csrf
 
+        {{-- Nombre --}}
+<div class="mb-4">
+    <label for="nombre" class="block text-gray-700 font-semibold mb-1">Nombre</label>
+    <input type="text" name="nombre" id="nombre"
+           value="{{ old('nombre') }}"
+           class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-400
+                  @error('nombre') border-red-500 @enderror">
+    @error('nombre')
+        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+    @enderror
+</div>
 
-         {{-- IDENTIFICACION --}}
-        <div>
-            <label for="identificacion" class="block text-gray-700 font-semibold mb-1">identificacion</label>
+        {{-- Apellido --}}
+        <div class="mb-4">
+            <label for="apellido" class="block text-gray-700 font-semibold mb-1">Apellido</label>
+            <input type="text" name="apellido" id="apellido"
+                   value="{{ old('apellido') }}"
+                   class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-400
+                          @error('apellido') border-red-500 @enderror">
+            @error('apellido')
+                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+            @enderror
+        </div>
+
+        {{-- IDENTIFICACION --}}
+        <div class="mb-4">
+            <label for="identificacion" class="block text-gray-700 font-semibold mb-1">Identificación</label>
             <input type="text" name="identificacion" id="identificacion"
-            inputmode="numeric" pattern="[0-9]*" oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                   inputmode="numeric" pattern="[0-9]*" oninput="this.value = this.value.replace(/[^0-9]/g, '')"
                    value="{{ old('identificacion') }}"
-                   class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-pink-300
+                   class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-400
                           @error('identificacion') border-red-500 @enderror">
             @error('identificacion')
                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -27,12 +52,12 @@
         </div>
 
         {{-- Telefono --}}
-        <div>
-            <label for="telefono" class="block text-gray-700 font-semibold mb-1">Telefono</label>
+        <div class="mb-4">
+            <label for="telefono" class="block text-gray-700 font-semibold mb-1">Teléfono</label>
             <input type="text" name="telefono" id="telefono"
-            inputmode="numeric" pattern="[0-9]*" oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                   inputmode="numeric" pattern="[0-9]*" oninput="this.value = this.value.replace(/[^0-9]/g, '')"
                    value="{{ old('telefono') }}"
-                   class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-pink-300
+                   class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-400
                           @error('telefono') border-red-500 @enderror">
             @error('telefono')
                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -40,11 +65,11 @@
         </div>
 
         {{-- Rh --}}
-        <div>
-            <label for="rh" class="block text-gray-700 font-semibold mb-1">rh</label>
+        <div class="mb-4">
+            <label for="rh" class="block text-gray-700 font-semibold mb-1">Rh</label>
             <input type="text" name="rh" id="rh"
                    value="{{ old('rh') }}"
-                   class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-pink-300
+                   class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-400
                           @error('rh') border-red-500 @enderror">
             @error('rh')
                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -52,22 +77,22 @@
         </div>
 
         {{-- EPS --}}
-        <div>
+        <div class="mb-4">
             <label for="eps" class="block text-gray-700 font-semibold mb-1">EPS</label>
             <input type="text" name="eps" id="eps"
                    value="{{ old('eps') }}"
-                   class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-pink-300
+                   class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-400
                           @error('eps') border-red-500 @enderror">
             @error('eps')
                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
             @enderror
         </div>
 
-        {{-- EPS --}}
-        <div>
-            <label for="estado" class="block text-gray-700 font-semibold mb-1">estado</label>
+        {{-- Estado --}}
+        <div class="mb-6">
+            <label for="estado" class="block text-gray-700 font-semibold mb-1">Estado</label>
             <select name="estado" id="estado"
-                    class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300
+                    class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-400
                            @error('estado') border-red-500 @enderror">
                 <option value="1" @selected(old('estado') == 1)>Activo</option>
                 <option value="0" @selected(old('estado') == 0)>Inactivo</option>
@@ -77,15 +102,15 @@
             @enderror
         </div>
 
-        <div class="flex gap-3 mt-6">
-            <button type="submit"
-                class="bg-pink-300 hover:bg-pink-400 text-white font-semibold px-4 py-2 rounded shadow">
-                💾 Guardar
-            </button>
+        <div class="flex justify-end gap-2">
             <a href="{{ route('empleados.index') }}"
-               class="bg-gray-300 hover:bg-gray-400 text-gray-700 font-semibold px-4 py-2 rounded shadow">
-               ↩️ Cancelar
+                class="bg-gray-500 hover:bg-gray-700 text-white font-semibold px-4 py-2 rounded-lg shadow">
+                Cancelar
             </a>
+            <button type="submit"
+                class="bg-cyan-600 hover:bg-cyan-800 text-white font-semibold px-4 py-2 rounded-lg shadow">
+                💾 Guardar Empleado
+            </button>
         </div>
     </form>
 </x-card>

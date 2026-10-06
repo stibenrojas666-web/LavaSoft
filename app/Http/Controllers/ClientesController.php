@@ -69,7 +69,7 @@ class ClientesController extends Controller
      */
     public function update(int $id, clienteUpdateRequest $request){
         $cliente = clientes::FindOrFail($id);
-         $cliente->update($request->validated());
+        $cliente->update($request->validated());
         
         return redirect()->route('clientes.index')->with('success','cliente actualizado');
     }

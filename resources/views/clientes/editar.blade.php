@@ -5,97 +5,82 @@
 @endsection
 
 @section('content')
-    <x-card>
-        <div class="flex items-center justify-between mb-6">
-            <h1 class="text-2xl font-bold text-blue-700">
-                Editar Cliente
-            </h1>
-            <a href="{{ route('clientes.index') }}" 
-               class="text-sm text-blue-600 hover:text-blue-800 font-medium">
-                ← Volver al listado
-            </a>
+
+<x-card>
+
+    <div class="flex items-center justify-between mb-6">
+        <h1 class="text-3xl font-bold text-cyan-700">
+            ✏️ Editar Cliente
+        </h1>
+        <a href="{{ route('clientes.index') }}"
+            class="text-sm text-cyan-600 hover:text-cyan-800 font-medium">
+            ← Volver al listado
+        </a>
+    </div>
+
+    <form action="{{ route('clientes.update', $cliente) }}" method="POST">
+        @csrf
+        @method('PUT')
+
+        {{-- Nombre --}}
+        <div class="mb-4">
+            <label for="nombreCliente" class="block text-gray-700 font-semibold mb-1">Nombre</label>
+            <input type="text" name="nombreCliente" id="nombreCliente"
+                   value="{{ old('nombreCliente', $cliente->nombreCliente) }}"
+                   class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-400
+                          @error('nombreCliente') border-red-500 @enderror">
+            @error('nombreCliente')
+                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+            @enderror
         </div>
 
-        <form action="{{ route('clientes.update', $cliente) }}" method="POST" class="space-y-5">
- 
-            @csrf
-            @method('PUT')
+        {{-- Apellido --}}
+        <div class="mb-4">
+            <label for="apellidoCliente" class="block text-gray-700 font-semibold mb-1">Apellido</label>
+            <input type="text" name="apellidoCliente" id="apellidoCliente"
+                   value="{{ old('apellidoCliente', $cliente->apellidoCliente) }}"
+                   class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-400
+                          @error('apellidoCliente') border-red-500 @enderror">
+            @error('apellidoCliente')
+                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+            @enderror
+        </div>
 
-            {{-- Nombre --}}
-            <div>
-                <label for="nombreCliente" class="block text-sm font-medium text-gray-700 mb-1">
-                    Nombre
-                </label>
-                <input type="text" 
-                       name="nombreCliente" 
-                       id="nombreCliente"
-                       value="{{ old('nombreCliente', $cliente->nombreCliente) }}"
-                       class="w-full px-4 py-2 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
-                       required>
-                @error('nombreCliente')
-                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                @enderror
-            </div>
+        {{-- Teléfono --}}
+        <div class="mb-4">
+            <label for="telefonoCliente" class="block text-gray-700 font-semibold mb-1">Teléfono</label>
+            <input type="text" name="telefonoCliente" id="telefonoCliente"
+                   value="{{ old('telefonoCliente', $cliente->telefonoCliente) }}"
+                   class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-400
+                          @error('telefonoCliente') border-red-500 @enderror">
+            @error('telefonoCliente')
+                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+            @enderror
+        </div>
 
-            {{-- Apellido --}}
-            <div>
-                <label for="apellidoCliente" class="block text-sm font-medium text-gray-700 mb-1">
-                    Apellido
-                </label>
-                <input type="text" 
-                       name="apellidoCliente" 
-                       id="apellidoCliente"
-                       value="{{ old('apellidoCliente', $cliente->apellidoCliente) }}"
-                       class="w-full px-4 py-2 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
-                       required>
-                @error('apellidoCliente')
-                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                @enderror
-            </div>
+        {{-- Email --}}
+        <div class="mb-6">
+            <label for="emailCliente" class="block text-gray-700 font-semibold mb-1">Email</label>
+            <input type="email" name="emailCliente" id="emailCliente"
+                   value="{{ old('emailCliente', $cliente->emailCliente) }}"
+                   class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-400
+                          @error('emailCliente') border-red-500 @enderror">
+            @error('emailCliente')
+                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+            @enderror
+        </div>
 
-            {{-- Teléfono --}}
-            <div>
-                <label for="telefonoCliente" class="block text-sm font-medium text-gray-700 mb-1">
-                    Teléfono
-                </label>
-                <input type="text" 
-                       name="telefonoCliente" 
-                       id="telefonoCliente"
-                       value="{{ old('telefonoCliente', $cliente->telefonoCliente) }}"
-                       class="w-full px-4 py-2 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
-                       required>
-                @error('telefonoCliente')
-                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                @enderror
-            </div>
+        <div class="flex justify-end gap-2">
+            <a href="{{ route('clientes.index') }}"
+                class="bg-gray-500 hover:bg-gray-700 text-white font-semibold px-4 py-2 rounded-lg shadow">
+                Cancelar
+            </a>
+            <button type="submit"
+                class="bg-cyan-600 hover:bg-cyan-800 text-white font-semibold px-4 py-2 rounded-lg shadow">
+                💾 Guardar cambios
+            </button>
+        </div>
+    </form>
+</x-card>
 
-            {{-- Email --}}
-            <div>
-                <label for="emailCliente" class="block text-sm font-medium text-gray-700 mb-1">
-                    Email
-                </label>
-                <input type="email" 
-                       name="emailCliente" 
-                       id="emailCliente"
-                       value="{{ old('emailCliente', $cliente->emailCliente) }}"
-                       class="w-full px-4 py-2 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
-                @error('emailCliente')
-                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                @enderror
-            </div>
-
-            {{-- Botones --}}
-            <div class="flex gap-3 pt-4">
-                <button type="submit" 
-                        class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm transition duration-200">
-                    Guardar cambios
-                </button>
-
-                <a href="{{ route('clientes.index') }}" 
-                   class="px-6 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition duration-200">
-                    Cancelar
-                </a>
-            </div>
-        </form>
-    </x-card>
 @endsection

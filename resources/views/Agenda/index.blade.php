@@ -66,7 +66,7 @@
                     </td>
 
                     <td class="px-4 py-3">
-                        {{ $a->empleado->nombreEmpleado ?? 'Sin asignar' }}
+                       {{ $a->empleado ? $a->empleado->nombre . ' ' . $a->empleado->apellido : 'Sin asignar' }}
                     </td>
 
                     <td class="px-4 py-3">
