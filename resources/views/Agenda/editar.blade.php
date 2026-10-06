@@ -80,8 +80,8 @@
 
                 @foreach($empleado as $e)
                     <option value="{{ $e->id }}"
-                        {{ old('empleadoId', $agenda->empleadoId) == $e->id ? 'selected' : '' }}>
-                        {{ $e->nombreEmpleado }}
+                        {{ old('empleadoId') == $e->id ? 'selected' : '' }}>
+                        {{ $e->nombre }} {{ $e->apellido }}
                     </option>
                 @endforeach
             </select>

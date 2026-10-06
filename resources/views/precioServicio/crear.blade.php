@@ -7,16 +7,18 @@
 @section('content')
 
 <x-card>
-    <h1 class="text-2xl font-bold mb-6 text-pink-600">Nuevo Precio de Servicio</h1>
+    <h1 class="text-3xl font-bold mb-6 text-cyan-700">
+        💲 Registrar Nuevo Precio de Servicio
+    </h1>
 
-    <form action="{{ route('precioServicio.store') }}" method="POST" class="space-y-4">
+    <form action="{{ route('precioServicio.store') }}" method="POST">
         @csrf
 
         {{-- servicio --}}
-        <div>
+        <div class="mb-4">
             <label for="servicio_id" class="block text-gray-700 font-semibold mb-1">Servicio</label>
             <select name="servicio_id" id="servicio_id"
-                    class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-pink-300
+                    class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-400
                            @error('servicio_id') border-red-500 @enderror">
                 <option value="">Selecciona un servicio</option>
                 @foreach($servicios as $servicio)
@@ -31,10 +33,10 @@
         </div>
 
         {{-- tipo de vehiculo --}}
-        <div>
+        <div class="mb-4">
             <label for="tipo_vehiculo_id" class="block text-gray-700 font-semibold mb-1">Tipo de vehículo</label>
             <select name="tipo_vehiculo_id" id="tipo_vehiculo_id"
-                    class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-pink-300
+                    class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-400
                            @error('tipo_vehiculo_id') border-red-500 @enderror">
                 <option value="">Selecciona un tipo de vehículo</option>
                 @foreach($tipoVehiculos as $tipoVehiculo)
@@ -49,26 +51,26 @@
         </div>
 
         {{-- precio --}}
-        <div>
+        <div class="mb-6">
             <label for="precio" class="block text-gray-700 font-semibold mb-1">Precio</label>
             <input type="number" step="0.01" min="0" name="precio" id="precio"
                    value="{{ old('precio') }}"
-                   class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-pink-300
+                   class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-400
                           @error('precio') border-red-500 @enderror">
             @error('precio')
                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
             @enderror
         </div>
 
-        <div class="flex gap-3 mt-6">
+        <div class="flex justify-end gap-2">
+            <a href="{{ route('precioServicio.index') }}"
+                class="bg-gray-500 hover:bg-gray-700 text-white font-semibold px-4 py-2 rounded-lg shadow">
+                Cancelar
+            </a>
             <button type="submit"
-                class="bg-pink-300 hover:bg-pink-400 text-white font-semibold px-4 py-2 rounded shadow">
+                class="bg-cyan-600 hover:bg-cyan-800 text-white font-semibold px-4 py-2 rounded-lg shadow">
                 💾 Guardar
             </button>
-            <a href="{{ route('precioServicio.index') }}"
-               class="bg-gray-300 hover:bg-gray-400 text-gray-700 font-semibold px-4 py-2 rounded shadow">
-               ↩️ Cancelar
-            </a>
         </div>
     </form>
 </x-card>
