@@ -31,8 +31,9 @@
     <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
             <thead>
-                <tr class="bg-cyan-100 border-b border-cyan-200 text-cyan-800 text-sm uppercase tracking-wider">
+                <tr class="bg-cyan-10n0 border-b border-cyan-200 text-cyan-800 text-sm uppercase tracking-wider">
                     <th class="py-3 px-4">Empleado</th>
+                    <th class="py-3 px-4">Identificacion</th>
                     <th class="py-3 px-4">Día</th>
                     <th class="py-3 px-4">Jornada</th>
                     <th class="py-3 px-4 text-center">Acciones</th>

@@ -57,9 +57,7 @@
             @include('layouts.partials.navbar')
 
             <main class="flex-1 p-4 sm:p-6 lg:p-8">
-                @if (session('success'))
-                    <x-alert type="success" class="mb-6">{{ session('success') }}</x-alert>
-                @endif
+                
                 @if (session('error'))
                     <x-alert type="error" class="mb-6">{{ session('error') }}</x-alert>
                 @endif
