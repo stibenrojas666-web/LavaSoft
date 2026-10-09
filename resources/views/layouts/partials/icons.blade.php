@@ -42,6 +42,36 @@
     @case('trash')
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="w-full h-full"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9.5 4h5a1 1 0 011 1v2h-7V5a1 1 0 011-1z" /></svg>
         @break
+    @case('user')
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="w-full h-full"><circle cx="12" cy="8" r="4" stroke-width="2" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 21a8 8 0 0116 0" /></svg>
+        @break
+    @case('briefcase')
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="w-full h-full"><rect x="3" y="7" width="18" height="14" rx="2" stroke-width="2" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2m-13 5h18m-11 0v2h4v-2" /></svg>
+        @break
+    @case('clock')
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="w-full h-full"><circle cx="12" cy="12" r="9" stroke-width="2" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 7v5l3 2" /></svg>
+        @break
+    @case('car')
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="w-full h-full"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 17h14l1-6-2-5H6l-2 5 1 6zm0 0v2m14-2v2M4 11h16M7 14h.01M17 14h.01" /></svg>
+        @break
+    @case('calendar')
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="w-full h-full"><rect x="3" y="5" width="18" height="16" rx="2" stroke-width="2" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 3v4M8 3v4M3 10h18m-13 4h.01M12 14h.01M15 14h.01M8 18h.01M12 18h.01" /></svg>
+        @break
+    @case('credit-card')
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="w-full h-full"><rect x="2.5" y="5" width="19" height="14" rx="2" stroke-width="2" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h3" /></svg>
+        @break
+    @case('clipboard')
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="w-full h-full"><rect x="5" y="4" width="14" height="17" rx="2" stroke-width="2" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 4.5V3h6v1.5M9 10h6m-6 4h6m-6 4h3" /></svg>
+        @break
+    @case('grid')
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="w-full h-full"><rect x="3" y="3" width="7" height="7" rx="1.5" stroke-width="2" /><rect x="14" y="3" width="7" height="7" rx="1.5" stroke-width="2" /><rect x="3" y="14" width="7" height="7" rx="1.5" stroke-width="2" /><rect x="14" y="14" width="7" height="7" rx="1.5" stroke-width="2" /></svg>
+        @break
+    @case('wrench')
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="w-full h-full"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.7 6.3a5 5 0 00-6.4 6.4L3.5 17.5a2.1 2.1 0 003 3l4.8-4.8a5 5 0 006.4-6.4l-3 3-3.5-3.5 3.5-2.5z" /></svg>
+        @break
+    @case('currency-dollar')
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="w-full h-full"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2v20m5-15a4 4 0 00-4-3h-2a4 4 0 000 8h2a4 4 0 010 8h-2a4 4 0 01-4-3" /></svg>
+        @break
     @default
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="w-full h-full"><circle cx="12" cy="12" r="9" stroke-width="2" /></svg>
 @endswitch

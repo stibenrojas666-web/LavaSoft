@@ -23,29 +23,19 @@
         <nav class="flex-1 overflow-y-auto px-3 py-6 space-y-1" aria-label="Navegación lateral">
 
             @php
+                $serviciosActivo = request()->routeIs('servicios.*', 'tipoVehiculo.*', 'precioServicio.*');
                 $links = [
-                    ['label' => 'Dashboard',   'route' => 'dashboard.index',  'icon' => 'home'],
-                    ['label' => 'Usuarios',    'route' => 'users.index',      'icon' => 'users'],
-                    ['label' => 'Perfiles/Roles', 'route' => 'roles.index',   'icon' => 'shield'],
-                    ['label' => 'Clientes',  'route' => 'clientes.index', 'icon' => 'users'],
-                    ['label' => 'Empleados',   'route' => 'empleados.index',   'icon' => 'box'],
-                    ['label' => 'Servicios',    'route' => 'servicios.index',    'icon' => 'chart'],
-                    ['label' => 'Turnos', 'route' => 'turnos.index', 'icon' => 'chart'],
-                    ['label' => 'tipo Vehiculo', 'route' => 'tipoVehiculo.index', 'icon' => 'box'],
-                    ['label' => 'Vehiculos',  'route' => 'vehiculos.index', 'icon' => 'box'],
-                    ['label' => 'Agenda', 'route' => 'agenda.index', 'icon' => 'shield'],
-                    ['label' => 'precio Servicio', 'route' => 'precioServicio.index', 'icon' => 'tag'],
-                    
-                    
-                    ['label' => 'Configuración', 'route' => 'settings.index', 'icon' => 'cog'],
-                    
-                    ['label' => 'Vehiculos',  'route' => 'vehiculos.index', 'icon' => 'user'],
-                    ['label' => 'tipo Vehiculo', 'route' => 'tipoVehiculo.index', 'icon' => 'cog'],
-                    ['label' => 'Agenda', 'route' => 'agenda.index', 'icon' => 'calendar'],
-                    ['label' => 'precio Servicio', 'route' => 'precioServicio.index', 'icon' => 'calendar'],
-                    ['label' => 'Pagos', 'route' => 'pagos.index', 'icon' => 'calendar'],
-                    ['label' => 'Orden', 'route' => 'agendaServicio.index', 'icon' => 'calendar'],
-                    
+                    ['label' => 'Dashboard',       'route' => 'dashboard.index',      'icon' => 'home'],
+                    ['label' => 'Usuarios',        'route' => 'users.index',          'icon' => 'users'],
+                    ['label' => 'Perfiles/Roles',  'route' => 'roles.index',          'icon' => 'shield'],
+                    ['label' => 'Clientes',        'route' => 'clientes.index',       'icon' => 'user'],
+                    ['label' => 'Empleados',       'route' => 'empleados.index',      'icon' => 'briefcase'],
+                    ['label' => 'Turnos',          'route' => 'turnos.index',         'icon' => 'clock'],
+                    ['label' => 'Vehículos',       'route' => 'vehiculos.index',      'icon' => 'car'],
+                    ['label' => 'Agenda',          'route' => 'agenda.index',         'icon' => 'calendar'],
+                    ['label' => 'Pagos',           'route' => 'pagos.index',          'icon' => 'credit-card'],
+                    ['label' => 'Órdenes',         'route' => 'agendaServicio.index', 'icon' => 'clipboard'],
+                    ['label' => 'Configuración',   'route' => 'settings.index',       'icon' => 'cog'],
                 ];
             @endphp
 
@@ -61,12 +51,71 @@
                             ? 'bg-primary-600 text-white shadow-sm'
                             : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}"
                 >
-                    <span class="w-5 h-5 flex-shrink-0" aria-hidden="true">
+                    <span class="w-5 h-5 flex-shrink-0 opacity-80 transition-opacity group-hover:opacity-100" aria-hidden="true">
                         @include('layouts.partials.icons', ['icon' => $link['icon']])
                     </span>
                     <span>{{ $link['label'] }}</span>
                 </a>
             @endforeach
+            {{-- Menú de Servicios --}}
+            <div
+                x-data="{ open: {{ $serviciosActivo ? 'true' : 'false' }} }"
+                class="space-y-1">
+                <button
+                    type="button"
+                    @click="open = !open"
+                    :aria-expanded="open.toString()"
+                    class="w-full group flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors
+                        {{ $serviciosActivo
+                            ? 'bg-primary-600 text-white shadow-sm'
+                            : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
+                    <span class="flex items-center gap-3">
+                        <span class="w-5 h-5 flex-shrink-0 opacity-80 transition-opacity group-hover:opacity-100" aria-hidden="true">
+                            @include('layouts.partials.icons', ['icon' => 'grid'])
+                        </span>
+
+                        <span>Más opciones</span>
+                    </span>
+
+                </button>
+
+                <div
+                    x-show="open"
+                    x-cloak
+                    x-transition
+                    class="ml-5 pl-3 border-l border-slate-700 space-y-1">
+                    <a
+                        href="{{ route('servicios.index') }}"
+                        class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors
+                            {{ request()->routeIs('servicios.*')
+                                ? 'bg-slate-800 text-white'
+                                : 'text-slate-400 hover:bg-slate-800 hover:text-white' }}">
+                        <span class="h-4 w-4 shrink-0 opacity-75" aria-hidden="true">@include('layouts.partials.icons', ['icon' => 'wrench'])</span>
+                        <span>Servicios</span>
+                    </a>
+
+                    <a
+                        href="{{ route('tipoVehiculo.index') }}"
+                        class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors
+                            {{ request()->routeIs('tipoVehiculo.*')
+                                ? 'bg-slate-800 text-white'
+                                : 'text-slate-400 hover:bg-slate-800 hover:text-white' }}">
+                        <span class="h-4 w-4 shrink-0 opacity-75" aria-hidden="true">@include('layouts.partials.icons', ['icon' => 'car'])</span>
+                        <span>Tipo de Vehículo</span>
+                    </a>
+
+                    <a
+                        href="{{ route('precioServicio.index') }}"
+                        class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors
+                            {{ request()->routeIs('precioServicio.*')
+                                ? 'bg-slate-800 text-white'
+                                : 'text-slate-400 hover:bg-slate-800 hover:text-white' }}">
+                        <span class="h-4 w-4 shrink-0 opacity-75" aria-hidden="true">@include('layouts.partials.icons', ['icon' => 'currency-dollar'])</span>
+                        <span>Precio de Servicio</span>
+                    </a>
+                </div>
+            </div>
+
         </nav>
 
         {{-- Cerrar sesión --}}
