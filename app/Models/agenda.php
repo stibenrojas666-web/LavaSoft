@@ -43,4 +43,10 @@ class agenda extends Model
         return $this->hasMany(agendaServicios::class, 'agendaId');
     }
 
+    /** Total vigente de los precios guardados para los servicios de esta cita. */
+    public function totalServicios(): float
+    {
+        return (float) $this->agendaServicios()->sum('Precio');
+    }
+
 }

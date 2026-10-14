@@ -42,6 +42,7 @@
                     <th class="py-3 px-4">Empleado</th>
                     <th class="py-3 px-4">Fecha</th>
                     <th class="py-3 px-4">Hora</th>
+                    <th class="py-3 px-4">Total servicios</th>
                     <th class="py-3 px-4">Atención</th>
                     <th class="py-3 px-4">Estado</th>
                     <th class="py-3 px-4 text-center">Acciones</th>
@@ -75,6 +76,10 @@
 
                     <td class="px-4 py-3">
                         {{ substr($a->hora, 0, 5) }}
+                    </td>
+
+                    <td class="px-4 py-3">
+                        ${{ number_format($a->agenda_servicios_sum_precio ?? 0, 2) }}
                     </td>
 
                     <td class="px-4 py-3">{{ $a->tipoDeAtencion }}</td>
@@ -118,7 +123,7 @@
                 @empty
 
                 <tr>
-                    <td colspan="9" class="px-4 py-6 text-center text-gray-500">
+                    <td colspan="10" class="px-4 py-6 text-center text-gray-500">
                         No hay citas registradas.
                     </td>
                 </tr>

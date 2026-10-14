@@ -22,7 +22,6 @@ class AgendaServicioStoreRequest extends FormRequest
                 // El mismo servicio no puede repetirse en la misma cita
                 Rule::unique('agenda_servicios', 'servicioId')->where('agendaId', $this->agendaId),
             ],
-            'Precio'     => 'required|numeric|min:0|max:99999999.99',
         ];
     }
 
@@ -34,10 +33,6 @@ class AgendaServicioStoreRequest extends FormRequest
             'servicioId.required' => 'El servicio es obligatorio',
             'servicioId.exists'   => 'El servicio seleccionado no existe',
             'servicioId.unique'   => 'Este servicio ya está agregado a la cita',
-            'Precio.required'     => 'El precio es obligatorio',
-            'Precio.numeric'      => 'El precio debe ser un número',
-            'Precio.min'          => 'El precio no puede ser negativo',
-            'Precio.max'          => 'El precio es demasiado alto',
         ];
     }
 }

@@ -23,7 +23,6 @@ class AgendaServicioUpdateRequest extends FormRequest
                     ->where('agendaId', $this->agendaId)
                     ->ignore($this->route('agendaServicio')),
             ],
-            'Precio'     => 'required|numeric|min:0|max:99999999.99',
         ];
     }
 
@@ -35,10 +34,6 @@ class AgendaServicioUpdateRequest extends FormRequest
             'servicioId.required' => 'El servicio es obligatorio',
             'servicioId.exists'   => 'El servicio seleccionado no existe',
             'servicioId.unique'   => 'Este servicio ya está agregado a la cita',
-            'Precio.required'     => 'El precio es obligatorio',
-            'Precio.numeric'      => 'El precio debe ser un número',
-            'Precio.min'          => 'El precio no puede ser negativo',
-            'Precio.max'          => 'El precio es demasiado alto',
         ];
     }
 }

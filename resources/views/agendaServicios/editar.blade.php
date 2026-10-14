@@ -68,18 +68,9 @@
             @enderror
         </div>
 
-        {{-- Precio --}}
-        <div class="mb-6">
-            <label for="Precio" class="block text-gray-700 font-semibold mb-1">Precio</label>
-
-            <input type="number" step="0.01" min="0" name="Precio" id="Precio"
-                value="{{ old('Precio', $agendaServicio->Precio) }}"
-                class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-400 @error('Precio') border-red-500 @enderror">
-
-            @error('Precio')
-                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-            @enderror
-        </div>
+        <p class="mb-6 text-sm text-gray-600">
+            Al guardar, el precio se actualiza según el tipo de vehículo de la cita seleccionada.
+        </p>
 
         <div class="flex justify-end gap-2">
             <a href="{{ route('agendaServicio.index') }}"

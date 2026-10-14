@@ -8,7 +8,9 @@ class AgendaRepository
 {
     public function getAll()
     {
-        return agenda::with(['empleado', 'cliente', 'vehiculo'])->get();
+        return agenda::with(['empleado', 'cliente', 'vehiculo'])
+            ->withSum('agendaServicios', 'Precio')
+            ->get();
     }
 
     public function keep(array $datos)
