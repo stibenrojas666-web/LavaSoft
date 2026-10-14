@@ -70,6 +70,27 @@
             @enderror
         </div>
 
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div>
+                <label for="horaInicio" class="block text-gray-700 font-semibold mb-1">Hora de inicio</label>
+                <input type="time" name="horaInicio" id="horaInicio"
+                    value="{{ old('horaInicio', $turno->horaInicio ? substr($turno->horaInicio, 0, 5) : '') }}"
+                    class="w-full border rounded-lg px-3 py-2 @error('horaInicio') border-red-500 @enderror">
+                @error('horaInicio')
+                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+            <div>
+                <label for="horaFin" class="block text-gray-700 font-semibold mb-1">Hora de fin</label>
+                <input type="time" name="horaFin" id="horaFin"
+                    value="{{ old('horaFin', $turno->horaFin ? substr($turno->horaFin, 0, 5) : '') }}"
+                    class="w-full border rounded-lg px-3 py-2 @error('horaFin') border-red-500 @enderror">
+                @error('horaFin')
+                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+        </div>
+
         <div class="flex justify-end gap-2">
             <a href="{{ route('turnos.index') }}"
                 class="bg-gray-500 hover:bg-gray-700 text-white font-semibold px-4 py-2 rounded-lg shadow">

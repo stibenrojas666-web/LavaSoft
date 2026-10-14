@@ -8,7 +8,7 @@ class turno extends Model
 {
     protected $table = 'turnos';
     protected $fillable =[
-        'empleado_id','dia','jornada',
+        'empleado_id','dia','jornada','horaInicio','horaFin'
     ];
     public function empleado()
     {
