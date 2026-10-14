@@ -23,6 +23,8 @@ Route::resource('servicios',ServicioController::class);
 Route::resource('vehiculos',VehiculoController::class);
 Route::resource('servicios', ServicioController::class);
 Route::resource('tipoVehiculo', TipoVehiculoController::class);
+Route::get('agenda/empleados-disponibles', [AgendaController::class, 'empleadosDisponibles'])
+    ->name('agenda.empleadosDisponibles');
 Route::resource('agenda',AgendaController::class);
 Route::resource('precioServicio',PrecioServicioController::class);
 Route::resource('agendaServicio',AgendaServiciosController::class);

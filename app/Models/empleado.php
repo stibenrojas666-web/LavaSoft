@@ -18,7 +18,12 @@ class empleado extends Model
 
     public function agendas()
     {
-        return $this->hasMany(agenda::class);
+        return $this->hasMany(agenda::class, 'empleadoId');
+    }
+
+    public function turnos()
+    {
+        return $this->hasMany(turno::class, 'empleado_id');
     }
 
 }

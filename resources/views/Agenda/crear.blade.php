@@ -73,6 +73,8 @@
             </label>
 
             <select name="empleadoId" id="empleadoId"
+                data-url="{{ route('agenda.empleadosDisponibles') }}"
+                data-selected="{{ old('empleadoId') }}"
                 class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-400 @error('empleadoId') border-red-500 @enderror">
 
                 <option value="">Sin asignar</option>
@@ -88,6 +90,7 @@
             @error('empleadoId')
                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
             @enderror
+            <p id="mensajeEmpleados" class="text-gray-500 text-sm mt-1">Selecciona fecha y hora para consultar quién está disponible.</p>
         </div>
 
         {{-- Fecha y hora --}}
@@ -173,5 +176,53 @@
     </form>
 
 </x-card>
+
+<script>
+    (() => {
+        const fecha = document.getElementById('fecha');
+        const hora = document.getElementById('hora');
+        const empleado = document.getElementById('empleadoId');
+        const mensaje = document.getElementById('mensajeEmpleados');
+
+        async function cargarEmpleadosDisponibles() {
+            const seleccionado = empleado.value || empleado.dataset.selected || '';
+            empleado.innerHTML = '<option value="">Sin asignar</option>';
+
+            if (!fecha.value || !hora.value) {
+                mensaje.textContent = 'Selecciona fecha y hora para consultar quién está disponible.';
+                return;
+            }
+
+            mensaje.textContent = 'Buscando empleados disponibles...';
+            const parametros = new URLSearchParams({ fecha: fecha.value, hora: hora.value });
+
+            try {
+                const respuesta = await fetch(`${empleado.dataset.url}?${parametros}`, {
+                    headers: { 'Accept': 'application/json' }
+                });
+                if (!respuesta.ok) throw new Error('No fue posible consultar la disponibilidad.');
+
+                const personas = await respuesta.json();
+                personas.forEach(persona => {
+                    const opcion = document.createElement('option');
+                    opcion.value = persona.id;
+                    opcion.textContent = `${persona.nombre} (${persona.jornada})`;
+                    opcion.selected = String(persona.id) === seleccionado;
+                    empleado.appendChild(opcion);
+                });
+                mensaje.textContent = personas.length
+                    ? 'Solo se muestran empleados con turno y sin otra cita en ese horario.'
+                    : 'No hay empleados disponibles para esa fecha y hora.';
+                empleado.dataset.selected = '';
+            } catch (error) {
+                mensaje.textContent = error.message;
+            }
+        }
+
+        fecha.addEventListener('change', cargarEmpleadosDisponibles);
+        hora.addEventListener('change', cargarEmpleadosDisponibles);
+        if (fecha.value && hora.value) cargarEmpleadosDisponibles();
+    })();
+</script>
 
 @endsection
