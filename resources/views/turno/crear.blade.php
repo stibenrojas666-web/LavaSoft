@@ -53,7 +53,7 @@
             <label for="jornada" class="block text-gray-700 font-semibold mb-1">Jornada</label>
             <select name="jornada" id="jornada"
                     class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-400
-                            @error('jornada') border-red-500 @enderror">
+                           @error('jornada') border-red-500 @enderror">
                 <option value="">Selecciona una jornada</option>
                 @foreach(['mañana','tarde','noche'] as $j)
                     <option value="{{ $j }}" {{ old('jornada') == $j ? 'selected' : '' }}>{{ ucfirst($j) }}</option>
