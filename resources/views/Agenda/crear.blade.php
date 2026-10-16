@@ -55,8 +55,9 @@
 
                 @foreach($vehiculo as $v)
                     <option value="{{ $v->id }}"
+                        data-tipo="{{ $v->tipoVehiculoId }}"
                         {{ old('vehiculoId') == $v->id ? 'selected' : '' }}>
-                        {{ $v->placa }} - {{ $v->modelo }}
+                        {{ $v->tipoVehiculo->nombre ?? 'Tipo sin registrar' }} - {{ $v->placa }}  - {{ $v->modelo }}
                     </option>
                 @endforeach
             </select>
@@ -87,6 +88,58 @@
 
             @error('empleadoId')
                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+            @enderror
+        </div>
+
+        {{-- Servicios de la cita --}}
+        <div class="mb-6">
+            <div class="mb-3">
+                <h2 class="text-lg font-semibold text-slate-800">Servicios para esta cita</h2>
+                <p class="mt-1 text-sm text-slate-500">Puedes seleccionar uno o varios servicios.</p>
+            </div>
+
+            <div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+                @forelse($servicio as $s)
+                    @php
+                        $preciosPorTipo = $s->precios->keyBy('tipo_vehiculo_id')->map(fn ($precio) => [
+                            'modalidad' => $precio->modalidad,
+                            'precio' => $precio->precio,
+                        ]);
+                    @endphp
+                    <div class="border-b border-slate-100 last:border-b-0" data-servicio-option>
+                    <label class="block cursor-pointer">
+                        <input
+                            type="checkbox"
+                            name="servicios[]"
+                            value="{{ $s->id }}"
+                            class="peer sr-only"
+                            data-servicio-id="{{ $s->id }}"
+                            data-precios='@json($preciosPorTipo)'
+                            {{ in_array($s->id, old('servicios', [])) ? 'checked' : '' }}>
+
+                        <span class="flex min-h-14 items-center gap-3 px-4 py-3 text-sm transition before:flex before:h-5 before:w-5 before:shrink-0 before:items-center before:justify-center before:rounded before:border before:border-slate-300 before:text-xs before:text-transparent before:transition before:content-['✓'] hover:bg-cyan-50 peer-checked:bg-cyan-50 peer-checked:text-cyan-800 peer-checked:before:border-cyan-600 peer-checked:before:bg-cyan-600 peer-checked:before:text-white peer-focus-visible:ring-2 peer-focus-visible:ring-inset peer-focus-visible:ring-cyan-500 peer-disabled:cursor-not-allowed peer-disabled:opacity-50">
+                            <span class="font-medium">{{ $s->nombre }}</span>
+                            <span class="ml-auto text-right text-xs font-semibold text-slate-500" data-precio-label>Selecciona un vehículo</span>
+                        </span>
+                    </label>
+                    <div class="hidden px-12 pb-3" data-precio-acordado="{{ $s->id }}">
+                        <label for="precio-acordado-{{ $s->id }}" class="block text-xs font-medium text-slate-600">Precio acordado con el cliente</label>
+                        <input type="number" min="0.01" step="0.01" inputmode="decimal"
+                            id="precio-acordado-{{ $s->id }}" name="precios_acordados[{{ $s->id }}]"
+                            value="{{ old('precios_acordados.' . $s->id) }}" disabled
+                            class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-200">
+                        @if($errors->has('precios_acordados.' . $s->id))
+                            <p class="mt-1 text-sm text-red-600">{{ $errors->first('precios_acordados.' . $s->id) }}</p>
+                        @endif
+                    </div>
+                    </div>
+                @empty
+                    <p class="px-4 py-3 text-sm text-slate-500">No hay servicios registrados.</p>
+                @endforelse
+            </div>
+
+            @error('servicios')
+                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
             @enderror
         </div>
 
@@ -173,5 +226,69 @@
     </form>
 
 </x-card>
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const vehiculo = document.getElementById('vehiculoId');
+        const servicios = document.querySelectorAll('[data-servicio-id]');
+        const formatoPesos = new Intl.NumberFormat('es-CO', {
+            style: 'currency', currency: 'COP', maximumFractionDigits: 0
+        });
+
+        function actualizarPrecios() {
+            const tipoId = vehiculo.selectedOptions[0]?.dataset.tipo;
+
+            servicios.forEach((checkbox) => {
+                const opcion = checkbox.closest('[data-servicio-option]');
+                const etiqueta = opcion.querySelector('[data-precio-label]');
+                const contenedorPrecio = opcion.querySelector(`[data-precio-acordado="${checkbox.dataset.servicioId}"]`);
+                const inputPrecio = contenedorPrecio.querySelector('input');
+                const configuraciones = JSON.parse(checkbox.dataset.precios || '{}');
+                const configuracion = tipoId ? configuraciones[tipoId] : null;
+
+                if (!tipoId) {
+                    etiqueta.textContent = 'Selecciona un vehículo';
+                    checkbox.disabled = false;
+                    contenedorPrecio.classList.add('hidden');
+                    inputPrecio.disabled = true;
+                    inputPrecio.required = false;
+                    return;
+                }
+
+                if (!configuracion) {
+                    etiqueta.textContent = 'No disponible para este tipo';
+                    checkbox.checked = false;
+                    checkbox.disabled = true;
+                    contenedorPrecio.classList.add('hidden');
+                    inputPrecio.disabled = true;
+                    inputPrecio.required = false;
+                    inputPrecio.value = '';
+                    return;
+                }
+
+                checkbox.disabled = false;
+                if (configuracion.modalidad === 'convenir') {
+                    etiqueta.textContent = 'A convenir';
+                    contenedorPrecio.classList.toggle('hidden', !checkbox.checked);
+                    inputPrecio.disabled = !checkbox.checked;
+                    inputPrecio.required = checkbox.checked;
+                } else {
+                    const importe = formatoPesos.format(Number(configuracion.precio));
+                    etiqueta.textContent = configuracion.modalidad === 'desde' ? `Desde ${importe}` : importe;
+                    contenedorPrecio.classList.add('hidden');
+                    inputPrecio.disabled = true;
+                    inputPrecio.required = false;
+                    inputPrecio.value = '';
+                }
+            });
+        }
+
+        vehiculo.addEventListener('change', actualizarPrecios);
+        servicios.forEach((checkbox) => checkbox.addEventListener('change', actualizarPrecios));
+        actualizarPrecios();
+    });
+</script>
+@endpush
 
 @endsection

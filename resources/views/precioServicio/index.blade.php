@@ -22,12 +22,6 @@
         </a>
     </div>
 
-    @if(session('success'))
-        <div class="mb-4 p-4 bg-green-100 border-l-4 border-green-500 text-green-700 rounded">
-            {{ session('success') }}
-        </div>
-    @endif
-
     <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
             <thead>
@@ -43,18 +37,26 @@
                 <tr class="hover:bg-cyan-50">
                     <td class="px-4 py-3">{{ $precioServicio->servicio->nombre ?? 'N/A' }}</td>
                     <td class="px-4 py-3">{{ $precioServicio->tipoVehiculo->nombre ?? 'N/A' }}</td>
-                    <td class="px-4 py-3">${{ number_format($precioServicio->precio, 2) }}</td>
+                    <td class="px-4 py-3">
+                        @if($precioServicio->modalidad === 'convenir')
+                            A convenir
+                        @elseif($precioServicio->modalidad === 'desde')
+                            Desde ${{ number_format($precioServicio->precio, 0, ',', '.') }}
+                        @else
+                            ${{ number_format($precioServicio->precio, 0, ',', '.') }}
+                        @endif
+                    </td>
                     <td class="px-4 py-3 text-center">
                         <a href="{{ route('precioServicio.edit', $precioServicio->id) }}"
-                            class="text-blue-600 hover:text-blue-900 mr-3">
-                            ✏️
+                            class="text-blue-600 hover:text-blue-900 mr-3" title="Editar" aria-label="Editar">
+                            <span aria-hidden="true" class="inline-block h-4 w-4">@include('layouts.partials.icons', ['icon' => 'pencil'])</span>
                         </a>
                         <form action="{{ route('precioServicio.destroy', $precioServicio->id) }}" method="POST" class="inline">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="text-red-600 hover:text-red-900"
+                            <button type="submit" class="text-red-600 hover:text-red-900" title="Eliminar" aria-label="Eliminar"
                                 onclick="return confirm('¿Desea eliminar este precio de servicio?')">
-                                🗑️
+                                <span aria-hidden="true" class="inline-block h-4 w-4">@include('layouts.partials.icons', ['icon' => 'trash'])</span>
                             </button>
                         </form>
                     </td>

@@ -57,7 +57,7 @@
                 @foreach($vehiculo as $v)
                     <option value="{{ $v->id }}"
                         {{ old('vehiculoId', $agenda->vehiculoId) == $v->id ? 'selected' : '' }}>
-                        {{ $v->placa }} - {{ $v->modelo }}
+                        {{ ucfirst($v->tipoVehiculo->nombre ?? 'Vehículo') }} · {{ $v->placa }} · {{ $v->modelo }}
                     </option>
                 @endforeach
             </select>

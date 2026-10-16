@@ -11,13 +11,13 @@
 --}}
 @props(['label', 'value', 'change' => null, 'trend' => 'up', 'icon' => 'chart'])
 
-<div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 sm:p-6">
+<div class="bg-white rounded-2xl border border-slate-200/90 shadow-[0_8px_28px_rgba(15,23,42,0.05)] p-5 sm:p-6 transition duration-200 hover:-translate-y-0.5 hover:shadow-lg">
     <div class="flex items-start justify-between">
         <div>
             <p class="text-sm font-medium text-slate-400">{{ $label }}</p>
             <p class="mt-2 text-2xl font-bold text-slate-800">{{ $value }}</p>
         </div>
-        <div class="w-11 h-11 rounded-lg bg-primary-50 text-primary-600 flex items-center justify-center flex-shrink-0">
+        <div class="w-11 h-11 rounded-xl bg-cyan-50 text-cyan-700 ring-1 ring-cyan-100 flex items-center justify-center flex-shrink-0">
             <span class="w-5 h-5 block">@include('layouts.partials.icons', ['icon' => $icon])</span>
         </div>
     </div>

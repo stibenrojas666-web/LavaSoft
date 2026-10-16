@@ -67,12 +67,13 @@
 
         {{-- Precio --}}
         <div class="mb-6">
-            <label for="Precio" class="block text-gray-700 font-semibold mb-1">Precio</label>
+            <label for="Precio" class="block text-gray-700 font-semibold mb-1">Precio cobrado o acordado</label>
 
             <input type="number" step="0.01" min="0" name="Precio" id="Precio"
                 value="{{ old('Precio') }}"
                 placeholder="0.00"
                 class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-400 @error('Precio') border-red-500 @enderror">
+            <p class="mt-1.5 text-sm text-slate-500">Si el servicio está “A convenir”, escribe el valor que acordaste con el cliente.</p>
 
             @error('Precio')
                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
