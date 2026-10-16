@@ -7,6 +7,9 @@
 
     {{-- Tarjetas estadísticas --}}
     <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-6">
+        <x-stat-card label="Clientes" :value="number_format($clientesTotal)" icon="users" />
+        <x-stat-card label="Vehículos" :value="number_format($vehiculosTotal)" icon="box" />
+        <x-stat-card label="Citas de hoy" :value="number_format($citasHoy)" icon="bell" />
         <x-stat-card
             label="Total de usuarios"
             :value="number_format($totalUsers)"
