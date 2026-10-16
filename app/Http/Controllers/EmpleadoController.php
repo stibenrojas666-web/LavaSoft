@@ -75,7 +75,9 @@ class EmpleadoController extends Controller
      */
     public function destroy(int $id)
     {
-        $this->empleadoService->eliminar($id);
+        if (!$this->empleadoService->eliminar($id)) {
+            return redirect()->route('empleados.index')->with('error', 'No se puede eliminar el empleado porque tiene citas o turnos relacionados.');
+        }
         return redirect()->route('empleados.index')->with('success', 'Empleado eliminado correctamente.');
     }
 }

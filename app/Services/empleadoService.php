@@ -21,8 +21,13 @@ public function guardar(array $datos){
     return $this->empleadoRepository->guardar($datos);
 }
 
-public function eliminar(int $id){
-    return $this->empleadoRepository->eliminar($id);
+    public function eliminar(int $id): bool
+    {
+        if ($this->empleadoRepository->tieneDependencias($id)) {
+            return false;
+        }
+
+        return $this->empleadoRepository->eliminar($id) > 0;
 }
 
 public function buscarPorId(int $id){

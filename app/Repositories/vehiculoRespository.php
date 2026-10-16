@@ -2,10 +2,11 @@
 
 namespace App\Repositories;
 use App\Models\vehiculo;
+use App\Models\agenda;
 
 class VehiculoRespository{
     public function getAll(){
-        return vehiculo::all();
+        return vehiculo::with(['cliente', 'tipoVehiculo'])->get();
     }
 
     public function keep(array $datos){
@@ -13,7 +14,7 @@ class VehiculoRespository{
     }
 
     public function finById(int $id){
-        return vehiculo::findOrFail($id);
+        return vehiculo::with(['cliente', 'tipoVehiculo'])->findOrFail($id);
     }
 
     public function update (int $id, array $datos){
@@ -24,5 +25,10 @@ class VehiculoRespository{
 
     public function delete (int $id){
         return vehiculo::destroy($id);
+    }
+
+    public function tieneDependencias(int $id): bool
+    {
+        return agenda::where('vehiculoId', $id)->exists();
     }
 }

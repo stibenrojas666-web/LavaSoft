@@ -16,7 +16,7 @@ class ClienteStoreRequest extends FormRequest
         return [
             'nombreCliente'    => 'required|string|max:100',
             'apellidoCliente'  => 'required|string|max:100',
-            'telefonoCliente'  => 'required|string|max:20',
+            'telefonoCliente'  => ['required', 'regex:/^[0-9]{7,15}$/'],
             'emailCliente'     => 'required|email|max:150|unique:clientes,emailCliente',
         ];
     }
@@ -27,6 +27,7 @@ class ClienteStoreRequest extends FormRequest
             'nombreCliente.required'   => 'El nombre es obligatorio',
             'apellidoCliente.required' => 'El apellido es obligatorio',
             'telefonoCliente.required' => 'El teléfono es obligatorio',
+            'telefonoCliente.regex' => 'El teléfono debe contener solo números (entre 7 y 15 dígitos).',
             'emailCliente.required'    => 'El email es obligatorio',
             'emailCliente.email'       => 'El email no es válido',
             'emailCliente.unique'      => 'Este email ya está registrado',

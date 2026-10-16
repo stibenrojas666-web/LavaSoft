@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Repositories\PagoRepository;
+use Illuminate\Support\Facades\DB;
 
 class PagoService
 {
@@ -20,7 +21,12 @@ class PagoService
 
     public function keep(array $datos)
     {
-        return $this->pagoRepository->keep($datos);
+        return DB::transaction(function () use ($datos) {
+            $pago = $this->pagoRepository->keep($datos);
+            $this->pagoRepository->confirmarAgenda((int) $pago->agendaId);
+
+            return $pago;
+        });
     }
 
     public function findById(int $id)
@@ -30,7 +36,12 @@ class PagoService
 
     public function update(int $id, array $datos)
     {
-        return $this->pagoRepository->update($id, $datos);
+        return DB::transaction(function () use ($id, $datos) {
+            $pago = $this->pagoRepository->update($id, $datos);
+            $this->pagoRepository->confirmarAgenda((int) $pago->agendaId);
+
+            return $pago;
+        });
     }
 
     public function delete(int $id)

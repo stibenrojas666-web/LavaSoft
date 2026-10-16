@@ -29,7 +29,7 @@ private tipoVehiculoService $tipoVehiculoService;
     {
         $vehiculo = $this->VehiculoService->getAll();
 
-        return view('Vehiculos.index', compact('vehiculo'));
+        return view('vehiculos.index', compact('vehiculo'));
     }
 
     /**
@@ -69,7 +69,7 @@ private tipoVehiculoService $tipoVehiculoService;
         $vehiculo = $this->VehiculoService->findById($id);
         $cliente = $this->clienteService->listarTodo();
         $tipoVehiculo = $this->tipoVehiculoService->listarTodo();
-        return view('Vehiculos.editar',compact('vehiculo','cliente','tipoVehiculo'));
+        return view('vehiculos.editar',compact('vehiculo','cliente','tipoVehiculo'));
 
         }
 
@@ -88,7 +88,9 @@ private tipoVehiculoService $tipoVehiculoService;
      */
     public function destroy(int $id)
     {
-        $this->VehiculoService->delete($id);
+        if (!$this->VehiculoService->delete($id)) {
+            return redirect()->route('vehiculos.index')->with('error', 'No se puede eliminar el vehículo porque tiene citas relacionadas.');
+        }
 
         return redirect()
             ->route('vehiculos.index')

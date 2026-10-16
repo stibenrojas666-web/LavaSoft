@@ -8,6 +8,7 @@ use App\Services\AgendaService;
 use App\Services\clienteService;
 use App\Services\empleadoService;
 use App\Services\VehiculoService;
+use App\Services\servicioService;
 
 class AgendaController extends Controller
 {
@@ -15,17 +16,20 @@ class AgendaController extends Controller
     private clienteService $clienteService;
     private empleadoService $empleadoService;
     private VehiculoService $vehiculoService;
+    private servicioService $servicioService;
 
     public function __construct(
         AgendaService $agendaService,
         clienteService $clienteService,
         empleadoService $empleadoService,
-        VehiculoService $vehiculoService
+        VehiculoService $vehiculoService,
+        servicioService $servicioService
     ) {
         $this->agendaService = $agendaService;
         $this->clienteService = $clienteService;
         $this->empleadoService = $empleadoService;
         $this->vehiculoService = $vehiculoService;
+        $this->servicioService = $servicioService;
     }
 
     /**
@@ -35,7 +39,7 @@ class AgendaController extends Controller
     {
         $agenda = $this->agendaService->getAll();
 
-        return view('agenda.index', compact('agenda'));
+        return view('Agenda.index', compact('agenda'));
     }
 
     /**
@@ -46,8 +50,9 @@ class AgendaController extends Controller
         $cliente = $this->clienteService->listarTodo();
         $empleado = $this->empleadoService->listarTodo();
         $vehiculo = $this->vehiculoService->getAll();
+        $servicio = $this->servicioService->listarActivosConPrecios();
 
-        return view('agenda.crear', compact('cliente', 'empleado', 'vehiculo'));
+        return view('Agenda.crear', compact('cliente', 'empleado', 'vehiculo', 'servicio'));
     }
 
     /**
@@ -79,7 +84,7 @@ class AgendaController extends Controller
         $empleado = $this->empleadoService->listarTodo();
         $vehiculo = $this->vehiculoService->getAll();
 
-        return view('agenda.editar', compact('agenda', 'cliente', 'empleado', 'vehiculo'));
+        return view('Agenda.editar', compact('agenda', 'cliente', 'empleado', 'vehiculo'));
     }
 
     /**
@@ -98,7 +103,9 @@ class AgendaController extends Controller
      */
     public function destroy(int $id)
     {
-        $this->agendaService->delete($id);
+        if (!$this->agendaService->delete($id)) {
+            return redirect()->route('agenda.index')->with('error', 'No se puede eliminar la cita porque tiene servicios o pagos relacionados.');
+        }
 
         return redirect()->route('agenda.index')->with('success', 'Cita eliminada correctamente.');
     }

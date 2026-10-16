@@ -65,7 +65,7 @@ class AgendaServiciosController extends Controller
     {
         $this->agendaServicioService->update($id, $request->validated());
 
-        return redirect()->route('agendaServicios.index')
+        return redirect()->route('agendaServicio.index')
             ->with('success', 'Servicio de la cita actualizado correctamente.');
     }
 
@@ -73,7 +73,7 @@ class AgendaServiciosController extends Controller
     {
         $this->agendaServicioService->delete($id);
 
-        return redirect()->route('agendaServicios.index')
+        return redirect()->route('agendaServicio.index')
             ->with('success', 'Servicio quitado de la cita correctamente.');
     }
 }

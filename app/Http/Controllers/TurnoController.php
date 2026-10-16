@@ -2,10 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\turno;
-use App\Models\empleado;
-use Illuminate\Http\Request;
 use App\Services\turnoService;
+use App\Services\empleadoService;
 use App\Http\Requests\turnoStoreRequest;
 use App\Http\Requests\turnoUpdateRequest;
 
@@ -14,9 +12,11 @@ class TurnoController extends Controller
 {
 
 private turnoService $turnoService;
-public function __construct(turnoService $turnoService)
+private empleadoService $empleadoService;
+public function __construct(turnoService $turnoService, empleadoService $empleadoService)
 {
     $this->turnoService = $turnoService;
+    $this->empleadoService = $empleadoService;
 }
     /**
      * Display a listing of the resource.
@@ -32,7 +32,7 @@ public function __construct(turnoService $turnoService)
      */
     public function create()
     {
-        $empleados = empleado::all();
+        $empleados = $this->empleadoService->listarTodo();
         return view('turno.crear', compact('empleados'));
     }
 
@@ -60,7 +60,7 @@ public function __construct(turnoService $turnoService)
     public function edit(int $id)
     {
         $turno = $this->turnoService->buscarPorId($id);
-        $empleados = empleado::all();
+        $empleados = $this->empleadoService->listarTodo();
         return view('turno.editar', compact('turno', 'empleados'));
     }
 

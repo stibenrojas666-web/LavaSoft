@@ -17,12 +17,21 @@ public function listarTodo(){
     return $this->servicioRepository->listarTodo();
 }
 
+public function listarActivosConPrecios(){
+    return $this->servicioRepository->listarActivosConPrecios();
+}
+
 public function guardar(array $datos){
     return $this->servicioRepository->guardar($datos);
 }
 
-public function eliminar(int $id){
-    return $this->servicioRepository->eliminar($id);
+public function eliminar(int $id): bool
+{
+    if ($this->servicioRepository->tieneDependencias($id)) {
+        return false;
+    }
+
+    return $this->servicioRepository->eliminar($id) > 0;
 }
 
 public function buscarPorId(int $id){

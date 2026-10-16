@@ -3,12 +3,14 @@
 namespace App\Repositories;
 
 use App\Models\agenda;
+use App\Models\agendaServicios;
+use App\Models\pago;
 
 class AgendaRepository
 {
     public function getAll()
     {
-        return agenda::with(['empleado', 'cliente', 'vehiculo'])->get();
+        return agenda::with(['empleado', 'cliente', 'vehiculo.tipoVehiculo'])->get();
     }
 
     public function keep(array $datos)
@@ -31,5 +33,11 @@ class AgendaRepository
     public function delete(int $id)
     {
         return agenda::destroy($id);
+    }
+
+    public function tieneDependencias(int $id): bool
+    {
+        return agendaServicios::where('agendaId', $id)->exists()
+            || pago::where('agendaId', $id)->exists();
     }
 }

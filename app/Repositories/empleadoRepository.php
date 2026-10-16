@@ -3,6 +3,8 @@
 namespace App\Repositories;
 
 use App\Models\empleado;
+use App\Models\agenda;
+use App\Models\turno;
 
 class empleadoRepository
 {
@@ -18,7 +20,13 @@ class empleadoRepository
 
     public function eliminar(int $id)
     {
-        empleado::destroy($id);
+        return empleado::destroy($id);
+    }
+
+    public function tieneDependencias(int $id): bool
+    {
+        return agenda::where('empleadoId', $id)->exists()
+            || turno::where('empleado_id', $id)->exists();
     }
 
     public function buscarPorId(int $id)

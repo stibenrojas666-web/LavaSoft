@@ -74,7 +74,9 @@ class ServicioController extends Controller
      */
     public function destroy(int $id)
     {
-        $this->servicioService->eliminar($id);
+        if (!$this->servicioService->eliminar($id)) {
+            return redirect()->route('servicios.index')->with('error', 'No se puede eliminar el servicio porque tiene citas o precios relacionados.');
+        }
         return redirect()->route('servicios.index')->with('success', 'Servicio eliminado correctamente');
     }
 }

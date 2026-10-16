@@ -74,7 +74,9 @@ class TipoVehiculoController extends Controller
      */
     public function destroy(int $id)
     {
-        $this->tipoVehiculoService->eliminar($id);
+        if (!$this->tipoVehiculoService->eliminar($id)) {
+            return redirect()->route('tipoVehiculo.index')->with('error', 'No se puede eliminar el tipo porque tiene vehículos o precios de servicio relacionados.');
+        }
         return redirect()->route('tipoVehiculo.index')->with('success', 'tipoVehiculo eliminado Correctamente.');
     }
 }

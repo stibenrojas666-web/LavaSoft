@@ -24,7 +24,11 @@ Class VehiculoService{
         return $this->VehiculoRespository->update($id, $datos);
     }
 
-    public function delete(int $id){
-        return $this->VehiculoRespository->delete($id);
+    public function delete(int $id): bool{
+        if ($this->VehiculoRespository->tieneDependencias($id)) {
+            return false;
+        }
+
+        return $this->VehiculoRespository->delete($id) > 0;
     }
 }

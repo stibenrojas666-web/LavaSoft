@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\pago;
+use App\Models\agenda;
 
 class PagoRepository
 {
@@ -14,6 +15,11 @@ class PagoRepository
     public function keep(array $datos)
     {
         return pago::create($datos);
+    }
+
+    public function confirmarAgenda(int $agendaId): void
+    {
+        agenda::whereKey($agendaId)->update(['estado' => 'confirmada']);
     }
 
     public function findById(int $id)

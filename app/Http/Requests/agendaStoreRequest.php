@@ -31,6 +31,10 @@ class AgendaStoreRequest extends FormRequest
             'hora'           => 'required|date_format:H:i',
             'estado'         => ['required', Rule::in(['pendiente', 'confirmada', 'cancelada'])],
             'tipoDeAtencion' => ['required', Rule::in(['Por orden de llegada', 'Por cita agendada'])],
+            'servicios'   => ['required', 'array', 'min:1'],
+            'servicios.*' => ['required', 'integer', 'distinct', 'exists:servicios,id'],
+            'precios_acordados' => ['nullable', 'array'],
+            'precios_acordados.*' => ['nullable', 'numeric', 'min:0.01', 'max:99999999.99'],
         ];
     }
 
@@ -51,6 +55,13 @@ class AgendaStoreRequest extends FormRequest
             'estado.in'                  => 'El estado seleccionado no es válido',
             'tipoDeAtencion.required'    => 'El tipo de atención es obligatorio',
             'tipoDeAtencion.in'          => 'El tipo de atención seleccionado no es válido',
+            'servicios.required' => 'Selecciona al menos un servicio para la cita.',
+'servicios.min' => 'Selecciona al menos un servicio para la cita.',
+'servicios.*.distinct' => 'No puedes seleccionar el mismo servicio más de una vez.',
+'servicios.*.exists' => 'Uno de los servicios seleccionados no existe.',
+            'precios_acordados.*.numeric' => 'El precio acordado debe ser un número.',
+            'precios_acordados.*.min' => 'El precio acordado debe ser mayor que cero.',
+            'precios_acordados.*.max' => 'El precio acordado es demasiado alto.',
         ];
     }
 }
