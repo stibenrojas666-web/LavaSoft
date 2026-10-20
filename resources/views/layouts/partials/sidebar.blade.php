@@ -16,35 +16,39 @@
         <nav class="flex-1 space-y-6 overflow-y-auto px-3 py-5" aria-label="Navegación lateral">
             <section aria-labelledby="nav-principal">
                 <h2 id="nav-principal" class="px-3 pb-2 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500">Principal</h2>
-                <a href="{{ route('dashboard.index') }}"
-                   @if(request()->routeIs('dashboard.index')) aria-current="page" @endif
-                   @click="sidebarOpen = false"
-                   class="sidebar-link {{ request()->routeIs('dashboard.index') ? 'sidebar-link-active' : '' }}">
-                    <span class="sidebar-icon">@include('layouts.partials.icons', ['icon' => 'home'])</span>
-                    <span>Dashboard</span>
-                </a>
+                @can('ver dashboard')
+                    <a href="{{ route('dashboard.index') }}"
+                        @if(request()->routeIs('dashboard.index')) aria-current="page" @endif
+                        @click="sidebarOpen = false"
+                        class="sidebar-link {{ request()->routeIs('dashboard.index') ? 'sidebar-link-active' : '' }}">
+                        <span class="sidebar-icon">@include('layouts.partials.icons', ['icon' => 'home'])</span>
+                        <span>Dashboard</span>
+                    </a>
+                @endcan
             </section>
 
             <section aria-labelledby="nav-gestion">
                 <h2 id="nav-gestion" class="px-3 pb-2 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500">Gestión</h2>
                 <div class="space-y-1">
                     @foreach ([
-                        ['Clientes', 'clientes.index', 'users'],
-                        ['Empleados', 'empleados.index', 'users'],
-                        ['Turnos', 'turnos.index', 'chart'],
-                        ['Vehículos', 'vehiculos.index', 'box'],
-                        ['Agenda', 'agenda.index', 'calendar'],
-                        ['Servicios por cita', 'agendaServicio.index', 'clipboard'],
-                        ['Pagos', 'pagos.index', 'tag'],
-                    ] as [$label, $routeName, $icon])
-                        @php($active = request()->routeIs(str_replace('.index', '.*', $routeName)))
-                        <a href="{{ route($routeName) }}"
-                           @if($active) aria-current="page" @endif
-                           @click="sidebarOpen = false"
-                           class="sidebar-link {{ $active ? 'sidebar-link-active' : '' }}">
-                            <span class="sidebar-icon">@include('layouts.partials.icons', ['icon' => $icon])</span>
-                            <span>{{ $label }}</span>
-                        </a>
+                        ['label' => 'Clientes', 'route' => 'clientes.index', 'icon' => 'users', 'can' => 'ver clientes'],
+                        ['label' => 'Empleados', 'route' => 'empleados.index', 'icon' => 'users', 'can' => 'ver empleados'],
+                        ['label' => 'Turnos', 'route' => 'turnos.index', 'icon' => 'chart', 'can' => 'ver turnos'],
+                        ['label' => 'Vehículos', 'route' => 'vehiculos.index', 'icon' => 'box', 'can' => 'ver vehiculos'],
+                        ['label' => 'Agenda', 'route' => 'agenda.index', 'icon' => 'calendar', 'can' => 'ver agenda'],
+                        ['label' => 'Servicios por cita', 'route' => 'agendaServicio.index', 'icon' => 'clipboard', 'can' => 'ver agendaservicio'],
+                        ['label' => 'Pagos', 'route' => 'pagos.index', 'icon' => 'tag', 'can' => 'ver pagos'],
+                    ] as $link)
+                        @can($link['can'])
+                            @php($active = request()->routeIs(str_replace('.index', '.*', $link['route'])))
+                            <a href="{{ route($link['route']) }}"
+                                @if($active) aria-current="page" @endif
+                                @click="sidebarOpen = false"
+                                class="sidebar-link {{ $active ? 'sidebar-link-active' : '' }}">
+                                <span class="sidebar-icon">@include('layouts.partials.icons', ['icon' => $link['icon']])</span>
+                                <span>{{ $link['label'] }}</span>
+                            </a>
+                        @endcan
                     @endforeach
                 </div>
             </section>
@@ -53,20 +57,35 @@
                 <h2 id="nav-catalogo" class="px-3 pb-2 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500">Catálogo</h2>
                 <div class="space-y-1">
                     @foreach ([
-                        ['Servicios', 'servicios.index', 'sparkles'],
-                        ['Tipos de vehículo', 'tipoVehiculo.index', 'box'],
-                        ['Precios de servicio', 'precioServicio.index', 'tag'],
-                    ] as [$label, $routeName, $icon])
-                        @php($active = request()->routeIs(str_replace('.index', '.*', $routeName)))
-                        <a href="{{ route($routeName) }}"
-                           @if($active) aria-current="page" @endif
-                           @click="sidebarOpen = false"
-                           class="sidebar-link {{ $active ? 'sidebar-link-active' : '' }}">
-                            <span class="sidebar-icon">@include('layouts.partials.icons', ['icon' => $icon])</span>
-                            <span>{{ $label }}</span>
-                        </a>
+                        ['label' => 'Servicios', 'route' => 'servicios.index', 'icon' => 'sparkles', 'can' => 'ver servicios'],
+                        ['label' => 'Tipos de vehículo', 'route' => 'tipoVehiculo.index', 'icon' => 'box', 'can' => 'ver tipovehiculo'],
+                        ['label' => 'Precios de servicio', 'route' => 'precioServicio.index', 'icon' => 'tag', 'can' => 'ver precioservicio'],
+                    ] as $link)
+                        @can($link['can'])
+                            @php($active = request()->routeIs(str_replace('.index', '.*', $link['route'])))
+                            <a href="{{ route($link['route']) }}"
+                                @if($active) aria-current="page" @endif
+                                @click="sidebarOpen = false"
+                                class="sidebar-link {{ $active ? 'sidebar-link-active' : '' }}">
+                                <span class="sidebar-icon">@include('layouts.partials.icons', ['icon' => $link['icon']])</span>
+                                <span>{{ $link['label'] }}</span>
+                            </a>
+                        @endcan
                     @endforeach
                 </div>
+            </section>
+
+            <section aria-labelledby="nav-seguridad">
+                <h2 id="nav-seguridad" class="px-3 pb-2 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500">Seguridad</h2>
+                @can(config('seguridad.permiso_admin'))
+                    <a href="{{ route('seguridad.permisos.index') }}"
+                        @if(request()->routeIs('seguridad.*')) aria-current="page" @endif
+                        @click="sidebarOpen = false"
+                        class="sidebar-link {{ request()->routeIs('seguridad.*') ? 'sidebar-link-active' : '' }}">
+                        <span class="sidebar-icon">@include('layouts.partials.icons', ['icon' => 'shield'])</span>
+                        <span>Gestión de usuarios y permisos</span>
+                    </a>
+                @endcan
             </section>
         </nav>
 
@@ -79,14 +98,7 @@
                     <span class="block truncate text-sm font-medium text-white">{{ auth()->user()?->name ?? 'Administrador' }}</span>
                     <span class="mt-0.5 block text-xs text-slate-500">Panel administrativo</span>
                 </span>
-                @if (Route::has('logout'))
-                    <form method="POST" action="{{ route('logout') }}">
-                        @csrf
-                        <button type="submit" class="rounded-lg p-2 text-slate-400 transition hover:bg-slate-700 hover:text-white" aria-label="Cerrar sesión" title="Cerrar sesión">
-                            <span class="block h-4 w-4">@include('layouts.partials.icons', ['icon' => 'logout'])</span>
-                        </button>
-                    </form>
-                @endif
+
             </div>
         </div>
     </div>

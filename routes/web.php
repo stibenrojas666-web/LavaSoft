@@ -12,18 +12,24 @@ use App\Http\Controllers\TipoVehiculoController;
 use App\Http\Controllers\PrecioServicioController;
 use App\Http\Controllers\TurnoController;
 use App\Http\Controllers\PagoController;
-Route::get('/', [DashboardController::class, 'index'])
-        ->name('dashboard.index');
-Route::resource('empleados',EmpleadoController::class);
-Route::resource('clientes',ClientesController::class);
-Route::resource('vehiculos',VehiculoController::class);
-Route::resource('servicios', ServicioController::class);
-Route::resource('tipoVehiculo', TipoVehiculoController::class);
-Route::get('agenda/empleados-disponibles', [AgendaController::class, 'empleadosDisponibles'])
-    ->name('agenda.empleadosDisponibles');
-Route::resource('agenda',AgendaController::class);
-Route::resource('precioServicio',PrecioServicioController::class);
-Route::resource('turnos',TurnoController::class);
-Route::resource('agendaServicio',AgendaServiciosController::class);
-Route::resource('pagos',PagoController::class);
 
+
+
+Route::middleware('auth')->group(function () {
+
+    Route::get('/dashboard', [DashboardController::class, 'index'])
+            ->name('dashboard.index')->middleware('modulo:dashboard');
+    Route::resource('empleados', EmpleadoController::class)->middleware('modulo:empleados');
+    Route::resource('clientes', ClientesController::class)->middleware('modulo:clientes');
+    Route::resource('vehiculos', VehiculoController::class)->middleware('modulo:vehiculos');
+    Route::resource('servicios', ServicioController::class)->middleware('modulo:servicios');
+    Route::resource('tipoVehiculo', TipoVehiculoController::class)->middleware('modulo:tipoVehiculo');
+    Route::get('agenda/empleados-disponibles', [AgendaController::class, 'empleadosDisponibles'])
+        ->name('agenda.empleadosDisponibles')->middleware('modulo:agenda');
+    Route::resource('agenda', AgendaController::class)->middleware('modulo:agenda');
+    Route::resource('precioServicio', PrecioServicioController::class)->middleware('modulo:precioServicio');
+    Route::resource('turnos', TurnoController::class)->middleware('modulo:turnos');
+    Route::resource('agendaServicio', AgendaServiciosController::class)->middleware('modulo:agendaServicio');
+    Route::resource('pagos', PagoController::class)->names('pagos')->middleware('modulo:pagos');
+
+});

@@ -33,6 +33,7 @@ class DatabaseSeeder extends Seeder
             TurnosSeeder::class,
             AgendaDemoSeeder::class,
             PagosSeeder::class,
+            SeguridadSeeder::class,
         ]);
     }
 }
