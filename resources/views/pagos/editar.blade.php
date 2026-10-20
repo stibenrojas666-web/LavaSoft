@@ -23,40 +23,21 @@
         @csrf
         @method('PUT')
 
-        {{-- Cita --}}
-        <div class="mb-4">
-            <label for="agendaId" class="block text-gray-700 font-semibold mb-1">Cita</label>
-
-            <select name="agendaId" id="agendaId"
-                class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-400 @error('agendaId') border-red-500 @enderror">
-
-                <option value="">Seleccione una cita</option>
-
-                @foreach($agenda as $a)
-                    <option value="{{ $a->id }}"
-                        {{ old('agendaId', $pago->agendaId) == $a->id ? 'selected' : '' }}>
-                        #{{ $a->id }} - {{ \Carbon\Carbon::parse($a->fecha)->format('d/m/Y') }}
-                        {{ substr($a->hora, 0, 5) }} - {{ $a->cliente->nombreCliente ?? 'N/A' }}
-                    </option>
-                @endforeach
-            </select>
-
-            @error('agendaId')
-                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-            @enderror
+        <div class="mb-4 rounded-lg border border-cyan-100 bg-cyan-50 p-4">
+            <p class="font-semibold text-cyan-900">Cita #{{ $pago->agendaId }}</p>
+            <p class="text-sm text-cyan-800">
+                {{ $pago->agenda->cliente->nombreCliente ?? 'Cliente' }} ·
+                {{ $pago->agenda->vehiculo->placa ?? 'Vehículo' }}
+            </p>
         </div>
 
-        {{-- Monto --}}
+        {{-- Total --}}
         <div class="mb-4">
-            <label for="Monto" class="block text-gray-700 font-semibold mb-1">Monto</label>
-
-            <input type="number" step="0.01" min="0" name="Monto" id="Monto"
-                value="{{ old('Monto', $pago->Monto) }}"
-                class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-400 @error('Monto') border-red-500 @enderror">
-
-            @error('Monto')
-                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-            @enderror
+            <label for="Monto" class="block text-gray-700 font-semibold mb-1">Total de servicios</label>
+            <input type="text" id="Monto" readonly
+                value="${{ number_format($total, 2) }}"
+                class="w-full rounded-lg border bg-gray-100 px-3 py-2 text-gray-700">
+            <p class="mt-1 text-xs text-gray-500">El total se vuelve a calcular desde los servicios guardados al actualizar el pago.</p>
         </div>
 
         {{-- Método de pago --}}

@@ -3,6 +3,8 @@
 namespace App\Repositories;
 
 use App\Models\tipoVehiculo;
+use App\Models\precioServicio;
+use App\Models\vehiculo;
 
 class tipoVehiculoRepository
 {
@@ -18,7 +20,13 @@ class tipoVehiculoRepository
 
     public function eliminar(int $id)
     {
-        tipoVehiculo::destroy($id);
+        return tipoVehiculo::destroy($id);
+    }
+
+    public function tieneDependencias(int $id): bool
+    {
+        return vehiculo::where('tipoVehiculoId', $id)->exists()
+            || precioServicio::where('tipo_vehiculo_id', $id)->exists();
     }
 
     public function buscarPorId(int $id)

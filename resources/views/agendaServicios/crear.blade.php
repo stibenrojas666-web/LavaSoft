@@ -65,9 +65,17 @@
             @enderror
         </div>
 
-        <p class="mb-6 text-sm text-gray-600">
-            El precio se calcula automáticamente según el tipo de vehículo de la cita.
-        </p>
+{{-- Precio manual solo para modalidad “A convenir”. El servidor calcula los demás. --}}
+        <div class="mb-6">
+            <label for="Precio" class="block text-gray-700 font-semibold mb-1">Precio acordado (solo si es “A convenir”)</label>
+            <input type="number" step="0.01" min="0.01" max="99999999.99" name="Precio" id="Precio"
+                value="{{ old('Precio') }}" placeholder="Déjalo vacío para precios del catálogo"
+                class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-400 @error('Precio') border-red-500 @enderror">
+            <p class="mt-1.5 text-sm text-slate-500">Para precio fijo o “Desde”, el sistema usa el catálogo según el vehículo. Si es “A convenir”, escribe aquí el valor acordado.</p>
+            @error('Precio')
+                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+            @enderror
+        </div>
 
         <div class="flex justify-end gap-2">
             <a href="{{ route('agendaServicio.index') }}"

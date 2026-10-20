@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Repositories\turnoRepository;
+use Illuminate\Validation\ValidationException;
 
 class turnoService
 {
@@ -18,6 +19,7 @@ public function listarTodo(){
 }
 
 public function guardar(array $datos){
+    $this->validarSinCruce($datos);
     return $this->turnoRepository->guardar($datos);
 }
 
@@ -31,7 +33,26 @@ public function buscarPorId(int $id){
 
 public function actualizar(int $id, array $datos)
 {
+    $this->validarSinCruce($datos, $id);
     return $this->turnoRepository->actualizar($id, $datos);
+}
+
+private function validarSinCruce(array $datos, ?int $turnoId = null): void
+{
+    $horaInicio = $datos['horaInicio'] . ':00';
+    $horaFin = $datos['horaFin'] . ':00';
+
+    if ($this->turnoRepository->tieneCruce(
+        (int) $datos['empleado_id'],
+        $datos['dia'],
+        $horaInicio,
+        $horaFin,
+        $turnoId
+    )) {
+        throw ValidationException::withMessages([
+            'horaInicio' => 'Este empleado ya tiene un turno que se cruza con ese horario en ese día.',
+        ]);
+    }
 }
 
 }

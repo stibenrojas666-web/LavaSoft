@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class clientes extends Model
 {
+  use HasFactory;
   protected $table = 'clientes';
   protected $fillable = [
     'nombreCliente',
@@ -16,7 +18,7 @@ class clientes extends Model
     
       public function vehiculo()
     {
-        return $this->hasMany(clientes::class); /**, 'clienteID' */
+      return $this->hasMany(vehiculo::class, 'clienteID');
     } 
 
     PUblic function agendas()

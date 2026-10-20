@@ -3,6 +3,8 @@
 namespace App\Repositories;
 
 use App\Models\clientes;
+use App\Models\agenda;
+use App\Models\vehiculo;
 
 class clienteRepository {
 public function listarTodo(){
@@ -14,11 +16,17 @@ public function guardar(array $datos){
     }
     
  public function eliminar(int $id){
-    clientes::destroy($id);
+    return clientes::destroy($id);
+    }
+
+    public function tieneDependencias(int $id): bool
+    {
+        return vehiculo::where('clienteID', $id)->exists()
+            || agenda::where('clienteId', $id)->exists();
     }
 
     public function buscarPorId(int $id){
-        return clientes::find($id);
+        return clientes::findOrFail($id);
     }
 
     public function actualizar(int $id, array $datos)

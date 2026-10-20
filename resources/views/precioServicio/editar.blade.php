@@ -58,13 +58,25 @@
             @enderror
         </div>
 
+        <div class="mb-4">
+            <label for="modalidad" class="block text-gray-700 font-semibold mb-1">Cómo se calcula</label>
+            <select name="modalidad" id="modalidad" required
+                    class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-400 @error('modalidad') border-red-500 @enderror">
+                <option value="fijo" {{ old('modalidad', $precioServicio->modalidad) === 'fijo' ? 'selected' : '' }}>Precio fijo</option>
+                <option value="desde" {{ old('modalidad', $precioServicio->modalidad) === 'desde' ? 'selected' : '' }}>Desde (precio inicial)</option>
+                <option value="convenir" {{ old('modalidad', $precioServicio->modalidad) === 'convenir' ? 'selected' : '' }}>A convenir con el cliente</option>
+            </select>
+            @error('modalidad') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
+        </div>
+
         {{-- precio --}}
         <div class="mb-6">
-            <label for="precio" class="block text-gray-700 font-semibold mb-1">Precio</label>
-            <input type="number" step="0.01" min="0" name="precio" id="precio"
+            <label for="precio" id="precio-label" class="block text-gray-700 font-semibold mb-1">Precio</label>
+            <input type="number" step="0.01" min="0.01" name="precio" id="precio"
                    value="{{ old('precio', $precioServicio->precio) }}"
                    class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-400
                           @error('precio') border-red-500 @enderror">
+            <p id="precio-ayuda" class="text-sm text-gray-500 mt-1"></p>
             @error('precio')
                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
             @enderror
@@ -82,5 +94,29 @@
         </div>
     </form>
 </x-card>
+
+<script>
+    (() => {
+        const modalidad = document.getElementById('modalidad');
+        const precio = document.getElementById('precio');
+        const etiqueta = document.getElementById('precio-label');
+        const ayuda = document.getElementById('precio-ayuda');
+
+        function actualizarPrecio() {
+            const esConvenir = modalidad.value === 'convenir';
+            precio.disabled = esConvenir;
+            precio.required = !esConvenir;
+            if (esConvenir) precio.value = '';
+            precio.closest('div').classList.toggle('hidden', esConvenir);
+            etiqueta.textContent = modalidad.value === 'desde' ? 'Precio inicial' : 'Precio';
+            ayuda.textContent = modalidad.value === 'desde'
+                ? 'Este valor se mostrará como precio desde.'
+                : (esConvenir ? 'El valor acordado se escribe al agendar la cita.' : '');
+        }
+
+        modalidad.addEventListener('change', actualizarPrecio);
+        actualizarPrecio();
+    })();
+</script>
 
 @endsection

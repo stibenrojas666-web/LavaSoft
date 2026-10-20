@@ -16,6 +16,7 @@ class AgendaServicioStoreRequest extends FormRequest
     {
         return [
             'agendaId'   => 'required|exists:agendas,id',
+            'Precio' => ['nullable', 'numeric', 'min:0.01', 'max:99999999.99'],
             'servicioId' => [
                 'required',
                 'exists:servicios,id',
@@ -33,6 +34,9 @@ class AgendaServicioStoreRequest extends FormRequest
             'servicioId.required' => 'El servicio es obligatorio',
             'servicioId.exists'   => 'El servicio seleccionado no existe',
             'servicioId.unique'   => 'Este servicio ya está agregado a la cita',
+            'Precio.numeric' => 'El precio acordado debe ser un número.',
+            'Precio.min' => 'El precio acordado debe ser mayor que cero.',
+            'Precio.max' => 'El precio acordado es demasiado alto.',
         ];
     }
 }

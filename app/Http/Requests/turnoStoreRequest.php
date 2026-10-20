@@ -4,8 +4,6 @@ namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\Validator;
 
 class turnoStoreRequest extends FormRequest
 {
@@ -31,31 +29,6 @@ class turnoStoreRequest extends FormRequest
             'horaInicio' => 'required|date_format:H:i',
             'horaFin' => 'required|date_format:H:i|after:horaInicio',
             ];
-    }
-
-    /** Evita que un empleado tenga dos turnos semanales que se crucen el mismo día. */
-    public function withValidator(Validator $validator): void
-    {
-        $validator->after(function (Validator $validator) {
-            if ($validator->errors()->has('empleado_id') || $validator->errors()->has('dia') ||
-                $validator->errors()->has('horaInicio') || $validator->errors()->has('horaFin')) {
-                return;
-            }
-
-            $inicio = $this->input('horaInicio') . ':00';
-            $fin = $this->input('horaFin') . ':00';
-
-            $seCruza = DB::table('turnos')
-                ->where('empleado_id', $this->input('empleado_id'))
-                ->where('dia', $this->input('dia'))
-                ->where('horaInicio', '<', $fin)
-                ->where('horaFin', '>', $inicio)
-                ->exists();
-
-            if ($seCruza) {
-                $validator->errors()->add('horaInicio', 'Este empleado ya tiene un turno que se cruza con ese horario en ese día.');
-            }
-        });
     }
 
     public function messages(): array

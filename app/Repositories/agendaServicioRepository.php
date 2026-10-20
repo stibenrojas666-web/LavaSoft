@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\agendaServicios;
+use App\Models\pago;
 
 class AgendaServicioRepository
 {
@@ -31,5 +32,10 @@ class AgendaServicioRepository
     public function delete(int $id)
     {
         return agendaServicios::destroy($id);
+    }
+
+    public function agendaTienePago(int $agendaId): bool
+    {
+        return pago::where('agendaId', $agendaId)->exists();
     }
 }

@@ -4,18 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\PagoStoreRequest;
 use App\Http\Requests\PagoUpdateRequest;
-use App\Services\AgendaService;
+use App\Http\Requests\PagoCreateRequest;
 use App\Services\PagoService;
 
 class PagoController extends Controller
 {
     private PagoService $pagoService;
-    private AgendaService $agendaService;
-
-    public function __construct(PagoService $pagoService, AgendaService $agendaService)
+    public function __construct(PagoService $pagoService)
     {
         $this->pagoService = $pagoService;
-        $this->agendaService = $agendaService;
     }
 
     public function index()
@@ -25,11 +22,14 @@ class PagoController extends Controller
         return view('pagos.index', compact('pago'));
     }
 
-    public function create()
+    public function create(PagoCreateRequest $request)
     {
-        $agenda = $this->agendaService->getAll();
+        $datos = $request->validated();
+        $formulario = $this->pagoService->datosParaCrear(
+            isset($datos['agendaId']) ? (int) $datos['agendaId'] : null
+        );
 
-        return view('pagos.crear', compact('agenda'));
+        return view('pagos.crear', $formulario);
     }
 
     public function store(PagoStoreRequest $request)
@@ -47,9 +47,9 @@ class PagoController extends Controller
     public function edit(int $id)
     {
         $pago = $this->pagoService->findById($id);
-        $agenda = $this->agendaService->getAll();
+        $total = $this->pagoService->calcularTotal((int) $pago->agendaId);
 
-        return view('pagos.editar', compact('pago', 'agenda'));
+        return view('pagos.editar', compact('pago', 'total'));
     }
 
     public function update(int $id, PagoUpdateRequest $request)

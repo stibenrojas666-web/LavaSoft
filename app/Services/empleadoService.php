@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Repositories\empleadoRepository;
+use Carbon\Carbon;
 
 class empleadoService
 {
@@ -17,12 +18,25 @@ public function listarTodo(){
     return $this->empleadoRepository->listarTodo();
 }
 
+    public function disponiblesEnHorario(string $fecha, string $hora, ?int $agendaId = null)
+    {
+        $dias = [1 => 'lunes', 2 => 'martes', 3 => 'miercoles', 4 => 'jueves', 5 => 'viernes', 6 => 'sabado', 7 => 'domingo'];
+        $dia = $dias[Carbon::parse($fecha)->dayOfWeekIso];
+
+        return $this->empleadoRepository->disponiblesEnHorario($fecha, $hora, $dia, $agendaId);
+    }
+
 public function guardar(array $datos){
     return $this->empleadoRepository->guardar($datos);
 }
 
-public function eliminar(int $id){
-    return $this->empleadoRepository->eliminar($id);
+    public function eliminar(int $id): bool
+    {
+        if ($this->empleadoRepository->tieneDependencias($id)) {
+            return false;
+        }
+
+        return $this->empleadoRepository->eliminar($id) > 0;
 }
 
 public function buscarPorId(int $id){

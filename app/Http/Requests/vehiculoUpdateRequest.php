@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class vehiculoUpdateRequest extends FormRequest
 {
@@ -25,7 +26,10 @@ class vehiculoUpdateRequest extends FormRequest
         return [
             'clienteID'=>'required|exists:clientes,id',
             'tipoVehiculoId'=>'required|exists:tipo_vehiculos,id',
-            'placa'=>'required|string|max:20|unique:vehiculos,placa,',
+            'placa' => [
+                'required', 'string', 'max:20',
+                Rule::unique('vehiculos', 'placa')->ignore($this->route('vehiculo')),
+            ],
             'modelo'=>'required|string|max:100',
             'color'=>'required|string|max:50',
             'estado'=>'required|string|max:50',

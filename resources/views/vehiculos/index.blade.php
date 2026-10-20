@@ -24,12 +24,6 @@
         </a>
     </div>
 
-    @if(session('success'))
-        <div class="mb-4 p-4 bg-green-100 border-l-4 border-green-500 text-green-700 rounded">
-            {{ session('success') }}
-        </div>
-    @endif
-
     <div class="overflow-x-auto">
 
         <table class="w-full text-left border-collapse">
@@ -80,8 +74,8 @@
                     <td class="px-4 py-3 text-center">
 
                         <a href="{{ route('vehiculos.edit', $v->id) }}"
-                            class="text-blue-600 hover:text-blue-900 mr-3">
-                            ✏️
+                            class="text-blue-600 hover:text-blue-900 mr-3" title="Editar" aria-label="Editar">
+                            <span aria-hidden="true" class="inline-block h-4 w-4">@include('layouts.partials.icons', ['icon' => 'pencil'])</span>
                         </a>
 
                         <form action="{{ route('vehiculos.destroy', $v->id) }}"
@@ -92,9 +86,9 @@
                             @method('DELETE')
 
                             <button type="submit"
-                                class="text-red-600 hover:text-red-900"
+                                class="text-red-600 hover:text-red-900" title="Eliminar" aria-label="Eliminar"
                                 onclick="return confirm('¿Desea eliminar este vehículo?')">
-                                🗑️
+                                <span aria-hidden="true" class="inline-block h-4 w-4">@include('layouts.partials.icons', ['icon' => 'trash'])</span>
                             </button>
 
                         </form>

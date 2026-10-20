@@ -16,7 +16,6 @@ Route::get('/', [DashboardController::class, 'index'])
         ->name('dashboard.index');
 Route::resource('empleados',EmpleadoController::class);
 Route::resource('clientes',ClientesController::class);
-Route::resource('servicios',ServicioController::class);
 Route::resource('vehiculos',VehiculoController::class);
 Route::resource('servicios', ServicioController::class);
 Route::resource('tipoVehiculo', TipoVehiculoController::class);
@@ -27,5 +26,4 @@ Route::resource('precioServicio',PrecioServicioController::class);
 Route::resource('turnos',TurnoController::class);
 Route::resource('agendaServicio',AgendaServiciosController::class);
 Route::resource('pagos',PagoController::class);
-Route::resource('turnos',TurnoController::class);
 

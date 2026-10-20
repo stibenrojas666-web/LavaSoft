@@ -57,7 +57,7 @@
                 @foreach($vehiculo as $v)
                     <option value="{{ $v->id }}"
                         {{ old('vehiculoId', $agenda->vehiculoId) == $v->id ? 'selected' : '' }}>
-                        {{ $v->placa }} - {{ $v->modelo }}
+                        {{ ucfirst($v->tipoVehiculo->nombre ?? 'Vehículo') }} · {{ $v->placa }} · {{ $v->modelo }}
                     </option>
                 @endforeach
             </select>
@@ -77,6 +77,7 @@
                 data-url="{{ route('agenda.empleadosDisponibles') }}"
                 data-agenda-id="{{ $agenda->id }}"
                 data-selected="{{ old('empleadoId', $agenda->empleadoId) }}"
+                data-agenda-id="{{ $agenda->id }}"
                 class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-400 @error('empleadoId') border-red-500 @enderror">
 
                 <option value="">Sin asignar</option>

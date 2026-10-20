@@ -49,7 +49,7 @@
         {{-- Teléfono --}}
         <div class="mb-4">
             <label for="telefonoCliente" class="block text-gray-700 font-semibold mb-1">Teléfono</label>
-            <input type="text" name="telefonoCliente" id="telefonoCliente"
+            <input type="tel" inputmode="numeric" pattern="[0-9]{7,15}" maxlength="15" name="telefonoCliente" id="telefonoCliente"
                    value="{{ old('telefonoCliente', $cliente->telefonoCliente) }}"
                    class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-400
                           @error('telefonoCliente') border-red-500 @enderror">
