@@ -37,10 +37,12 @@
                         ['label' => 'Vehículos', 'route' => 'vehiculos.index', 'icon' => 'box', 'can' => 'ver vehiculos'],
                         ['label' => 'Agenda', 'route' => 'agenda.index', 'icon' => 'calendar', 'can' => 'ver agenda'],
                         ['label' => 'Servicios por cita', 'route' => 'agendaServicio.index', 'icon' => 'clipboard', 'can' => 'ver agendaservicio'],
-                        ['label' => 'Pagos', 'route' => 'pagos.index', 'icon' => 'tag', 'can' => 'ver pagos'],
+                        ['label' => 'Historial de pagos', 'route' => 'pagos.historial', 'icon' => 'credit-card', 'can' => 'ver pagos'],
                     ] as $link)
                         @can($link['can'])
-                            @php($active = request()->routeIs(str_replace('.index', '.*', $link['route'])))
+                            @php($active = str_contains($link['route'], '.index')
+                                ? request()->routeIs(str_replace('.index', '.*', $link['route']))
+                                : request()->routeIs($link['route']))
                             <a href="{{ route($link['route']) }}"
                                 @if($active) aria-current="page" @endif
                                 @click="sidebarOpen = false"
