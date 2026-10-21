@@ -12,12 +12,30 @@ Class VehiculoService{
         return $this->VehiculoRespository->getAll(); 
     }
 
+    public function buscar(string $texto, array $filtros = [])
+    {
+        return $this->VehiculoRespository->buscar($texto, $filtros);
+    }
+
+    public function cambiarEstado(int $id): bool
+    {
+        return $this->VehiculoRespository->cambiarEstado($id);
+    }
+
     public function keep(array $datos){
         return $this->VehiculoRespository->keep($datos);
     }
 
     public function findById(int $id){
         return $this->VehiculoRespository->finById($id);
+    }
+
+    public function historial(int $id): array
+    {
+        $vehiculo = $this->VehiculoRespository->finById($id);
+        $historial = $this->VehiculoRespository->historialServicios($id);
+
+        return compact('vehiculo', 'historial');
     }
 
     public function update(int $id, array $datos){

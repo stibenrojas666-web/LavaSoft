@@ -18,6 +18,11 @@ public function listarTodo(){
     return $this->empleadoRepository->listarTodo();
 }
 
+    public function buscar(string $texto, array $filtros = [])
+{
+        return $this->empleadoRepository->buscar($texto, $filtros);
+}
+
     public function disponiblesEnHorario(string $fecha, string $hora, ?int $agendaId = null)
     {
         $dias = [1 => 'lunes', 2 => 'martes', 3 => 'miercoles', 4 => 'jueves', 5 => 'viernes', 6 => 'sabado', 7 => 'domingo'];
@@ -46,6 +51,16 @@ public function buscarPorId(int $id){
 public function actualizar(int $id, array $datos)
 {
     return $this->empleadoRepository->actualizar($id, $datos);
+}
+
+public function cambiarEstado(int $id): bool
+{
+    $empleado = $this->empleadoRepository->buscarPorId($id);
+    $nuevoEstado = !(bool) $empleado->estado;
+
+    $this->empleadoRepository->actualizar($id, ['estado' => $nuevoEstado]);
+
+    return $nuevoEstado;
 }
 
 }

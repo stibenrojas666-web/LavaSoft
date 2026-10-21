@@ -7,6 +7,7 @@ use App\Services\servicioService;
 use App\Services\tipoVehiculoService;
 use App\Http\Requests\precioServicioStoreRequest;
 use App\Http\Requests\precioServicioUpdateRequest;
+use App\Http\Requests\BusquedaIndexRequest;
 
 class PrecioServicioController extends Controller 
 {
@@ -23,10 +24,14 @@ class PrecioServicioController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(BusquedaIndexRequest $request)
     {
-        $precioServicio = $this->precioServicioService->listarTodo();
-        return view('precioServicio.index', compact('precioServicio'));
+        $datos = $request->validated();
+        $buscar = trim((string) ($datos['buscar'] ?? ''));
+        $filtros = array_intersect_key($datos, array_flip(['tipoVehiculoId', 'modalidad']));
+        $precioServicio = $this->precioServicioService->buscar($buscar, $filtros);
+        $tipoVehiculos = $this->tipoVehiculoService->listarTodo();
+        return view('precioServicio.index', compact('precioServicio', 'buscar', 'filtros', 'tipoVehiculos'));
     }
 
     /**

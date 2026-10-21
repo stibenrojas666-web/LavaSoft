@@ -31,6 +31,12 @@ class vehiculo extends Model
 
     public function agendas()
     {
-        return $this->hasMany(agenda::class);
+        return $this->belongsToMany(agenda::class, 'agenda_servicios', 'vehiculoId', 'agendaId')
+            ->distinct();
+    }
+
+    public function agendaServicios()
+    {
+        return $this->hasMany(agendaServicios::class, 'vehiculoId');
     }
 }

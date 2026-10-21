@@ -15,7 +15,7 @@ class EmpleadoFactory extends Factory
             'apellido' => fake()->lastName(),
             'identificacion' => fake()->unique()->numerify('##########'),
             'telefono' => fake()->numerify('3#########'),
-            'rh' => fake()->randomElement(['O+', 'O-', 'A+', 'A-', 'B+', 'B-']),
+            'rh' => fake()->randomElement(config('empleado.tiposSangre')),
             'eps' => fake()->company(),
             'estado' => true,
         ];

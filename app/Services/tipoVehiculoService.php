@@ -17,6 +17,11 @@ public function listarTodo(){
     return $this->tipoVehiculoRepository->listarTodo();
 }
 
+public function buscar(string $texto)
+{
+    return $this->tipoVehiculoRepository->buscar($texto);
+}
+
 public function guardar(array $datos){
     return $this->tipoVehiculoRepository->guardar($datos);
 }

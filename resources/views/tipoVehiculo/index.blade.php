@@ -13,14 +13,9 @@
             🚙 Tipos de Vehículo
         </h2>
 
-        <a href="{{ route('tipoVehiculo.create') }}"
-            class="bg-cyan-600 hover:bg-cyan-700 text-white font-semibold py-2 px-4 rounded-lg shadow transition duration-200 flex items-center gap-2">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-            </svg>
-            Nuevo Tipo de Vehículo
-        </a>
     </div>
+
+    <x-list-search :action="route('tipoVehiculo.index')" :value="$buscar" placeholder="Nombre del tipo de vehículo" />
 
     <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
@@ -52,12 +47,14 @@
                 @empty
                 <tr>
                     <td colspan="2" class="px-4 py-6 text-center text-gray-500">
-                        No hay tipos de vehículo registrados.
+                        {{ $buscar !== '' ? 'No encontramos tipos de vehículo con esa búsqueda.' : 'No hay tipos de vehículo registrados.' }}
                     </td>
                 </tr>
                 @endforelse
             </tbody>
         </table>
     </div>
+    @if($tipoVehiculos->hasPages())<div class="mt-6">{{ $tipoVehiculos->links() }}</div>@endif
 </x-card>
+<x-floating-action :href="route('tipoVehiculo.create')" label="Nuevo tipo de vehículo" icon="car" />
 @endsection

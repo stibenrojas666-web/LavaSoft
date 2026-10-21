@@ -18,6 +18,11 @@ public function listarTodo(){
     return $this->turnoRepository->listarTodo();
 }
 
+    public function buscar(string $texto, array $filtros = [])
+{
+        return $this->turnoRepository->buscar($texto, $filtros);
+}
+
 public function guardar(array $datos){
     $this->validarSinCruce($datos);
     return $this->turnoRepository->guardar($datos);

@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class empleadoStoreRequest extends FormRequest
 {
@@ -27,7 +28,7 @@ class empleadoStoreRequest extends FormRequest
             'apellido' => 'required|string|max:20',
             'identificacion' => 'required|string|max:20',
             'telefono' => 'required|string|max:15',
-            'rh' => 'required|string|max:3',
+            'rh' => ['required', Rule::in(config('empleado.tiposSangre'))],
             'eps' => 'required|string|max:50',
             'estado' => 'required|boolean',
         ];
@@ -41,6 +42,7 @@ class empleadoStoreRequest extends FormRequest
             'identificacion.required' => 'El campo identificacion es obligatorio.',
             'telefono.required' => 'El campo teléfono es obligatorio.',
             'rh.required' => 'El campo RH es obligatorio.',
+            'rh.in' => 'Selecciona un tipo de sangre válido.',
             'eps.required' => 'El campo EPS es obligatorio.'
         ];
     }

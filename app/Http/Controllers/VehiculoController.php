@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\VehiculoStoreRequest;
 use App\Http\Requests\VehiculoUpdateRequest;
+use App\Http\Requests\VehiculoIndexRequest;
 use App\Services\VehiculoService;
 use App\Services\clienteService;
 use App\Services\tipoVehiculoService;
@@ -25,11 +26,25 @@ private tipoVehiculoService $tipoVehiculoService;
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(VehiculoIndexRequest $request)
     {
-        $vehiculo = $this->VehiculoService->getAll();
+        $datos = $request->validated();
+        $buscar = trim((string) ($datos['buscar'] ?? ''));
+        $filtros = array_intersect_key($datos, array_flip(['estado', 'tipoVehiculoId']));
+        $vehiculo = $this->VehiculoService->buscar($buscar, $filtros);
 
-        return view('vehiculos.index', compact('vehiculo'));
+        $tipoVehiculos = $this->tipoVehiculoService->listarTodo();
+        return view('vehiculos.index', compact('vehiculo', 'buscar', 'filtros', 'tipoVehiculos'));
+    }
+
+    public function cambiarEstado(int $id)
+    {
+        $activo = $this->VehiculoService->cambiarEstado($id);
+
+        return redirect()->route('vehiculos.index')->with(
+            'success',
+            $activo ? 'Vehículo activado correctamente.' : 'Vehículo desactivado correctamente.'
+        );
     }
 
     /**
@@ -56,9 +71,9 @@ private tipoVehiculoService $tipoVehiculoService;
     /**
      * Display the specified resource.
      */
-    public function show()
+    public function show(int $id)
     {
-        //
+        return view('vehiculos.historial', $this->VehiculoService->historial($id));
     }
 
     /**

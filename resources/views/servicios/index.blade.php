@@ -13,14 +13,11 @@
             🧽 Servicios
         </h2>
 
-        <a href="{{ route('servicios.create') }}"
-            class="bg-cyan-600 hover:bg-cyan-700 text-white font-semibold py-2 px-4 rounded-lg shadow transition duration-200 flex items-center gap-2">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-            </svg>
-            Nuevo Servicio
-        </a>
     </div>
+
+    <x-list-search :action="route('servicios.index')" :value="$buscar" placeholder="Nombre o descripción del servicio" :filters="[
+        ['name' => 'estado', 'label' => 'Estado', 'options' => ['' => 'Todos', 'activo' => 'Activos', 'inactivo' => 'Inactivos'], 'value' => $filtros['estado'] ?? ''],
+    ]" />
 
     <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
@@ -38,12 +35,19 @@
                     <td class="px-4 py-3">{{ $servicio->nombre }}</td>
                     <td class="px-4 py-3">{{ $servicio->descripcion }}</td>
                     <td class="px-4 py-3">
-                        <span class="px-2 py-1 rounded-full text-xs
-                            @if($servicio->estado) bg-green-100 text-green-800
-                            @else bg-red-100 text-red-800
-                            @endif">
-                            {{ $servicio->estado ? 'Activo' : 'Inactivo' }}
-                        </span>
+                        <div class="flex items-center gap-2">
+                            <form action="{{ route('servicios.estado', array_merge(['id' => $servicio->id], request()->query())) }}" method="POST">
+                                @csrf
+                                @method('PATCH')
+                                <button type="submit" role="switch" aria-checked="{{ $servicio->estado ? 'true' : 'false' }}"
+                                    aria-label="{{ $servicio->estado ? 'Desactivar' : 'Activar' }} servicio {{ $servicio->nombre }}"
+                                    title="{{ $servicio->estado ? 'Desactivar servicio' : 'Activar servicio' }}"
+                                    class="relative inline-flex h-7 w-12 items-center rounded-full transition focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 {{ $servicio->estado ? 'bg-emerald-500' : 'bg-slate-300' }}">
+                                    <span class="inline-block h-5 w-5 transform rounded-full bg-white shadow transition {{ $servicio->estado ? 'translate-x-6' : 'translate-x-1' }}"></span>
+                                </button>
+                            </form>
+                            <span class="text-sm font-semibold {{ $servicio->estado ? 'text-emerald-700' : 'text-slate-500' }}">{{ $servicio->estado ? 'Activo' : 'Inactivo' }}</span>
+                        </div>
                     </td>
                     <td class="px-4 py-3 text-center">
                         <a href="{{ route('servicios.edit', $servicio->id) }}"
@@ -63,12 +67,14 @@
                 @empty
                 <tr>
                     <td colspan="4" class="px-4 py-6 text-center text-gray-500">
-                        No hay servicios registrados.
+                        {{ $buscar !== '' ? 'No encontramos servicios con esa búsqueda.' : 'No hay servicios registrados.' }}
                     </td>
                 </tr>
                 @endforelse
             </tbody>
         </table>
     </div>
+    @if($servicios->hasPages())<div class="mt-6">{{ $servicios->links() }}</div>@endif
 </x-card>
+<x-floating-action :href="route('servicios.create')" label="Nuevo servicio" icon="plus" />
 @endsection

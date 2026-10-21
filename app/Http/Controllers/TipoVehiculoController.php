@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 use App\Services\tipoVehiculoService;
 use App\Http\Requests\tipoVehiculoStoreRequest;
 use App\Http\Requests\tipoVehiculoUpdateRequest;
+use App\Http\Requests\BusquedaIndexRequest;
 
 class TipoVehiculoController extends Controller
 {
@@ -18,10 +19,11 @@ class TipoVehiculoController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(BusquedaIndexRequest $request)
     {
-        $tipoVehiculos = $this->tipoVehiculoService->listarTodo();
-        return view('tipoVehiculo.index', compact('tipoVehiculos'));
+        $buscar = trim((string) $request->validated('buscar', ''));
+        $tipoVehiculos = $this->tipoVehiculoService->buscar($buscar);
+        return view('tipoVehiculo.index', compact('tipoVehiculos', 'buscar'));
     }
 
     /**

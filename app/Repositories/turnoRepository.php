@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\turno;
+use App\Support\TextoBusqueda;
 
 class turnoRepository
 {
@@ -19,6 +20,25 @@ class turnoRepository
     public function listarTodo()
     {
         return turno::with('empleado')->get();
+    }
+
+    public function buscar(string $texto, array $filtros = [])
+    {
+        return TextoBusqueda::aplicar(turno::with('empleado'), $texto, function ($coincidencias, $termino) {
+                $coincidencias->where('dia', 'like', $termino)
+                    ->orWhere('jornada', 'like', $termino)
+                    ->orWhere('horaInicio', 'like', $termino)
+                    ->orWhere('horaFin', 'like', $termino)
+                    ->orWhereHas('empleado', fn ($empleado) => $empleado->where('nombre', 'like', $termino)
+                        ->orWhere('apellido', 'like', $termino)
+                        ->orWhere('identificacion', 'like', $termino));
+            })
+            ->when(($filtros['dia'] ?? '') !== '', fn ($query) => $query->where('dia', $filtros['dia']))
+            ->when(($filtros['jornada'] ?? '') !== '', fn ($query) => $query->where('jornada', $filtros['jornada']))
+            ->orderBy('dia')
+            ->orderBy('horaInicio')
+            ->paginate(12)
+            ->withQueryString();
     }
 
     public function guardar(array $datos)

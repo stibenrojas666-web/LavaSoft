@@ -1,69 +1,80 @@
 @extends('layouts.app')
 
-@section('title')
-    Clientes
-@endsection
+@section('title', 'Clientes')
+@section('page-title', 'Clientes')
 
 @section('content')
+    <x-card>
+        <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+            <div>
+                <p class="text-sm text-slate-500">Directorio</p>
+                <h1 class="text-2xl font-bold text-cyan-800">Clientes</h1>
+            </div>
+            <span class="rounded-full bg-cyan-50 px-3 py-1 text-sm font-medium text-cyan-800">{{ $clientes->total() }} encontrados</span>
+        </div>
 
-<x-card>
+        @if(session('success'))
+            <p class="mb-5 rounded-lg bg-green-50 p-3 text-sm text-green-800">{{ session('success') }}</p>
+        @endif
+        @if(session('error'))
+            <p class="mb-5 rounded-lg bg-red-50 p-3 text-sm text-red-800">{{ session('error') }}</p>
+        @endif
 
-    <div class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-bold text-cyan-700">
-            🧑‍🤝‍🧑 Clientes
-        </h2>
+        <x-list-search :action="route('clientes.index')" :value="$buscar" placeholder="Nombre, apellido, teléfono o correo" />
 
-        <a href="{{ route('clientes.create') }}"
-            class="bg-cyan-600 hover:bg-cyan-700 text-white font-semibold py-2 px-4 rounded-lg shadow transition duration-200 flex items-center gap-2">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-            </svg>
-            Nuevo Cliente
-        </a>
-    </div>
+        <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            @forelse($clientes as $cliente)
+                <article class="flex h-full flex-col rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-cyan-200 hover:shadow-md">
+                    <div class="flex items-start gap-4">
+                        <span class="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-cyan-100 p-3 text-cyan-800">
+                            @include('layouts.partials.icons', ['icon' => 'user'])
+                        </span>
+                        <div class="min-w-0 flex-1">
+                            <h2 class="truncate text-lg font-bold text-slate-900">{{ $cliente->nombreCliente }} {{ $cliente->apellidoCliente }}</h2>
+                            <p class="mt-1 text-xs font-medium uppercase tracking-wide text-slate-400">Cliente #{{ $cliente->id }}</p>
+                        </div>
+                    </div>
 
-    <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse">
-            <thead>
-                <tr class="bg-cyan-100 border-b border-cyan-200 text-cyan-800 text-sm uppercase tracking-wider">
-                    <th class="py-3 px-4">Nombre</th>
-                    <th class="py-3 px-4">Apellido</th>
-                    <th class="py-3 px-4">Teléfono</th>
-                    <th class="py-3 px-4">Email</th>
-                    <th class="py-3 px-4 text-center">Acciones</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-200 text-sm text-gray-700">
-                @forelse($clientes as $cliente)
-                <tr class="hover:bg-cyan-50">
-                    <td class="px-4 py-3">{{ $cliente->nombreCliente }}</td>
-                    <td class="px-4 py-3">{{ $cliente->apellidoCliente }}</td>
-                    <td class="px-4 py-3">{{ $cliente->telefonoCliente }}</td>
-                    <td class="px-4 py-3">{{ $cliente->emailCliente }}</td>
-                    <td class="px-4 py-3 text-center">
-                        <a href="{{ route('clientes.edit', $cliente->id) }}"
-                            class="text-blue-600 hover:text-blue-900 mr-3" title="Editar" aria-label="Editar">
-                            <span aria-hidden="true" class="inline-block h-4 w-4">@include('layouts.partials.icons', ['icon' => 'pencil'])</span>
+                    <dl class="mt-5 space-y-3 text-sm">
+                        <div class="flex gap-3">
+                            <dt class="w-20 shrink-0 text-slate-500">Teléfono</dt>
+                            <dd class="break-all font-medium text-slate-800">{{ $cliente->telefonoCliente ?: 'Sin registrar' }}</dd>
+                        </div>
+                        <div class="flex gap-3">
+                            <dt class="w-20 shrink-0 text-slate-500">Correo</dt>
+                            <dd class="break-all font-medium text-slate-800">{{ $cliente->emailCliente ?: 'Sin registrar' }}</dd>
+                        </div>
+                    </dl>
+
+                    <div class="mt-auto flex flex-wrap items-center justify-between gap-2 border-t border-slate-100 pt-4">
+                        <a href="{{ route('clientes.show', $cliente->id) }}" class="inline-flex items-center gap-2 rounded-lg bg-cyan-50 px-3 py-2 text-sm font-semibold text-cyan-800 transition hover:bg-cyan-100" title="Historial de vehículos">
+                            <span class="h-4 w-4">@include('layouts.partials.icons', ['icon' => 'car'])</span>
+                            Vehículos
                         </a>
-                        <form action="{{ route('clientes.destroy', $cliente->id) }}" method="POST" class="inline">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="text-red-600 hover:text-red-900" title="Eliminar" aria-label="Eliminar"
-                                onclick="return confirm('¿Desea eliminar este cliente?')">
-                                <span aria-hidden="true" class="inline-block h-4 w-4">@include('layouts.partials.icons', ['icon' => 'trash'])</span>
-                            </button>
-                        </form>
-                    </td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="5" class="px-4 py-6 text-center text-gray-500">
-                        No hay clientes registrados.
-                    </td>
-                </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
-</x-card>
+                        <div class="flex items-center gap-1">
+                            <a href="{{ route('clientes.edit', $cliente->id) }}" class="grid h-9 w-9 place-items-center rounded-lg text-blue-700 transition hover:bg-blue-50" title="Editar cliente" aria-label="Editar cliente">
+                                <span class="h-4 w-4">@include('layouts.partials.icons', ['icon' => 'pencil'])</span>
+                            </a>
+                            <form action="{{ route('clientes.destroy', $cliente->id) }}" method="POST" onsubmit="return confirm('¿Desea eliminar este cliente?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="grid h-9 w-9 place-items-center rounded-lg text-red-700 transition hover:bg-red-50" title="Eliminar cliente" aria-label="Eliminar cliente">
+                                    <span class="h-4 w-4">@include('layouts.partials.icons', ['icon' => 'trash'])</span>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </article>
+            @empty
+                <div class="rounded-xl border border-dashed border-slate-300 bg-slate-50 px-4 py-10 text-center sm:col-span-2 xl:col-span-3">
+                    <span class="mx-auto block h-8 w-8 text-slate-400">@include('layouts.partials.icons', ['icon' => 'users'])</span>
+                    <p class="mt-3 font-medium text-slate-700">{{ $buscar !== '' ? 'No encontramos clientes con esa búsqueda.' : 'Todavía no hay clientes registrados.' }}</p>
+                    @if($buscar !== '')<a href="{{ route('clientes.index') }}" class="mt-2 inline-block text-sm font-semibold text-cyan-800 hover:underline">Ver todos los clientes</a>@endif
+                </div>
+            @endforelse
+        </div>
+
+        @if($clientes->hasPages())<div class="mt-6">{{ $clientes->links() }}</div>@endif
+    </x-card>
+    <x-floating-action :href="route('clientes.create')" label="Nuevo cliente" />
 @endsection

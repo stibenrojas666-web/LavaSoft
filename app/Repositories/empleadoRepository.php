@@ -5,12 +5,28 @@ namespace App\Repositories;
 use App\Models\empleado;
 use App\Models\agenda;
 use App\Models\turno;
+use App\Support\TextoBusqueda;
 
 class empleadoRepository
 {
     public function listarTodo()
     {
         return empleado::all();
+    }
+
+    public function buscar(string $texto, array $filtros = [])
+    {
+        return TextoBusqueda::aplicar(empleado::query(), $texto, fn ($filtros, $termino) => $filtros
+                ->where('nombre', 'like', $termino)
+                ->orWhere('apellido', 'like', $termino)
+                ->orWhere('identificacion', 'like', $termino)
+                ->orWhere('telefono', 'like', $termino)
+                ->orWhere('rh', 'like', $termino)
+                ->orWhere('eps', 'like', $termino))
+            ->orderBy('nombre')
+            ->orderBy('apellido')
+            ->paginate(12)
+            ->withQueryString();
     }
 
     public function disponiblesEnHorario(string $fecha, string $hora, string $dia, ?int $agendaId = null)
@@ -24,6 +40,7 @@ class empleadoRepository
                     ->where('horaInicio', '<=', $horaCompleta)
                     ->where('horaFin', '>', $horaCompleta);
             })
+            ->when(($filtros['estado'] ?? '') !== '', fn ($query) => $query->where('estado', $filtros['estado'] === 'activo'))
             ->whereDoesntHave('agendas', function ($query) use ($fecha, $hora, $agendaId) {
                 $query->where('fecha', $fecha)
                     ->whereTime('hora', '=', $hora)

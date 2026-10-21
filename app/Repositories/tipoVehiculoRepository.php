@@ -5,12 +5,21 @@ namespace App\Repositories;
 use App\Models\tipoVehiculo;
 use App\Models\precioServicio;
 use App\Models\vehiculo;
+use App\Support\TextoBusqueda;
 
 class tipoVehiculoRepository
 {
     public function listarTodo()
     {
         return tipoVehiculo::all();
+    }
+
+    public function buscar(string $texto)
+    {
+        return TextoBusqueda::aplicar(tipoVehiculo::query(), $texto, fn ($query, $termino) => $query->where('nombre', 'like', $termino))
+            ->orderBy('nombre')
+            ->paginate(12)
+            ->withQueryString();
     }
 
     public function guardar(array $datos)

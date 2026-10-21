@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Services\empleadoService;
 use App\Http\Requests\empleadoStoreRequest;
 use App\Http\Requests\empleadoUpdateRequest;
+use App\Http\Requests\BusquedaIndexRequest;
 
 class EmpleadoController extends Controller
 {
@@ -15,10 +16,13 @@ class EmpleadoController extends Controller
         $this->empleadoService = $empleadoService;
     }
 
-    public function index()
+    public function index(BusquedaIndexRequest $request)
     {
-        $empleados = $this->empleadoService->listarTodo();
-        return view('empleados.index', compact('empleados'));
+        $datos = $request->validated();
+        $buscar = trim((string) ($datos['buscar'] ?? ''));
+        $filtros = array_intersect_key($datos, array_flip(['estado']));
+        $empleados = $this->empleadoService->buscar($buscar, $filtros);
+        return view('empleados.index', compact('empleados', 'buscar', 'filtros'));
     }
 
     /**
@@ -67,6 +71,16 @@ class EmpleadoController extends Controller
     $this->empleadoService->actualizar($id, $request->validated());
     return redirect()->route('empleados.index')->with('success', 'Empleado actualizado correctamente.');
 }
+
+    public function cambiarEstado(int $id)
+    {
+        $activo = $this->empleadoService->cambiarEstado($id);
+
+        return redirect()->route('empleados.index')->with(
+            'success',
+            $activo ? 'Empleado activado correctamente.' : 'Empleado desactivado correctamente.'
+        );
+    }
 
     /**
      * Remove the specified resource from storage.

@@ -6,6 +6,7 @@ use App\Services\turnoService;
 use App\Services\empleadoService;
 use App\Http\Requests\turnoStoreRequest;
 use App\Http\Requests\turnoUpdateRequest;
+use App\Http\Requests\BusquedaIndexRequest;
 
 
 class TurnoController extends Controller
@@ -21,10 +22,13 @@ public function __construct(turnoService $turnoService, empleadoService $emplead
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(BusquedaIndexRequest $request)
     {
-        $turnos = $this->turnoService->listarTodo();
-        return view('turno.index', compact('turnos'));
+        $datos = $request->validated();
+        $buscar = trim((string) ($datos['buscar'] ?? ''));
+        $filtros = array_intersect_key($datos, array_flip(['dia', 'jornada']));
+        $turnos = $this->turnoService->buscar($buscar, $filtros);
+        return view('turno.index', compact('turnos', 'buscar', 'filtros'));
     }
 
     /**

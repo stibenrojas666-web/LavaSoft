@@ -13,14 +13,12 @@
             💲 Precios de Servicio
         </h2>
 
-        <a href="{{ route('precioServicio.create') }}"
-            class="bg-cyan-600 hover:bg-cyan-700 text-white font-semibold py-2 px-4 rounded-lg shadow transition duration-200 flex items-center gap-2">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-            </svg>
-            Nuevo Precio de Servicio
-        </a>
     </div>
+
+    <x-list-search :action="route('precioServicio.index')" :value="$buscar" placeholder="Servicio, tipo de vehículo o modalidad" :filters="[
+        ['name' => 'tipoVehiculoId', 'label' => 'Tipo de vehículo', 'options' => ['' => 'Todos'] + $tipoVehiculos->pluck('nombre', 'id')->all(), 'value' => $filtros['tipoVehiculoId'] ?? ''],
+        ['name' => 'modalidad', 'label' => 'Precio', 'options' => ['' => 'Todas', 'fijo' => 'Fijo', 'desde' => 'Desde', 'convenir' => 'A convenir'], 'value' => $filtros['modalidad'] ?? ''],
+    ]" />
 
     <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
@@ -33,25 +31,25 @@
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-200 text-sm text-gray-700">
-                @forelse($precioServicio as $precioServicio)
+                @forelse($precioServicio as $precio)
                 <tr class="hover:bg-cyan-50">
-                    <td class="px-4 py-3">{{ $precioServicio->servicio->nombre ?? 'N/A' }}</td>
-                    <td class="px-4 py-3">{{ $precioServicio->tipoVehiculo->nombre ?? 'N/A' }}</td>
+                    <td class="px-4 py-3">{{ $precio->servicio->nombre ?? 'N/A' }}</td>
+                    <td class="px-4 py-3">{{ $precio->tipoVehiculo->nombre ?? 'N/A' }}</td>
                     <td class="px-4 py-3">
-                        @if($precioServicio->modalidad === 'convenir')
+                        @if($precio->modalidad === 'convenir')
                             A convenir
-                        @elseif($precioServicio->modalidad === 'desde')
-                            Desde ${{ number_format($precioServicio->precio, 0, ',', '.') }}
+                        @elseif($precio->modalidad === 'desde')
+                            Desde ${{ number_format($precio->precio, 0, ',', '.') }}
                         @else
-                            ${{ number_format($precioServicio->precio, 0, ',', '.') }}
+                            ${{ number_format($precio->precio, 0, ',', '.') }}
                         @endif
                     </td>
                     <td class="px-4 py-3 text-center">
-                        <a href="{{ route('precioServicio.edit', $precioServicio->id) }}"
+                        <a href="{{ route('precioServicio.edit', $precio->id) }}"
                             class="text-blue-600 hover:text-blue-900 mr-3" title="Editar" aria-label="Editar">
                             <span aria-hidden="true" class="inline-block h-4 w-4">@include('layouts.partials.icons', ['icon' => 'pencil'])</span>
                         </a>
-                        <form action="{{ route('precioServicio.destroy', $precioServicio->id) }}" method="POST" class="inline">
+                        <form action="{{ route('precioServicio.destroy', $precio->id) }}" method="POST" class="inline">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="text-red-600 hover:text-red-900" title="Eliminar" aria-label="Eliminar"
@@ -64,7 +62,7 @@
                 @empty
                 <tr>
                     <td colspan="4" class="px-4 py-6 text-center text-gray-500">
-                        No hay precios de servicio registrados.
+                        {{ $buscar !== '' ? 'No encontramos precios con esa búsqueda.' : 'No hay precios de servicio registrados.' }}
                     </td>
                 </tr>
                 @endforelse
@@ -72,4 +70,5 @@
         </table>
     </div>
 </x-card>
+<x-floating-action :href="route('precioServicio.create')" label="Nuevo precio" icon="plus" />
 @endsection

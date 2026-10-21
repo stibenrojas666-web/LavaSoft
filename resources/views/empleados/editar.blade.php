@@ -76,10 +76,12 @@
         {{-- Rh --}}
         <div class="mb-4">
             <label for="rh" class="block text-gray-700 font-semibold mb-1">Rh</label>
-            <input type="text" name="rh" id="rh"
-                   value="{{ old('rh', $empleado->rh) }}"
-                   class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-400
-                          @error('rh') border-red-500 @enderror">
+            <select name="rh" id="rh" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-400 @error('rh') border-red-500 @enderror">
+                <option value="">Seleccione el tipo de sangre</option>
+                @foreach(config('empleado.tiposSangre') as $tipoSangre)
+                    <option value="{{ $tipoSangre }}" @selected(old('rh', $empleado->rh) === $tipoSangre)>{{ $tipoSangre }}</option>
+                @endforeach
+            </select>
             @error('rh')
                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
             @enderror

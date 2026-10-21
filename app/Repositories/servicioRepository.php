@@ -5,12 +5,24 @@ namespace App\Repositories;
 use App\Models\servicio;
 use App\Models\agendaServicios;
 use App\Models\precioServicio;
+use App\Support\TextoBusqueda;
 
 class servicioRepository
 {
     public function listarTodo()
     {
         return servicio::all();
+    }
+
+    public function buscar(string $texto, array $filtros = [])
+    {
+        return TextoBusqueda::aplicar(servicio::query(), $texto, fn ($consulta, $termino) => $consulta
+                ->where('nombre', 'like', $termino)
+                ->orWhere('descripcion', 'like', $termino))
+            ->when(($filtros['estado'] ?? '') !== '', fn ($query) => $query->where('estado', $filtros['estado'] === 'activo'))
+            ->orderBy('nombre')
+            ->paginate(12)
+            ->withQueryString();
     }
 
     public function listarActivosConPrecios()
@@ -21,6 +33,15 @@ class servicioRepository
     public function guardar(array $datos)
     {
         return servicio::create($datos);
+    }
+
+    public function cambiarEstado(int $id): bool
+    {
+        $servicio = servicio::findOrFail($id);
+        $servicio->estado = ! (bool) $servicio->estado;
+        $servicio->save();
+
+        return (bool) $servicio->estado;
     }
 
     public function eliminar(int $id)

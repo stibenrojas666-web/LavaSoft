@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Services\clienteService;
 use App\Http\Requests\ClienteStoreRequest;
 use App\Http\Requests\ClienteUpdateRequest;
+use App\Http\Requests\BusquedaIndexRequest;
 
 
 class ClientesController extends Controller
@@ -19,10 +20,11 @@ class ClientesController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(BusquedaIndexRequest $request)
     {
-        $clientes = $this->clientesService->listarTodo();
-        return view('clientes.index', compact('clientes'));
+        $buscar = trim((string) $request->validated('buscar', ''));
+        $clientes = $this->clientesService->buscar($buscar);
+        return view('clientes.index', compact('clientes', 'buscar'));
     }
 
     /**
@@ -49,9 +51,11 @@ class ClientesController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show()
+    public function show(int $id)
     {
-        //
+        $cliente = $this->clientesService->buscarConHistorial($id);
+
+        return view('clientes.historial', compact('cliente'));
     }
 
     /**

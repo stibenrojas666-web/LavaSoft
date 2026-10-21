@@ -1,118 +1,107 @@
 @extends('layouts.app')
 
-@section('title')
-    Gestión de Vehículos
-@endsection
+@section('title', 'Vehículos')
+@section('page-title', 'Vehículos')
 
 @section('content')
+    <x-card>
+        <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+            <div>
+                <p class="text-sm text-slate-500">Vehículos de tus clientes</p>
+                <h1 class="text-2xl font-bold text-cyan-800">Vehículos</h1>
+            </div>
+            <span class="rounded-full bg-cyan-50 px-3 py-1 text-sm font-medium text-cyan-800">{{ $vehiculo->total() }} encontrados</span>
+        </div>
 
-<x-card>
+        @if(session('success'))
+            <p class="mb-5 rounded-lg bg-green-50 p-3 text-sm text-green-800">{{ session('success') }}</p>
+        @endif
+        @if(session('error'))
+            <p class="mb-5 rounded-lg bg-red-50 p-3 text-sm text-red-800">{{ session('error') }}</p>
+        @endif
 
-    <div class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-bold text-cyan-700">
-            🚗 Lista de Vehículos
-        </h2>
+        <x-list-search :action="route('vehiculos.index')" :value="$buscar" placeholder="Placa, modelo, cliente o tipo de vehículo" :filters="[
+            ['name' => 'estado', 'label' => 'Estado', 'options' => ['' => 'Todos', 'activo' => 'Activos', 'inactivo' => 'Inactivos'], 'value' => $filtros['estado'] ?? ''],
+            ['name' => 'tipoVehiculoId', 'label' => 'Tipo de vehículo', 'options' => ['' => 'Todos'] + $tipoVehiculos->pluck('nombre', 'id')->all(), 'value' => $filtros['tipoVehiculoId'] ?? ''],
+        ]" />
 
-        <a href="{{ route('vehiculos.create') }}"
-            class="bg-cyan-600 hover:bg-cyan-700 text-white font-semibold py-2 px-4 rounded-lg shadow transition duration-200 flex items-center gap-2">
-
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-            </svg>
-
-            Nuevo Vehículo
-        </a>
-    </div>
-
-    <div class="overflow-x-auto">
-
-        <table class="w-full text-left border-collapse">
-
-            <thead>
-                <tr class="bg-cyan-100 border-b border-cyan-200 text-cyan-800 text-sm uppercase tracking-wider">
-                    <th class="py-3 px-4">ID</th>
-                    <th class="py-3 px-4">Cliente</th>
-                    <th class="py-3 px-4">Tipo Vehículo</th>
-                    <th class="py-3 px-4">Placa</th>
-                    <th class="py-3 px-4">Modelo</th>
-                    <th class="py-3 px-4">Color</th>
-                    <th class="py-3 px-4">Estado</th>
-                    <th class="py-3 px-4 text-center">Acciones</th>
-                </tr>
-            </thead>
-
-            <tbody class="divide-y divide-gray-200 text-sm text-gray-700">
-
-                @forelse ($vehiculo as $v)
-
-                <tr class="hover:bg-cyan-50">
-
-                    <td class="px-4 py-3">{{ $v->id }}</td>
-
-                    <td class="px-4 py-3">
-                        {{ $v->cliente->nombreCliente ?? 'N/A' }}
-                        {{ $v->cliente->apellidoCliente ?? '' }}
-                    </td>
-
-                    <td class="px-4 py-3">
-                        {{ $v->tipoVehiculo->nombre ?? 'N/A' }}
-                    </td>
-
-                    <td class="px-4 py-3">{{ $v->placa }}</td>
-
-                    <td class="px-4 py-3">{{ $v->modelo }}</td>
-
-                    <td class="px-4 py-3">{{ $v->color }}</td>
-
-                    <td class="px-4 py-3">
-                        <span class="px-2 py-1 rounded-full text-xs
-                            {{ $v->estado === 'Activo' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
-                            {{ $v->estado }}
+        <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            @forelse($vehiculo as $v)
+                @php
+                    $tipoNombre = strtolower($v->tipoVehiculo->nombre ?? '');
+                    $iconoVehiculo = str_contains($tipoNombre, 'moto') ? 'motorcycle' : 'car';
+                    $activo = strtolower((string) $v->estado) === 'activo';
+                @endphp
+                <article class="flex h-full flex-col rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-cyan-200 hover:shadow-md">
+                    <div class="flex items-start gap-4">
+                        <span class="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-cyan-100 p-3 text-cyan-800">
+                            @include('layouts.partials.icons', ['icon' => $iconoVehiculo])
                         </span>
-                    </td>
+                        <div class="min-w-0 flex-1">
+                            <h2 class="truncate text-lg font-bold uppercase tracking-wide text-slate-900">{{ $v->placa }}</h2>
+                            <p class="mt-1 text-sm font-medium text-cyan-800">{{ $v->tipoVehiculo->nombre ?? 'Tipo sin registrar' }}</p>
+                        </div>
+                    </div>
 
-                    <td class="px-4 py-3 text-center">
+                    <dl class="mt-5 space-y-3 text-sm">
+                        <div class="flex gap-3">
+                            <dt class="w-16 shrink-0 text-slate-500">Cliente</dt>
+                            <dd class="min-w-0 truncate font-medium text-slate-800">{{ $v->cliente->nombreCliente ?? 'Sin cliente' }} {{ $v->cliente->apellidoCliente ?? '' }}</dd>
+                        </div>
+                        <div class="flex gap-3">
+                            <dt class="w-16 shrink-0 text-slate-500">Modelo</dt>
+                            <dd class="font-medium text-slate-800">{{ $v->modelo ?: 'Sin registrar' }}</dd>
+                        </div>
+                        <div class="flex gap-3">
+                            <dt class="w-16 shrink-0 text-slate-500">Color</dt>
+                            <dd class="font-medium text-slate-800">{{ $v->color ?: 'Sin registrar' }}</dd>
+                        </div>
+                    </dl>
 
-                        <a href="{{ route('vehiculos.edit', $v->id) }}"
-                            class="text-blue-600 hover:text-blue-900 mr-3" title="Editar" aria-label="Editar">
-                            <span aria-hidden="true" class="inline-block h-4 w-4">@include('layouts.partials.icons', ['icon' => 'pencil'])</span>
-                        </a>
+                    <div class="mt-auto flex flex-wrap items-center justify-between gap-2 border-t border-slate-100 pt-4">
+                        <div class="flex flex-wrap items-center gap-3">
+                            <form action="{{ route('vehiculos.estado', $v->id) }}" method="POST">
+                                @csrf
+                                @method('PATCH')
+                                <button type="submit" role="switch" aria-checked="{{ $activo ? 'true' : 'false' }}"
+                                    aria-label="{{ $activo ? 'Desactivar' : 'Activar' }} vehículo {{ $v->placa }}"
+                                    title="{{ $activo ? 'Desactivar vehículo' : 'Activar vehículo' }}"
+                                    class="relative inline-flex h-7 w-12 items-center rounded-full transition focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 {{ $activo ? 'bg-emerald-500' : 'bg-slate-300' }}">
+                                    <span class="inline-block h-5 w-5 transform rounded-full bg-white shadow transition {{ $activo ? 'translate-x-6' : 'translate-x-1' }}"></span>
+                                </button>
+                            </form>
+                            <span class="text-sm font-semibold {{ $activo ? 'text-emerald-700' : 'text-slate-500' }}">{{ $activo ? 'Activo' : 'Inactivo' }}</span>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <a href="{{ route('vehiculos.show', $v->id) }}" class="grid h-9 w-9 place-items-center rounded-lg bg-cyan-50 text-cyan-800 transition hover:bg-cyan-100" title="Historial del vehículo" aria-label="Historial del vehículo">
+                                <span class="h-4 w-4">@include('layouts.partials.icons', ['icon' => 'history'])</span>
+                            </a>
+                            <a href="{{ route('vehiculos.edit', $v->id) }}" class="grid h-9 w-9 place-items-center rounded-lg text-blue-700 transition hover:bg-blue-50" title="Editar vehículo" aria-label="Editar vehículo">
+                                <span class="h-4 w-4">@include('layouts.partials.icons', ['icon' => 'pencil'])</span>
+                            </a>
+                            <form action="{{ route('vehiculos.destroy', $v->id) }}" method="POST" onsubmit="return confirm('¿Desea eliminar este vehículo?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="grid h-9 w-9 place-items-center rounded-lg text-red-700 transition hover:bg-red-50" title="Eliminar vehículo" aria-label="Eliminar vehículo">
+                                    <span class="h-4 w-4">@include('layouts.partials.icons', ['icon' => 'trash'])</span>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </article>
+            @empty
+                <div class="rounded-xl border border-dashed border-slate-300 bg-slate-50 px-4 py-10 text-center sm:col-span-2 xl:col-span-3">
+                    <span class="mx-auto block h-8 w-8 text-slate-400">@include('layouts.partials.icons', ['icon' => 'car'])</span>
+                    <p class="mt-3 font-medium text-slate-700">{{ $buscar !== '' ? 'No encontramos vehículos con esa búsqueda.' : 'Todavía no hay vehículos registrados.' }}</p>
+                    @if($buscar !== '')<a href="{{ route('vehiculos.index') }}" class="mt-2 inline-block text-sm font-semibold text-cyan-800 hover:underline">Ver todos los vehículos</a>@endif
+                </div>
+            @endforelse
+        </div>
 
-                        <form action="{{ route('vehiculos.destroy', $v->id) }}"
-                            method="POST"
-                            class="inline">
+        @if($vehiculo->hasPages())
+            <div class="mt-6">{{ $vehiculo->links() }}</div>
+        @endif
 
-                            @csrf
-                            @method('DELETE')
-
-                            <button type="submit"
-                                class="text-red-600 hover:text-red-900" title="Eliminar" aria-label="Eliminar"
-                                onclick="return confirm('¿Desea eliminar este vehículo?')">
-                                <span aria-hidden="true" class="inline-block h-4 w-4">@include('layouts.partials.icons', ['icon' => 'trash'])</span>
-                            </button>
-
-                        </form>
-
-                    </td>
-
-                </tr>
-
-                @empty
-
-                <tr>
-                    <td colspan="8" class="px-4 py-6 text-center text-gray-500">
-                        No hay vehículos registrados.
-                    </td>
-                </tr>
-
-                @endforelse
-
-            </tbody>
-
-        </table>
-
-    </div>
-
-</x-card>
-
+    </x-card>
+    <x-floating-action :href="route('vehiculos.create')" label="Nuevo vehículo" icon="car" />
 @endsection

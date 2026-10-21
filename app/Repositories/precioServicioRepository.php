@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\precioServicio;
+use App\Support\TextoBusqueda;
 
 class precioServicioRepository
 {
@@ -10,6 +11,24 @@ class precioServicioRepository
     {
         return precioServicio::with(['servicio', 'tipoVehiculo'])
             ->whereHas('servicio', fn ($query) => $query->where('estado', true))
+            ->get();
+    }
+
+    public function buscar(string $texto, array $filtros = [])
+    {
+        return TextoBusqueda::aplicar(
+                precioServicio::with(['servicio', 'tipoVehiculo'])
+                    ->whereHas('servicio', fn ($query) => $query->where('estado', true)),
+                $texto,
+                fn ($consulta, $termino) => $consulta
+                    ->whereHas('servicio', fn ($servicio) => $servicio->where('nombre', 'like', $termino))
+                    ->orWhereHas('tipoVehiculo', fn ($tipo) => $tipo->where('nombre', 'like', $termino))
+                    ->orWhere('modalidad', 'like', $termino)
+                    ->orWhere('precio', 'like', $termino)
+            )
+            ->when(($filtros['tipoVehiculoId'] ?? '') !== '', fn ($query) => $query->where('tipo_vehiculo_id', $filtros['tipoVehiculoId']))
+            ->when(($filtros['modalidad'] ?? '') !== '', fn ($query) => $query->where('modalidad', $filtros['modalidad']))
+            ->orderBy('servicio_id')
             ->get();
     }
 

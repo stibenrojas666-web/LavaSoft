@@ -1,69 +1,78 @@
 @extends('layouts.app')
 
-@section('title')
-    Turnos
-@endsection
+@section('title', 'Turnos')
+@section('page-title', 'Turnos')
 
 @section('content')
+    <x-card>
+        <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+            <div>
+                <p class="text-sm text-slate-500">Horario del equipo</p>
+                <h1 class="text-2xl font-bold text-cyan-800">Turnos</h1>
+            </div>
+            <span class="rounded-full bg-cyan-50 px-3 py-1 text-sm font-medium text-cyan-800">{{ $turnos->total() }} encontrados</span>
+        </div>
 
-<x-card>
+        @if(session('success'))<p class="mb-5 rounded-lg bg-green-50 p-3 text-sm text-green-800">{{ session('success') }}</p>@endif
+        @if(session('error'))<p class="mb-5 rounded-lg bg-red-50 p-3 text-sm text-red-800">{{ session('error') }}</p>@endif
 
-    <div class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-bold text-cyan-700">
-            🕒 Turnos
-        </h2>
+        <x-list-search :action="route('turnos.index')" :value="$buscar" placeholder="Empleado, identificación, día, jornada u hora" :filters="[
+            ['name' => 'dia', 'label' => 'Día', 'options' => ['' => 'Todos', 'lunes' => 'Lunes', 'martes' => 'Martes', 'miercoles' => 'Miércoles', 'jueves' => 'Jueves', 'viernes' => 'Viernes', 'sabado' => 'Sábado', 'domingo' => 'Domingo'], 'value' => $filtros['dia'] ?? ''],
+            ['name' => 'jornada', 'label' => 'Jornada', 'options' => ['' => 'Todas', 'mañana' => 'Mañana', 'tarde' => 'Tarde', 'noche' => 'Noche'], 'value' => $filtros['jornada'] ?? ''],
+        ]" />
 
-        <a href="{{ route('turnos.create') }}"
-            class="bg-cyan-600 hover:bg-cyan-700 text-white font-semibold py-2 px-4 rounded-lg shadow transition duration-200 flex items-center gap-2">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-            </svg>
-            Nuevo Turno
-        </a>
-    </div>
+        <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            @forelse($turnos as $turno)
+                <article class="flex h-full flex-col rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-cyan-200 hover:shadow-md">
+                    <div class="flex items-start gap-4">
+                        <span class="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-indigo-100 p-3 text-indigo-800">
+                            @include('layouts.partials.icons', ['icon' => 'clock'])
+                        </span>
+                        <div class="min-w-0 flex-1">
+                            <h2 class="truncate text-lg font-bold text-slate-900">{{ $turno->empleado->nombre ?? 'Sin empleado' }} {{ $turno->empleado->apellido ?? '' }}</h2>
+                            <p class="mt-1 text-xs font-medium uppercase tracking-wide text-slate-400">{{ $turno->empleado->identificacion ?? 'Identificación no disponible' }}</p>
+                        </div>
+                    </div>
 
-    <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse">
-            <thead>
-                <tr class="bg-cyan-100 border-b border-cyan-200 text-cyan-800 text-sm uppercase tracking-wider">
-                    <th class="py-3 px-4">Empleado</th>
-                    <th class="py-3 px-4">Identificación</th>
-                    <th class="py-3 px-4">Día</th>
-                    <th class="py-3 px-4">Jornada</th>
-                    <th class="py-3 px-4 text-center">Acciones</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-200 text-sm text-gray-700">
-                @forelse($turnos as $turno)
-                <tr class="hover:bg-cyan-50">
-                    <td class="px-4 py-3">{{ $turno->empleado->nombre ?? 'N/A' }} {{ $turno->empleado->apellido ?? '' }}</td>
-                    <td class="px-4 py-3">{{ $turno->empleado->identificacion ?? 'N/A' }}</td>
-                    <td class="px-4 py-3">{{ ucfirst($turno->dia) }}</td>
-                    <td class="px-4 py-3">{{ ucfirst($turno->jornada) }}</td>
-                    <td class="px-4 py-3 text-center">
-                        <a href="{{ route('turnos.edit', $turno->id) }}"
-                            class="text-blue-600 hover:text-blue-900 mr-3" title="Editar" aria-label="Editar">
-                            <span aria-hidden="true" class="inline-block h-4 w-4">@include('layouts.partials.icons', ['icon' => 'pencil'])</span>
+                    <div class="mt-5 grid grid-cols-2 gap-3">
+                        <div class="rounded-xl bg-slate-50 p-3">
+                            <p class="text-xs font-medium uppercase tracking-wide text-slate-500">Día</p>
+                            <p class="mt-1 font-semibold capitalize text-slate-900">{{ $turno->dia }}</p>
+                        </div>
+                        <div class="rounded-xl bg-slate-50 p-3">
+                            <p class="text-xs font-medium uppercase tracking-wide text-slate-500">Jornada</p>
+                            <p class="mt-1 font-semibold capitalize text-slate-900">{{ $turno->jornada }}</p>
+                        </div>
+                    </div>
+
+                    <div class="mt-3 flex items-center justify-between rounded-xl border border-cyan-100 bg-cyan-50 px-4 py-3">
+                        <span class="text-sm font-medium text-cyan-900">Horario</span>
+                        <span class="font-semibold text-cyan-900">{{ substr($turno->horaInicio, 0, 5) }} – {{ substr($turno->horaFin, 0, 5) }}</span>
+                    </div>
+
+                    <div class="mt-auto flex justify-end gap-1 border-t border-slate-100 pt-4">
+                        <a href="{{ route('turnos.edit', $turno->id) }}" class="grid h-9 w-9 place-items-center rounded-lg text-blue-700 transition hover:bg-blue-50" title="Editar turno" aria-label="Editar turno">
+                            <span class="h-4 w-4">@include('layouts.partials.icons', ['icon' => 'pencil'])</span>
                         </a>
-                        <form action="{{ route('turnos.destroy', $turno->id) }}" method="POST" class="inline">
+                        <form action="{{ route('turnos.destroy', $turno->id) }}" method="POST" onsubmit="return confirm('¿Desea eliminar este turno?')">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="text-red-600 hover:text-red-900" title="Eliminar" aria-label="Eliminar"
-                                onclick="return confirm('¿Desea eliminar este turno?')">
-                                <span aria-hidden="true" class="inline-block h-4 w-4">@include('layouts.partials.icons', ['icon' => 'trash'])</span>
+                            <button type="submit" class="grid h-9 w-9 place-items-center rounded-lg text-red-700 transition hover:bg-red-50" title="Eliminar turno" aria-label="Eliminar turno">
+                                <span class="h-4 w-4">@include('layouts.partials.icons', ['icon' => 'trash'])</span>
                             </button>
                         </form>
-                    </td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="5" class="px-4 py-6 text-center text-gray-500">
-                        No hay turnos registrados.
-                    </td>
-                </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
-</x-card>
+                    </div>
+                </article>
+            @empty
+                <div class="rounded-xl border border-dashed border-slate-300 bg-slate-50 px-4 py-10 text-center sm:col-span-2 xl:col-span-3">
+                    <span class="mx-auto block h-8 w-8 text-slate-400">@include('layouts.partials.icons', ['icon' => 'clock'])</span>
+                    <p class="mt-3 font-medium text-slate-700">{{ $buscar !== '' ? 'No encontramos turnos con esa búsqueda.' : 'Todavía no hay turnos registrados.' }}</p>
+                    @if($buscar !== '')<a href="{{ route('turnos.index') }}" class="mt-2 inline-block text-sm font-semibold text-cyan-800 hover:underline">Ver todos los turnos</a>@endif
+                </div>
+            @endforelse
+        </div>
+
+        @if($turnos->hasPages())<div class="mt-6">{{ $turnos->links() }}</div>@endif
+    </x-card>
+    <x-floating-action :href="route('turnos.create')" label="Nuevo turno" icon="clock" />
 @endsection
