@@ -3,11 +3,10 @@
 namespace App\Http\Controllers;
 
 
-use App\Models\tipoVehiculo;
-use Illuminate\Http\Request;
 use App\Services\tipoVehiculoService;
 use App\Http\Requests\tipoVehiculoStoreRequest;
 use App\Http\Requests\tipoVehiculoUpdateRequest;
+use App\Http\Requests\BusquedaIndexRequest;
 
 class TipoVehiculoController extends Controller
 {
@@ -20,10 +19,11 @@ class TipoVehiculoController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(BusquedaIndexRequest $request)
     {
-        $tipoVehiculos = $this->tipoVehiculoService->listarTodo();
-        return view('tipoVehiculo.index', compact('tipoVehiculos'));
+        $buscar = trim((string) $request->validated('buscar', ''));
+        $tipoVehiculos = $this->tipoVehiculoService->buscar($buscar);
+        return view('tipoVehiculo.index', compact('tipoVehiculos', 'buscar'));
     }
 
     /**
@@ -74,7 +74,9 @@ class TipoVehiculoController extends Controller
      */
     public function destroy(int $id)
     {
-        $this->tipoVehiculoService->eliminar($id);
+        if (!$this->tipoVehiculoService->eliminar($id)) {
+            return redirect()->route('tipoVehiculo.index')->with('error', 'No se puede eliminar el tipo porque tiene vehículos o precios de servicio relacionados.');
+        }
         return redirect()->route('tipoVehiculo.index')->with('success', 'tipoVehiculo eliminado Correctamente.');
     }
 }

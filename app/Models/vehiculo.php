@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class vehiculo extends Model
 {
+    use HasFactory;
     protected $table = 'vehiculos';
 
     protected $fillable = [
@@ -29,6 +31,12 @@ class vehiculo extends Model
 
     public function agendas()
     {
-        return $this->hasMany(agenda::class);
+        return $this->belongsToMany(agenda::class, 'agenda_servicios', 'vehiculoId', 'agendaId')
+            ->distinct();
+    }
+
+    public function agendaServicios()
+    {
+        return $this->hasMany(agendaServicios::class, 'vehiculoId');
     }
 }

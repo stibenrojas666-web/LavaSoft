@@ -3,22 +3,57 @@
 namespace App\Repositories;
 
 use App\Models\clientes;
+use App\Models\agenda;
+use App\Models\vehiculo;
+use App\Support\TextoBusqueda;
 
 class clienteRepository {
 public function listarTodo(){
     return clientes::all();
 }
 
+    public function buscar(string $texto)
+    {
+        return TextoBusqueda::aplicar(clientes::query(), $texto, fn ($filtros, $termino) => $filtros
+                ->where('nombreCliente', 'like', $termino)
+                ->orWhere('apellidoCliente', 'like', $termino)
+                ->orWhere('telefonoCliente', 'like', $termino)
+                ->orWhere('emailCliente', 'like', $termino))
+            ->orderBy('apellidoCliente')
+            ->orderBy('nombreCliente')
+            ->paginate(12)
+            ->withQueryString();
+    }
+
 public function guardar(array $datos){
     return clientes::create($datos);
     }
     
  public function eliminar(int $id){
-    clientes::destroy($id);
+    return clientes::destroy($id);
+    }
+
+    public function tieneDependencias(int $id): bool
+    {
+        return vehiculo::where('clienteID', $id)->exists()
+            || agenda::where('clienteId', $id)->exists();
     }
 
     public function buscarPorId(int $id){
-        return clientes::find($id);
+        return clientes::findOrFail($id);
+    }
+
+    public function buscarConHistorial(int $id)
+    {
+        return clientes::with([
+            'vehiculo.tipoVehiculo',
+            'vehiculo.agendaServicios' => function ($query) {
+                $query->whereHas('agenda', fn ($agenda) => $agenda->where('estado', 'terminada'))
+                    ->with(['agenda.empleado', 'agenda.pago', 'servicio'])
+                    ->orderByDesc('agendaId')
+                    ->orderByDesc('id');
+            },
+        ])->findOrFail($id);
     }
 
     public function actualizar(int $id, array $datos)

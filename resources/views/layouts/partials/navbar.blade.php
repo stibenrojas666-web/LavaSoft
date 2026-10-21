@@ -1,106 +1,75 @@
-<header class="sticky top-0 z-20 bg-white border-b border-slate-200">
-    <div class="h-16 px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
+@php
+    $titulosPantalla = [
+        'dashboard.index' => 'Dashboard',
+        'clientes.*' => 'Clientes',
+        'empleados.*' => 'Empleados',
+        'turnos.*' => 'Turnos',
+        'vehiculos.*' => 'Vehículos',
+        'agenda.*' => 'Agenda de citas',
+        'agendaServicio.*' => 'Servicios por cita',
+        'pagos.*' => 'Pagos',
+        'servicios.*' => 'Servicios',
+        'tipoVehiculo.*' => 'Tipos de vehículo',
+        'precioServicio.*' => 'Precios de servicio',
+    ];
+    $tituloActual = 'LavaSoft';
+    foreach ($titulosPantalla as $patron => $titulo) {
+        if (request()->routeIs($patron)) {
+            $tituloActual = $titulo;
+            break;
+        }
+    }
+    $usuarioActual = auth()->user();
+@endphp
 
-        <div class="flex items-center gap-4 min-w-0">
-            {{-- Botón menú móvil --}}
+<header class="sticky top-0 z-20 border-b border-slate-200/80 bg-white/95 backdrop-blur">
+    <div class="flex h-[76px] items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+        <div class="flex min-w-0 items-center gap-3 sm:gap-4">
             <button
                 @click="sidebarOpen = !sidebarOpen"
                 type="button"
-                class="lg:hidden p-2 rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                class="rounded-xl border border-slate-200 p-2 text-slate-600 transition hover:border-cyan-200 hover:bg-cyan-50 hover:text-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 lg:hidden"
                 aria-label="Abrir menú lateral"
             >
-                <span class="w-6 h-6 block">@include('layouts.partials.icons', ['icon' => 'menu'])</span>
+                <span class="block h-5 w-5">@include('layouts.partials.icons', ['icon' => 'menu'])</span>
             </button>
 
-            <h1 class="text-lg sm:text-xl font-semibold text-slate-800 truncate">
-                @yield('page-title', 'Dashboard')
-            </h1>
+            <div class="min-w-0">
+                <p class="truncate text-lg font-semibold tracking-tight text-slate-800 sm:text-xl">@yield('page-title', $tituloActual)</p>
+                <p class="hidden text-xs text-slate-500 sm:block">Panel de administración de LavaSoft</p>
+            </div>
         </div>
 
-        <div class="flex items-center gap-2 sm:gap-4">
-
-            {{-- Buscador --}}
-            <form method="GET" action="{{ url()->current() }}" class="relative hidden md:block" role="search">
-                <label for="global-search" class="sr-only">Buscar</label>
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 w-4 h-4 pointer-events-none">
-                    @include('layouts.partials.icons', ['icon' => 'search'])
-                </span>
-                <input
-                    id="global-search"
-                    type="search"
-                    name="q"
-                    value="{{ request('q') }}"
-                    placeholder="Buscar..."
-                    class="w-56 lg:w-72 pl-9 pr-3 py-2 text-sm rounded-lg border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition"
-                >
-            </form>
-
-            {{-- Notificaciones --}}
-            <div x-data="{ open: false }" class="relative">
-                <button
-                    @click="open = !open"
-                    @click.outside="open = false"
-                    type="button"
-                    class="relative p-2 rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                    aria-label="Ver notificaciones"
-                >
-                    <span class="w-5 h-5 block">@include('layouts.partials.icons', ['icon' => 'bell'])</span>
-                    <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500 ring-2 ring-white"></span>
-                </button>
-
-                <div
-                    x-show="open" x-cloak
-                    x-transition
-                    class="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-lg border border-slate-100 overflow-hidden"
-                >
-                    <div class="px-4 py-3 border-b border-slate-100 font-semibold text-sm text-slate-700">
-                        Notificaciones
-                    </div>
-                    <ul class="max-h-72 overflow-y-auto divide-y divide-slate-100">
-                        @forelse (($notifications ?? []) as $notification)
-                            <li class="px-4 py-3 text-sm hover:bg-slate-50">
-                                <p class="text-slate-700">{{ $notification['message'] }}</p>
-                                <p class="text-xs text-slate-400 mt-1">{{ $notification['time'] }}</p>
-                            </li>
-                        @empty
-                            <li class="px-4 py-6 text-sm text-slate-400 text-center">Sin notificaciones nuevas</li>
-                        @endforelse
-                    </ul>
-                </div>
+        <div class="flex shrink-0 items-center gap-3 sm:gap-5">
+            <div class="hidden items-center gap-2 rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-700 sm:flex">
+                <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
+                Sistema activo
             </div>
-
-            {{-- Menú de usuario --}}
-            <div x-data="{ open: false }" class="relative">
-                <button
-                    @click="open = !open"
-                    @click.outside="open = false"
-                    type="button"
-                    class="flex items-center gap-2 pl-1 pr-2 py-1 rounded-lg hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                    aria-haspopup="true"
-                    :aria-expanded="open.toString()"
-                >
-                    <img
-                        class="w-8 h-8 rounded-full object-cover ring-1 ring-slate-200"
-                        src="{{ auth()->user()->avatar_url ?? 'https://ui-avatars.com/api/?name=' . urlencode(auth()->user()->name ?? 'Admin') }}"
-                        alt="Avatar de {{ auth()->user()->name ?? 'Usuario' }}"
-                    >
-                    <span class="hidden sm:block text-sm font-medium text-slate-700">
-                        {{ auth()->user()->name ?? 'Administrador' }}
+            <div class="hidden text-right sm:block">
+                <p class="text-xs font-medium uppercase tracking-wide text-slate-400">Hoy</p>
+                <p class="text-sm font-semibold text-slate-700">{{ now()->format('d/m/Y') }}</p>
+            </div>
+            <div x-data="{ openUserMenu: false }" class="relative">
+                <button type="button" @click="openUserMenu = !openUserMenu" :aria-expanded="openUserMenu.toString()"
+                        aria-haspopup="true" class="flex items-center gap-2 rounded-xl bg-slate-50 py-1.5 pl-1.5 pr-3 ring-1 ring-slate-200/80 hover:bg-slate-100">
+                    <span class="grid h-9 w-9 place-items-center rounded-lg bg-primary-100 text-xs font-bold text-primary-700">
+                        {{ strtoupper(substr($usuarioActual?->name ?? 'Admin', 0, 2)) }}
                     </span>
-                    <span class="w-4 h-4 text-slate-400 hidden sm:block">@include('layouts.partials.icons', ['icon' => 'chevron-down'])</span>
+                    <span class="hidden text-sm font-medium text-slate-700 sm:block">{{ $usuarioActual?->name ?? 'Administrador' }}</span>
+                    <span class="block h-4 w-4 text-slate-500">@include('layouts.partials.icons', ['icon' => 'chevron-down'])</span>
                 </button>
 
-                <div
-                    x-show="open" x-cloak
-                    x-transition
-                    class="absolute right-0 mt-2 w-52 bg-white rounded-xl shadow-lg border border-slate-100 overflow-hidden py-1"
-                >
-                    <a href="{{ Route::has('profile.edit') ? route('profile.edit') : '#' }}" class="block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50">Mi perfil</a>
-                    <a href="{{ Route::has('settings.index') ? route('settings.index') : '#' }}" class="block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50">Configuración</a>
-                    <hr class="my-1 border-slate-100">
-                    <form method="POST" action="{{ Route::has('logout') ? route('logout') : '#' }}">
+                <div x-show="openUserMenu" x-cloak @click.away="openUserMenu = false"
+                     class="absolute right-0 z-50 mt-2 w-60 overflow-hidden rounded-xl border border-slate-200 bg-white py-1 shadow-lg">
+                    @can(config('seguridad.permiso_admin'))
+                        <a href="{{ route('seguridad.permisos.index') }}" class="block px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50">
+                            Seguridad y permisos
+                        </a>
+                    @endcan
+                    <div class="border-t border-slate-100"></div>
+                    <form method="POST" action="{{ route('logout') }}">
                         @csrf
-                        <button type="submit" class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50">
+                        <button type="submit" class="w-full px-4 py-2.5 text-left text-sm text-red-600 hover:bg-red-50">
                             Cerrar sesión
                         </button>
                     </form>

@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\clientes;
 use App\Services\clienteService;
 use App\Http\Requests\ClienteStoreRequest;
 use App\Http\Requests\ClienteUpdateRequest;
+use App\Http\Requests\BusquedaIndexRequest;
 
 
 class ClientesController extends Controller
@@ -20,10 +20,11 @@ class ClientesController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(BusquedaIndexRequest $request)
     {
-        $clientes = $this->clientesService->listarTodo();
-        return view('clientes.index', compact('clientes'));
+        $buscar = trim((string) $request->validated('buscar', ''));
+        $clientes = $this->clientesService->buscar($buscar);
+        return view('clientes.index', compact('clientes', 'buscar'));
     }
 
     /**
@@ -50,9 +51,11 @@ class ClientesController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show()
+    public function show(int $id)
     {
-        //
+        $cliente = $this->clientesService->buscarConHistorial($id);
+
+        return view('clientes.historial', compact('cliente'));
     }
 
     /**
@@ -60,26 +63,29 @@ class ClientesController extends Controller
      */
     public function edit(int $id)
     {
-        $cliente = clientes::findOrFail($id);
+        $cliente = $this->clientesService->buscarPorId($id);
         return view ('clientes.editar', compact('cliente'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(int $id, clienteUpdateRequest $request){
-        $cliente = clientes::FindOrFail($id);
-         $cliente->update($request->validated());
-        
-        return redirect()->route('clientes.index')->with('success','cliente actualizado');
-    }
+    public function update(int $id, clienteUpdateRequest $request)
+{
+    $this->clientesService->actualizar($id, $request->validated());
+
+    return redirect()->route('clientes.index')
+        ->with('success', 'Cliente actualizado');
+}
 
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(int $id)
     {
-        $this->clientesService->eliminar($id);
+        if (!$this->clientesService->eliminar($id)) {
+            return redirect()->route('clientes.index')->with('error', 'No se puede eliminar el cliente porque tiene vehículos o citas relacionados.');
+        }
         return redirect()->route('clientes.index')->with('success', 'Cliente eliminado correctamente.');
     }
 }

@@ -2,29 +2,36 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\precioServicio;
-use App\Models\servicio;
-use App\Models\tipoVehiculo;
-use Illuminate\Http\Request;
 use App\Services\precioServicioService;
+use App\Services\servicioService;
+use App\Services\tipoVehiculoService;
 use App\Http\Requests\precioServicioStoreRequest;
 use App\Http\Requests\precioServicioUpdateRequest;
+use App\Http\Requests\BusquedaIndexRequest;
 
 class PrecioServicioController extends Controller 
 {
     private precioServicioService $precioServicioService;
+    private servicioService $servicioService;
+    private tipoVehiculoService $tipoVehiculoService;
 
-    public function __construct(precioServicioService $precioServicioService)
+    public function __construct(precioServicioService $precioServicioService, servicioService $servicioService, tipoVehiculoService $tipoVehiculoService)
     {
         $this->precioServicioService = $precioServicioService;
+        $this->servicioService = $servicioService;
+        $this->tipoVehiculoService = $tipoVehiculoService;
     }
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(BusquedaIndexRequest $request)
     {
-        $precioServicio = $this->precioServicioService->listarTodo();
-        return view('precioServicio.index', compact('precioServicio'));
+        $datos = $request->validated();
+        $buscar = trim((string) ($datos['buscar'] ?? ''));
+        $filtros = array_intersect_key($datos, array_flip(['tipoVehiculoId', 'modalidad']));
+        $precioServicio = $this->precioServicioService->buscar($buscar, $filtros);
+        $tipoVehiculos = $this->tipoVehiculoService->listarTodo();
+        return view('precioServicio.index', compact('precioServicio', 'buscar', 'filtros', 'tipoVehiculos'));
     }
 
     /**
@@ -32,8 +39,8 @@ class PrecioServicioController extends Controller
      */
     public function create()
     {
-        $servicios = servicio::all();
-        $tipoVehiculos = tipoVehiculo::all();
+        $servicios = $this->servicioService->listarActivosConPrecios();
+        $tipoVehiculos = $this->tipoVehiculoService->listarTodo();
         return view('precioServicio.crear', compact('servicios', 'tipoVehiculos'));
     }
 
@@ -61,8 +68,8 @@ class PrecioServicioController extends Controller
     public function edit(int $id)
     {
         $precioServicio = $this->precioServicioService->buscarPorId($id);
-        $servicios = servicio::all();
-        $tipoVehiculos = tipoVehiculo::all();
+        $servicios = $this->servicioService->listarActivosConPrecios();
+        $tipoVehiculos = $this->tipoVehiculoService->listarTodo();
         return view('precioServicio.editar', compact('precioServicio', 'servicios', 'tipoVehiculos'));
     }
 

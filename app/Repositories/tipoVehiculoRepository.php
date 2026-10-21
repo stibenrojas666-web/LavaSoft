@@ -3,12 +3,23 @@
 namespace App\Repositories;
 
 use App\Models\tipoVehiculo;
+use App\Models\precioServicio;
+use App\Models\vehiculo;
+use App\Support\TextoBusqueda;
 
 class tipoVehiculoRepository
 {
     public function listarTodo()
     {
         return tipoVehiculo::all();
+    }
+
+    public function buscar(string $texto)
+    {
+        return TextoBusqueda::aplicar(tipoVehiculo::query(), $texto, fn ($query, $termino) => $query->where('nombre', 'like', $termino))
+            ->orderBy('nombre')
+            ->paginate(12)
+            ->withQueryString();
     }
 
     public function guardar(array $datos)
@@ -18,7 +29,13 @@ class tipoVehiculoRepository
 
     public function eliminar(int $id)
     {
-        tipoVehiculo::destroy($id);
+        return tipoVehiculo::destroy($id);
+    }
+
+    public function tieneDependencias(int $id): bool
+    {
+        return vehiculo::where('tipoVehiculoId', $id)->exists()
+            || precioServicio::where('tipo_vehiculo_id', $id)->exists();
     }
 
     public function buscarPorId(int $id)

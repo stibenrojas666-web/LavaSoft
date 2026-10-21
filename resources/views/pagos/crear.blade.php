@@ -27,16 +27,19 @@
             <label for="agendaId" class="block text-gray-700 font-semibold mb-1">Cita</label>
 
             <select name="agendaId" id="agendaId"
+                onchange="if(this.value){window.location.href='{{ route('pagos.create') }}?agendaId='+encodeURIComponent(this.value)}else{window.location.href='{{ route('pagos.create') }}'}"
                 class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-400 @error('agendaId') border-red-500 @enderror">
 
                 <option value="">Seleccione una cita</option>
 
-                @foreach($agenda as $a)
-                    <option value="{{ $a->id }}" {{ old('agendaId') == $a->id ? 'selected' : '' }}>
+                @forelse($agenda as $a)
+                    <option value="{{ $a->id }}" {{ (string) request('agendaId') === (string) $a->id ? 'selected' : '' }}>
                         #{{ $a->id }} - {{ \Carbon\Carbon::parse($a->fecha)->format('d/m/Y') }}
                         {{ substr($a->hora, 0, 5) }} - {{ $a->cliente->nombreCliente ?? 'N/A' }}
                     </option>
-                @endforeach
+                @empty
+                    <option value="" disabled>No hay citas pendientes de pago</option>
+                @endforelse
             </select>
 
             @error('agendaId')
@@ -44,18 +47,35 @@
             @enderror
         </div>
 
-        {{-- Monto --}}
+        @if($agendaSeleccionada)
+            <div class="mb-4 rounded-lg border border-cyan-100 bg-cyan-50 p-4">
+                <h2 class="font-semibold text-cyan-900">Servicios de la cita #{{ $agendaSeleccionada->id }}</h2>
+                <p class="mb-3 text-sm text-cyan-800">
+                    {{ $agendaSeleccionada->cliente->nombreCliente ?? 'Cliente' }} ·
+                    {{ $agendaSeleccionada->agendaServicios->pluck('vehiculo.placa')->filter()->unique()->implode(', ') ?: 'Vehículo' }} ·
+                    {{ \Carbon\Carbon::parse($agendaSeleccionada->fecha)->format('d/m/Y') }}
+                </p>
+                <div class="divide-y divide-cyan-100">
+                    @forelse($agendaSeleccionada->agendaServicios as $linea)
+                        <div class="flex justify-between gap-4 py-2 text-sm">
+                            <span>{{ $linea->servicio->nombre ?? 'Servicio' }}</span>
+                            <span>${{ number_format((float) $linea->Precio, 2) }}</span>
+                        </div>
+                    @empty
+                        <p class="py-2 text-sm text-red-700">Esta cita no tiene servicios registrados.</p>
+                    @endforelse
+                </div>
+            </div>
+        @endif
+
+        {{-- Total de solo lectura; el servidor vuelve a sumarlo al guardar. --}}
         <div class="mb-4">
-            <label for="Monto" class="block text-gray-700 font-semibold mb-1">Monto</label>
-
-            <input type="number" step="0.01" min="0" name="Monto" id="Monto"
-                value="{{ old('Monto') }}"
-                placeholder="0.00"
-                class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-400 @error('Monto') border-red-500 @enderror">
-
-            @error('Monto')
-                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-            @enderror
+            <label for="Monto" class="block text-gray-700 font-semibold mb-1">Total a pagar</label>
+            <input type="text" id="Monto" readonly
+                value="{{ $total === null ? '' : '$' . number_format($total, 2) }}"
+                placeholder="Selecciona una cita para ver el total"
+                class="w-full rounded-lg border bg-gray-100 px-3 py-2 text-gray-700">
+            <p class="mt-1 text-xs text-gray-500">El total se calcula sumando los servicios. No se puede editar desde este formulario.</p>
         </div>
 
         {{-- Método de pago --}}
@@ -100,7 +120,7 @@
                 Cancelar
             </a>
 
-            <button type="submit"
+            <button type="submit" {{ !$agendaSeleccionada || $total <= 0 ? 'disabled' : '' }}
                 class="bg-cyan-600 hover:bg-cyan-800 text-white font-semibold px-4 py-2 rounded-lg shadow">
                 💾 Guardar Pago
             </button>

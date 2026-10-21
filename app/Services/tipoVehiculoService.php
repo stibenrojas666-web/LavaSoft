@@ -17,12 +17,22 @@ public function listarTodo(){
     return $this->tipoVehiculoRepository->listarTodo();
 }
 
+public function buscar(string $texto)
+{
+    return $this->tipoVehiculoRepository->buscar($texto);
+}
+
 public function guardar(array $datos){
     return $this->tipoVehiculoRepository->guardar($datos);
 }
 
-public function eliminar(int $id){
-    return $this->tipoVehiculoRepository->eliminar($id);
+public function eliminar(int $id): bool
+{
+    if ($this->tipoVehiculoRepository->tieneDependencias($id)) {
+        return false;
+    }
+
+    return $this->tipoVehiculoRepository->eliminar($id) > 0;
 }
 
 public function buscarPorId(int $id){

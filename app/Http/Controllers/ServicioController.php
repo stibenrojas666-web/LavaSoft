@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\servicio;
-use Illuminate\Http\Request;
 use App\Services\servicioService;
 use App\Http\Requests\servicioStoreRequest;
 use App\Http\Requests\servicioUpdateRequest;
+use App\Http\Requests\BusquedaIndexRequest;
 
 class ServicioController extends Controller
 {
@@ -19,10 +18,13 @@ class ServicioController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(BusquedaIndexRequest $request)
     {
-        $servicios = $this->servicioService->listarTodo();
-        return view('servicios.index', compact('servicios'));
+        $datos = $request->validated();
+        $buscar = trim((string) ($datos['buscar'] ?? ''));
+        $filtros = array_intersect_key($datos, array_flip(['estado']));
+        $servicios = $this->servicioService->buscar($buscar, $filtros);
+        return view('servicios.index', compact('servicios', 'buscar', 'filtros'));
     }
 
     /**
@@ -41,6 +43,16 @@ class ServicioController extends Controller
         $datos = $request->validated();
         $this->servicioService->guardar($datos);
         return redirect()->route('servicios.index')->with('success', 'Servicio creado correctamente.');
+    }
+
+    public function cambiarEstado(int $id)
+    {
+        $activo = $this->servicioService->cambiarEstado($id);
+
+        return redirect()->route('servicios.index', request()->query())->with(
+            'success',
+            $activo ? 'Servicio activado correctamente.' : 'Servicio desactivado correctamente.'
+        );
     }
 
     /**
@@ -74,7 +86,9 @@ class ServicioController extends Controller
      */
     public function destroy(int $id)
     {
-        $this->servicioService->eliminar($id);
+        if (!$this->servicioService->eliminar($id)) {
+            return redirect()->route('servicios.index')->with('error', 'No se puede eliminar el servicio porque tiene citas o precios relacionados.');
+        }
         return redirect()->route('servicios.index')->with('success', 'Servicio eliminado correctamente');
     }
 }

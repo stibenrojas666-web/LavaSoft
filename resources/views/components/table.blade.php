@@ -24,7 +24,7 @@
 --}}
 @props(['headers' => []])
 
-<div class="overflow-x-auto">
+<div class="overflow-x-auto rounded-xl border border-slate-100">
     <table class="min-w-full divide-y divide-slate-100">
         <thead>
             <tr class="bg-slate-50">

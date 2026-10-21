@@ -3,11 +3,14 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class empleado extends Model
 {
+    use HasFactory;
     protected $table = 'empleados';
     protected $fillable = [
+        'nombre','apellido',
         'identificacion',
         'telefono',
         'rh',
@@ -17,7 +20,12 @@ class empleado extends Model
 
     public function agendas()
     {
-        return $this->hasMany(agenda::class);
+        return $this->hasMany(agenda::class, 'empleadoId');
+    }
+
+    public function turnos()
+    {
+        return $this->hasMany(turno::class, 'empleado_id');
     }
 
 }

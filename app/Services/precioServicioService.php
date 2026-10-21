@@ -17,6 +17,11 @@ public function listarTodo(){
     return $this->precioServicioRepository->listarTodo();
 }
 
+public function buscar(string $texto, array $filtros = [])
+{
+    return $this->precioServicioRepository->buscar($texto, $filtros);
+}
+
 public function guardar(array $datos){
     return $this->precioServicioRepository->guardar($datos);
 }
