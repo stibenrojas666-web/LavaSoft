@@ -5,9 +5,9 @@
 @section('content')
     <div class="flex items-center justify-between">
         <h1 class="text-xl font-semibold">Cuentas de usuario</h1>
-        <a href="{{ route('seguridad.cuentas.create') }}"
-            class="rounded-md bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2">Nuevo usuario</a>
     </div>
+    <x-list-search :action="route('seguridad.cuentas.index')" :value="$buscar" placeholder="Nombre, correo o rol" />
+    <p class="mb-3 text-sm text-slate-500">{{ $usuarios->total() }} usuarios encontrados</p>
 
     <div class="bg-white rounded-xl border border-slate-200 overflow-x-auto">
         <table class="min-w-full text-sm">
@@ -55,10 +55,12 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="3" class="px-4 py-6 text-center text-slate-500">No hay usuarios registrados.</td>
+                        <td colspan="3" class="px-4 py-6 text-center text-slate-500">{{ $buscar !== '' ? 'No encontramos usuarios con esa búsqueda.' : 'No hay usuarios registrados.' }}</td>
                     </tr>
                 @endforelse
             </tbody>
         </table>
     </div>
+    @if($usuarios->hasPages())<div class="mt-5">{{ $usuarios->links() }}</div>@endif
+    <x-floating-action :href="route('seguridad.cuentas.create')" label="Nuevo usuario" />
 @endsection

@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Seguridad;
 use App\Http\Controllers\Controller;
 use App\Services\Seguridad\PermisoService;
 use App\Services\Seguridad\RolService;
+use App\Http\Requests\BusquedaIndexRequest;
 use Exception;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -21,11 +22,14 @@ class RolController extends Controller
     ) {
     }
 
-    public function index(): View
+    public function index(BusquedaIndexRequest $request): View
     {
+        $datos = $request->validated();
+        $buscar = trim((string) ($datos['buscar'] ?? ''));
         return view('seguridad.roles.index', [
-            'roles' => $this->rolService->listar(),
+            'roles' => $this->rolService->buscar($buscar),
             'rolService' => $this->rolService,
+            'buscar' => $buscar,
         ]);
     }
 

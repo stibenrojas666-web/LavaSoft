@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Seguridad;
 
 use App\Http\Controllers\Controller;
 use App\Services\Seguridad\CuentaService;
+use App\Http\Requests\BusquedaIndexRequest;
 use Exception;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -17,10 +18,13 @@ class CuentaController extends Controller
     {
     }
 
-    public function index(): View
+    public function index(BusquedaIndexRequest $request): View
     {
+        $datos = $request->validated();
+        $buscar = trim((string) ($datos['buscar'] ?? ''));
         return view('seguridad.cuentas.index', [
-            'usuarios' => $this->cuentaService->listar(),
+            'usuarios' => $this->cuentaService->buscarEnListado($buscar),
+            'buscar' => $buscar,
         ]);
     }
 

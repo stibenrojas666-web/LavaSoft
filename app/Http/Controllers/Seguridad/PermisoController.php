@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Seguridad;
 
 use App\Http\Controllers\Controller;
 use App\Services\Seguridad\PermisoService;
+use App\Http\Requests\BusquedaIndexRequest;
 use Exception;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -17,12 +18,15 @@ class PermisoController extends Controller
     {
     }
 
-    public function index(): View
+    public function index(BusquedaIndexRequest $request): View
     {
+        $datos = $request->validated();
+        $buscar = trim((string) ($datos['buscar'] ?? ''));
         return view('seguridad.permisos.index', [
-            'permisos' => $this->permisoService->listar(),
+            'permisos' => $this->permisoService->buscar($buscar),
             'modulos' => $this->permisoService->listarModulos(),
             'acciones' => config('seguridad.acciones'),
+            'buscar' => $buscar,
         ]);
     }
 

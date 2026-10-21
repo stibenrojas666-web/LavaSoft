@@ -7,6 +7,11 @@
 
 @include('seguridad._errores')
 
+<div class="mb-4 rounded-xl border border-slate-200 bg-slate-50 p-3">
+    <label for="buscarMatrizUsuarios" class="mb-2 block text-sm font-semibold text-slate-700">Buscar usuario por nombre o correo</label>
+    <input id="buscarMatrizUsuarios" type="search" placeholder="Escribe una o varias palabras" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm">
+</div>
+
 <form action="{{ route('seguridad.usuarios.update') }}" method="POST" class="bg-white rounded-xl border border-slate-200 overflow-x-auto">
     @csrf
     @method('PUT')
@@ -27,7 +32,7 @@
         </thead>
         <tbody class="divide-y divide-slate-100">
             @foreach ($usuarios as $usuario)
-                <tr>
+                <tr data-usuario-busqueda="{{ mb_strtolower($usuario->name . ' ' . $usuario->email) }}">
                     <td class="px-4 py-3">
                         <div class="font-medium">{{ $usuario->name }}</div>
                         <div class="text-xs text-slate-400">{{ $usuario->email }}</div>
@@ -60,4 +65,18 @@
         <button type="submit" class="rounded-md bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2">Guardar asignaciones</button>
     </div>
 </form>
+<script>
+    (() => {
+        const campo = document.getElementById('buscarMatrizUsuarios');
+        if (!campo) return;
+        const filas = [...document.querySelectorAll('[data-usuario-busqueda]')];
+        campo.addEventListener('input', () => {
+            const palabras = campo.value.toLocaleLowerCase().trim().split(/\s+/).filter(Boolean);
+            filas.forEach(fila => {
+                const texto = fila.dataset.usuarioBusqueda || '';
+                fila.hidden = !palabras.every(palabra => texto.includes(palabra));
+            });
+        });
+    })();
+</script>
 @endsection

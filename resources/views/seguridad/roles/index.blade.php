@@ -5,8 +5,9 @@
 @section('content')
 <div class="flex items-center justify-between">
     <h1 class="text-xl font-semibold">Roles</h1>
-    <a href="{{ route('seguridad.roles.create') }}" class="rounded-md bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2">Nuevo rol</a>
 </div>
+<x-list-search :action="route('seguridad.roles.index')" :value="$buscar" placeholder="Nombre del rol o permiso" />
+<p class="mb-3 text-sm text-slate-500">{{ $roles->total() }} roles encontrados</p>
 
 <div class="bg-white rounded-xl border border-slate-200 overflow-x-auto">
     <table class="min-w-full text-sm">
@@ -70,9 +71,11 @@
                     </td>
                 </tr>
             @empty
-                <tr><td colspan="5" class="px-4 py-6 text-center text-slate-500">No hay roles registrados.</td></tr>
+                <tr><td colspan="5" class="px-4 py-6 text-center text-slate-500">{{ $buscar !== '' ? 'No encontramos roles con esa búsqueda.' : 'No hay roles registrados.' }}</td></tr>
             @endforelse
         </tbody>
     </table>
 </div>
+@if($roles->hasPages())<div class="mt-5">{{ $roles->links() }}</div>@endif
+<x-floating-action :href="route('seguridad.roles.create')" label="Nuevo rol" />
 @endsection

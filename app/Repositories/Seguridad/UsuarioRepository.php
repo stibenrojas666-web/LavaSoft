@@ -5,6 +5,7 @@ namespace App\Repositories\Seguridad;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Collection;
 use Spatie\Permission\Models\Role;
+use App\Support\TextoBusqueda;
 
 class UsuarioRepository
 {
@@ -48,6 +49,16 @@ class UsuarioRepository
     public function listarConRoles(): Collection
     {
         return $this->modelo()::with('rolesConInactivos')->orderBy('name')->get();
+    }
+
+    public function buscarConRoles(string $texto)
+    {
+        $consulta = TextoBusqueda::aplicar($this->modelo()::with('rolesConInactivos'), $texto, fn ($filtros, $termino) => $filtros
+            ->where('name', 'like', $termino)
+            ->orWhere('email', 'like', $termino)
+            ->orWhereHas('rolesConInactivos', fn ($rol) => $rol->where('name', 'like', $termino)));
+
+        return $consulta->orderBy('name')->paginate(12)->withQueryString();
     }
 
     public function sincronizarRoles(Authenticatable $usuario, array $nombresDeRoles): void

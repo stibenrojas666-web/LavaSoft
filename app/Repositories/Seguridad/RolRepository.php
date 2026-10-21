@@ -4,12 +4,22 @@ namespace App\Repositories\Seguridad;
 
 use Illuminate\Database\Eloquent\Collection;
 use Spatie\Permission\Models\Role;
+use App\Support\TextoBusqueda;
 
 class RolRepository
 {
     public function listar(): Collection
     {
         return Role::with('permissions')->withCount('users')->orderBy('name')->get();
+    }
+
+    public function buscar(string $texto)
+    {
+        $consulta = TextoBusqueda::aplicar(Role::with('permissions')->withCount('users'), $texto, fn ($filtros, $termino) => $filtros
+            ->where('name', 'like', $termino)
+            ->orWhereHas('permissions', fn ($permiso) => $permiso->where('name', 'like', $termino)));
+
+        return $consulta->orderBy('name')->paginate(12)->withQueryString();
     }
 
     public function listarNombres(): array

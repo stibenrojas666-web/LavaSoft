@@ -7,6 +7,8 @@
 
 @include('seguridad._errores')
 
+<x-list-search :action="route('seguridad.permisos.index')" :value="$buscar" placeholder="Nombre del permiso o módulo" />
+
 <datalist id="lista-modulos">
     @foreach ($modulos as $modulo)
         <option value="{{ $modulo }}"></option>

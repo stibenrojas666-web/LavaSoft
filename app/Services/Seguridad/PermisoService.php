@@ -22,6 +22,11 @@ class PermisoService
         return $this->permisoRepository->listar();
     }
 
+    public function buscar(string $texto): Collection
+    {
+        return $this->permisoRepository->buscar($texto);
+    }
+
     public function listarModulos(): array
     {
         return $this->permisoRepository->listarModulos();

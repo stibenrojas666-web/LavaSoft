@@ -24,6 +24,11 @@ class CuentaService
         return $this->usuarioRepository->listarConRoles();
     }
 
+    public function buscarEnListado(string $texto)
+    {
+        return $this->usuarioRepository->buscarConRoles($texto);
+    }
+
     public function listarRoles(): Collection
     {
         return $this->rolRepository->listar();

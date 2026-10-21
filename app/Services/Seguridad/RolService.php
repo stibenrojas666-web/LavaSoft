@@ -24,6 +24,11 @@ class RolService
         return $this->rolRepository->listar();
     }
 
+    public function buscar(string $texto)
+    {
+        return $this->rolRepository->buscar($texto);
+    }
+
     public function listarUsuariosConRoles(): Collection
     {
         return $this->usuarioRepository->listarConRoles();
