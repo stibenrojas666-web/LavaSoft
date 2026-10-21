@@ -5,6 +5,7 @@ use App\Http\Controllers\Seguridad\CuentaController;
 use App\Http\Controllers\Seguridad\PermisoController;
 use App\Http\Controllers\Seguridad\RolController;
 use App\Http\Controllers\Seguridad\UsuarioRolController;
+use App\Http\Middleware\NoCacheHeaders;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('web')->group(function () {
@@ -16,7 +17,7 @@ Route::middleware('web')->group(function () {
             ->name('login.store');
     });
 
-    Route::middleware('auth')->group(function () {
+    Route::middleware(['auth', NoCacheHeaders::class])->group(function () {
         Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
         Route::prefix('seguridad')

@@ -137,6 +137,17 @@
 
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js" defer></script>
 
+    <script>
+        window.addEventListener('pageshow', function (event) {
+            const navigation = performance.getEntriesByType('navigation')[0];
+            const regresoConAtrasAdelante = navigation && navigation.type === 'back_forward';
+
+            if (event.persisted || regresoConAtrasAdelante) {
+                window.location.reload();
+            }
+        });
+    </script>
+
     @stack('scripts')
 </body>
 </html>
