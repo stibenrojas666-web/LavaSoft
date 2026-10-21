@@ -65,6 +65,10 @@ class DashboardRepository
 
     public function ultimasCitas()
     {
-        return agenda::with(['cliente', 'vehiculo'])->latest('created_at')->take(6)->get();
+        return agenda::with(['cliente', 'empleado', 'agendaServicios.vehiculo.tipoVehiculo', 'agendaServicios.servicio'])
+            ->withSum('agendaServicios', 'Precio')
+            ->latest('created_at')
+            ->take(6)
+            ->get();
     }
 }
