@@ -15,20 +15,16 @@ class PagoStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'agendaId'        => 'required|exists:agendas,id',
             'MetodoPago'      => ['required', Rule::in(['Efectivo', 'Tarjeta', 'Transferencia'])],
-            'RequerirFactura' => 'required|boolean',
+            'RequerirFactura' => ['sometimes', 'boolean'],
         ];
     }
 
     public function messages(): array
     {
         return [
-            'agendaId.required'        => 'La cita es obligatoria',
-            'agendaId.exists'          => 'La cita seleccionada no existe',
             'MetodoPago.required'      => 'El método de pago es obligatorio',
             'MetodoPago.in'            => 'El método de pago seleccionado no es válido',
-            'RequerirFactura.required' => 'Indique si requiere factura',
             'RequerirFactura.boolean'  => 'El valor de factura no es válido',
         ];
     }

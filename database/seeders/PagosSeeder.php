@@ -15,7 +15,7 @@ class PagosSeeder extends Seeder
         $cita = agenda::query()
             ->where('fecha', now()->toDateString())
             ->where('hora', '08:00:00')
-            ->whereHas('vehiculo', fn ($query) => $query->where('placa', 'DEMO001'))
+            ->whereHas('agendaServicios.vehiculo', fn ($query) => $query->where('placa', 'DEMO001'))
             ->firstOrFail();
 
         DB::transaction(function () use ($cita) {
@@ -34,8 +34,7 @@ class PagosSeeder extends Seeder
                 'RequerirFactura' => false,
             ]);
 
-            // La regla del proyecto es confirmar la cita al registrar un pago.
-            $cita->update(['estado' => 'confirmada']);
+            $cita->update(['estado' => 'terminada']);
         });
     }
 }

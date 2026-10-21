@@ -27,7 +27,7 @@
             <p class="font-semibold text-cyan-900">Cita #{{ $pago->agendaId }}</p>
             <p class="text-sm text-cyan-800">
                 {{ $pago->agenda->cliente->nombreCliente ?? 'Cliente' }} ·
-                {{ $pago->agenda->vehiculo->placa ?? 'Vehículo' }}
+                {{ $pago->agenda->agendaServicios->pluck('vehiculo.placa')->filter()->unique()->implode(', ') ?: 'Vehículo' }}
             </p>
         </div>
 

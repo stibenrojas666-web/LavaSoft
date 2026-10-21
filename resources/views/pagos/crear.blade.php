@@ -52,7 +52,7 @@
                 <h2 class="font-semibold text-cyan-900">Servicios de la cita #{{ $agendaSeleccionada->id }}</h2>
                 <p class="mb-3 text-sm text-cyan-800">
                     {{ $agendaSeleccionada->cliente->nombreCliente ?? 'Cliente' }} ·
-                    {{ $agendaSeleccionada->vehiculo->placa ?? 'Vehículo' }} ·
+                    {{ $agendaSeleccionada->agendaServicios->pluck('vehiculo.placa')->filter()->unique()->implode(', ') ?: 'Vehículo' }} ·
                     {{ \Carbon\Carbon::parse($agendaSeleccionada->fecha)->format('d/m/Y') }}
                 </p>
                 <div class="divide-y divide-cyan-100">

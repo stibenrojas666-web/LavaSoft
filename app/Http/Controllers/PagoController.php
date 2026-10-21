@@ -2,67 +2,48 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\PagoStoreRequest;
-use App\Http\Requests\PagoUpdateRequest;
-use App\Http\Requests\PagoCreateRequest;
+use App\Http\Requests\pagoStoreRequest;
+use App\Http\Requests\BusquedaIndexRequest;
 use App\Services\PagoService;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 
 class PagoController extends Controller
 {
-    private PagoService $pagoService;
-    public function __construct(PagoService $pagoService)
+    public function __construct(private PagoService $pagoService)
     {
-        $this->pagoService = $pagoService;
     }
 
-    public function index()
-    {
-        $pago = $this->pagoService->getAll();
-
-        return view('pagos.index', compact('pago'));
-    }
-
-    public function create(PagoCreateRequest $request)
+    public function historial(BusquedaIndexRequest $request): View
     {
         $datos = $request->validated();
-        $formulario = $this->pagoService->datosParaCrear(
-            isset($datos['agendaId']) ? (int) $datos['agendaId'] : null
-        );
-
-        return view('pagos.crear', $formulario);
+        $buscar = trim((string) ($datos['buscar'] ?? ''));
+        $filtros = array_intersect_key($datos, array_flip(['metodo', 'desde', 'hasta']));
+        return view('pagos.historial', [
+            'pagos' => $this->pagoService->buscarHistorialPagos($buscar, $filtros),
+            'buscar' => $buscar,
+            'filtros' => $filtros,
+        ]);
     }
 
-    public function store(PagoStoreRequest $request)
+    public function factura(int $agendaId): View
     {
-        $this->pagoService->keep($request->validated());
-
-        return redirect()->route('pagos.index')->with('success', 'Pago registrado correctamente.');
+        return view('pagos.factura', $this->pagoService->obtenerFactura($agendaId));
     }
 
-    public function show()
+    public function registrarPago(int $agendaId, pagoStoreRequest $request): RedirectResponse
     {
-        //
+        $this->pagoService->registrarPago($agendaId, $request->validated());
+
+        return redirect()->route('agenda.factura', $agendaId)
+            ->with('success', 'Pago registrado y cita marcada como terminada.');
     }
 
-    public function edit(int $id)
+    public function enviarCorreo(int $agendaId): RedirectResponse
     {
-        $pago = $this->pagoService->findById($id);
-        $total = $this->pagoService->calcularTotal((int) $pago->agendaId);
+        $this->pagoService->enviarFacturaPorCorreo($agendaId);
 
-        return view('pagos.editar', compact('pago', 'total'));
-    }
-
-    public function update(int $id, PagoUpdateRequest $request)
-    {
-        $this->pagoService->update($id, $request->validated());
-
-        return redirect()->route('pagos.index')->with('success', 'Pago actualizado correctamente.');
-    }
-
-    public function destroy(int $id)
-    {
-        $this->pagoService->delete($id);
-
-        return redirect()->route('pagos.index')->with('success', 'Pago eliminado correctamente.');
+        return redirect()->route('agenda.factura', $agendaId)
+            ->with('success', 'Factura enviada al correo registrado del cliente.');
     }
 }
