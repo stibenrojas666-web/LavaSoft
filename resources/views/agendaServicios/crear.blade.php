@@ -44,6 +44,19 @@
             @enderror
         </div>
 
+        <div class="mb-4">
+            <label for="vehiculoId" class="block font-semibold text-gray-700 mb-1">Vehículo de la cita</label>
+            <select name="vehiculoId" id="vehiculoId" class="w-full rounded-lg border px-3 py-2 @error('vehiculoId') border-red-500 @enderror">
+                <option value="">Seleccione un vehículo</option>
+                @foreach($vehiculo as $v)
+                    <option value="{{ $v->id }}" @selected(old('vehiculoId') == $v->id)>
+                        {{ $v->placa }} · {{ $v->tipoVehiculo->nombre ?? 'Vehículo' }} · {{ $v->cliente->nombreCliente ?? 'Cliente' }}
+                    </option>
+                @endforeach
+            </select>
+            @error('vehiculoId') <p class="mt-1 text-sm text-red-500">{{ $message }}</p> @enderror
+        </div>
+
         {{-- Servicio --}}
         <div class="mb-4">
             <label for="servicioId" class="block text-gray-700 font-semibold mb-1">Servicio</label>

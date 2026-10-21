@@ -28,11 +28,6 @@ class agenda extends Model
         return $this->belongsTo(clientes::class, 'clienteId');
     }
 
-    public function vehiculo()
-    {
-        return $this->belongsTo(vehiculo::class, 'vehiculoId');
-    }
-
     public function pago()
     {
         return $this->hasOne(pago::class, 'agendaId');
@@ -40,7 +35,13 @@ class agenda extends Model
 
     public function agendaServicios()
     {
-        return $this->hasMany(agendaServicios::class, 'agendaId');
+        return $this->hasMany(agendaServicios::class, 'agendaId')->with(['vehiculo.tipoVehiculo', 'servicio']);
+    }
+
+    public function vehiculos()
+    {
+        return $this->belongsToMany(vehiculo::class, 'agenda_servicios', 'agendaId', 'vehiculoId')
+            ->distinct();
     }
 
     /** Total vigente de los precios guardados para los servicios de esta cita. */

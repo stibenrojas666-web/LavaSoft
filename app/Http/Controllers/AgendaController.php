@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 use App\Http\Requests\agendaStoreRequest;
 use App\Http\Requests\agendaUpdateRequest;
+use App\Http\Requests\BusquedaIndexRequest;
 use App\Http\Requests\EmpleadosDisponiblesRequest;
 use App\Services\AgendaService;
 use App\Services\clienteService;
@@ -35,11 +36,27 @@ class AgendaController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(BusquedaIndexRequest $request)
     {
-        $agenda = $this->agendaService->getAll();
+        $datos = $request->validated();
+        $buscar = trim((string) ($datos['buscar'] ?? ''));
+        $filtros = array_intersect_key($datos, array_flip(['estado', 'desde', 'hasta', 'orden']));
+        $agenda = $this->agendaService->buscar($buscar, $filtros);
+        $vista = $datos['vista'] ?? 'lista';
+        $mes = $datos['mes'] ?? now()->format('Y-m');
+        $inicioMes = \Illuminate\Support\Carbon::createFromFormat('!Y-m', $mes)->startOfMonth();
+        $finMes = $inicioMes->copy()->endOfMonth();
+        $fechaCalendario = $datos['fecha'] ?? ($inicioMes->isCurrentMonth() ? today()->toDateString() : $inicioMes->toDateString());
+        $citasCalendario = $vista === 'calendario'
+            ? $this->agendaService->buscarParaCalendario(
+                $buscar,
+                array_intersect_key($datos, array_flip(['estado', 'desde', 'hasta'])),
+                $inicioMes->toDateString(),
+                $finMes->toDateString()
+            )
+            : collect();
 
-        return view('Agenda.index', compact('agenda'));
+        return view('Agenda.index', compact('agenda', 'buscar', 'filtros', 'mes', 'vista', 'citasCalendario', 'fechaCalendario'));
     }
 
     /**
@@ -50,9 +67,9 @@ class AgendaController extends Controller
         $cliente = $this->clienteService->listarTodo();
         $empleado = collect();
         $vehiculo = $this->vehiculoService->getAll();
-        $servicio = $this->servicioService->listarActivosConPrecios();
+        $serviciosPrecios = $this->servicioService->catalogoActivosConPrecios();
 
-        return view('Agenda.crear', compact('cliente', 'empleado', 'vehiculo', 'servicio'));
+        return view('Agenda.crear', compact('cliente', 'empleado', 'vehiculo', 'serviciosPrecios'));
     }
 
     /**
@@ -83,8 +100,9 @@ class AgendaController extends Controller
         $cliente = $this->clienteService->listarTodo();
         $empleado = $agenda->empleado ? collect([$agenda->empleado]) : collect();
         $vehiculo = $this->vehiculoService->getAll();
+        $serviciosPrecios = $this->servicioService->catalogoActivosConPrecios();
 
-        return view('Agenda.editar', compact('agenda', 'cliente', 'empleado', 'vehiculo'));
+        return view('Agenda.editar', compact('agenda', 'cliente', 'empleado', 'vehiculo', 'serviciosPrecios'));
     }
 
     /** Retorna empleados con turno en ese día/hora y sin otra cita activa. */

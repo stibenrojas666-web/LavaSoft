@@ -21,11 +21,24 @@ class AgendaServicioService
         return $this->agendaServicioRepository->getAll();
     }
 
+    public function buscar(string $texto, array $filtros = [])
+    {
+        return $this->agendaServicioRepository->buscar($texto, $filtros);
+    }
+
     public function keep(array $datos)
     {
         $this->validarAgendaSinPago((int) $datos['agendaId']);
+        $agenda = $this->agendaServicioRepository->buscarAgenda((int) $datos['agendaId']);
+        $this->validarVehiculoDelCliente((int) $datos['vehiculoId'], (int) $agenda->clienteId);
+        $this->agendaService->validarVehiculoDisponible(
+            (int) $datos['vehiculoId'],
+            (string) $agenda->fecha,
+            (string) $agenda->hora,
+            (int) $agenda->id
+        );
         $datos['Precio'] = $this->agendaService->calcularPrecioServicio(
-            (int) $datos['agendaId'],
+            (int) $datos['vehiculoId'],
             (int) $datos['servicioId'],
             $datos['Precio'] ?? null
         );
@@ -43,8 +56,16 @@ class AgendaServicioService
         $actual = $this->agendaServicioRepository->findById($id);
         $this->validarAgendaSinPago((int) $actual->agendaId);
         $this->validarAgendaSinPago((int) $datos['agendaId']);
+        $agenda = $this->agendaServicioRepository->buscarAgenda((int) $datos['agendaId']);
+        $this->validarVehiculoDelCliente((int) $datos['vehiculoId'], (int) $agenda->clienteId);
+        $this->agendaService->validarVehiculoDisponible(
+            (int) $datos['vehiculoId'],
+            (string) $agenda->fecha,
+            (string) $agenda->hora,
+            (int) $agenda->id
+        );
         $datos['Precio'] = $this->agendaService->calcularPrecioServicio(
-            (int) $datos['agendaId'],
+            (int) $datos['vehiculoId'],
             (int) $datos['servicioId'],
             $datos['Precio'] ?? null
         );
@@ -65,6 +86,15 @@ class AgendaServicioService
         if ($this->agendaServicioRepository->agendaTienePago($agendaId)) {
             throw ValidationException::withMessages([
                 'agendaId' => 'No se pueden modificar los servicios de una cita que ya tiene un pago registrado.',
+            ]);
+        }
+    }
+
+    private function validarVehiculoDelCliente(int $vehiculoId, int $clienteId): void
+    {
+        if (!$this->agendaService->vehiculoPerteneceACliente($vehiculoId, $clienteId)) {
+            throw ValidationException::withMessages([
+                'vehiculoId' => 'El vehículo seleccionado no pertenece al cliente de esta cita.',
             ]);
         }
     }

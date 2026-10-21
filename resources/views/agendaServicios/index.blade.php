@@ -13,14 +13,13 @@
             🧽 Servicios por Cita
         </h2>
 
-        <a href="{{ route('agendaServicio.create') }}"
-            class="bg-cyan-600 hover:bg-cyan-700 text-white font-semibold py-2 px-4 rounded-lg shadow transition duration-200 flex items-center gap-2">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-            </svg>
-            Agregar Servicio
-        </a>
     </div>
+
+    <x-list-search :action="route('agendaServicio.index')" :value="$buscar" placeholder="Cita, placa, cliente o servicio" :filters="[
+        ['name' => 'estado', 'label' => 'Estado de la cita', 'options' => ['' => 'Todos', 'pendiente' => 'Pendiente', 'confirmada' => 'Confirmada', 'terminada' => 'Terminada', 'cancelada' => 'Cancelada'], 'value' => $filtros['estado'] ?? ''],
+        ['name' => 'desde', 'label' => 'Desde', 'type' => 'date', 'value' => $filtros['desde'] ?? ''],
+        ['name' => 'hasta', 'label' => 'Hasta', 'type' => 'date', 'value' => $filtros['hasta'] ?? ''],
+    ]" />
 
     <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
@@ -29,6 +28,7 @@
                 <tr class="bg-cyan-100 border-b border-cyan-200 text-cyan-800 text-sm uppercase tracking-wider">
                     <th class="py-3 px-4">ID</th>
                     <th class="py-3 px-4">Cita</th>
+                    <th class="py-3 px-4">Vehículo</th>
                     <th class="py-3 px-4">Servicio</th>
                     <th class="py-3 px-4">Precio</th>
                     <th class="py-3 px-4 text-center">Acciones</th>
@@ -51,6 +51,8 @@
                             - {{ $as->agenda->cliente->nombreCliente ?? 'N/A' }}
                         @endif
                     </td>
+
+                    <td class="px-4 py-3">{{ $as->vehiculo->placa ?? 'N/A' }}</td>
 
                     <td class="px-4 py-3">{{ $as->servicio->nombre ?? 'N/A' }}</td>
 
@@ -81,8 +83,8 @@
                 @empty
 
                 <tr>
-                    <td colspan="5" class="px-4 py-6 text-center text-gray-500">
-                        No hay servicios asignados a citas.
+                    <td colspan="6" class="px-4 py-6 text-center text-gray-500">
+                        {{ $buscar !== '' ? 'No encontramos servicios con esa búsqueda.' : 'No hay servicios asignados a citas.' }}
                     </td>
                 </tr>
 
@@ -92,7 +94,9 @@
 
         </table>
     </div>
+    @if($agendaServicio->hasPages())<div class="mt-6">{{ $agendaServicio->links() }}</div>@endif
 
 </x-card>
+<x-floating-action :href="route('agendaServicio.create')" label="Agregar servicio" icon="plus" />
 
 @endsection

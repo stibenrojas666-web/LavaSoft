@@ -10,6 +10,7 @@ class agendaServicios extends Model
 
     protected $fillable = [
         'agendaId',
+        'vehiculoId',
         'servicioId',
         'Precio',
     ];
@@ -22,5 +23,10 @@ class agendaServicios extends Model
     public function servicio()
     {
         return $this->belongsTo(servicio::class, 'servicioId');
+    }
+
+    public function vehiculo()
+    {
+        return $this->belongsTo(vehiculo::class, 'vehiculoId');
     }
 }
