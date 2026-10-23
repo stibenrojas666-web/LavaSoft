@@ -18,7 +18,7 @@
         </a>
     </div>
 
-    <form action="{{ route('empleados.update', $empleado->id) }}" method="POST">
+    <form action="{{ route('empleados.update', $empleado->id) }}" method="POST" novalidate>
         @csrf
         @method('PUT')
 
@@ -51,7 +51,7 @@
         <div class="mb-4">
             <label for="identificacion" class="block text-gray-700 font-semibold mb-1">Identificación</label>
             <input type="text" name="identificacion" id="identificacion"
-                   inputmode="numeric" pattern="[0-9]*" oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                   inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')"
                    value="{{ old('identificacion', (int) $empleado->identificacion) }}"
                    class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-400
                           @error('identificacion') border-red-500 @enderror">
@@ -64,7 +64,7 @@
         <div class="mb-4">
             <label for="telefono" class="block text-gray-700 font-semibold mb-1">Teléfono</label>
             <input type="text" name="telefono" id="telefono"
-                   inputmode="numeric" pattern="[0-9]*" oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                   inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')"
                    value="{{ old('telefono', (int) $empleado->telefono) }}"
                    class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-400
                           @error('telefono') border-red-500 @enderror">

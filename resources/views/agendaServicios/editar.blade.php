@@ -19,7 +19,7 @@
         </a>
     </div>
 
-    <form action="{{ route('agendaServicio.update', $agendaServicio->id) }}" method="POST">
+    <form action="{{ route('agendaServicio.update', $agendaServicio->id) }}" method="POST" novalidate>
         @csrf
         @method('PUT')
 

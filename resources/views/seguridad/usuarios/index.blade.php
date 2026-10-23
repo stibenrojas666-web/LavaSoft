@@ -12,9 +12,15 @@
     <input id="buscarMatrizUsuarios" type="search" placeholder="Escribe una o varias palabras" class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm">
 </div>
 
-<form action="{{ route('seguridad.usuarios.update') }}" method="POST" class="bg-white rounded-xl border border-slate-200 overflow-x-auto">
+<form action="{{ route('seguridad.usuarios.update') }}" method="POST" novalidate class="bg-white rounded-xl border border-slate-200 overflow-x-auto">
     @csrf
     @method('PUT')
+    @error('roles')<p class="m-4 text-sm text-red-600">{{ $message }}</p>@enderror
+    @foreach ($errors->get('roles.*') as $mensajes)
+        @foreach ($mensajes as $mensaje)
+            <p class="mx-4 mt-1 text-sm text-red-600">{{ $mensaje }}</p>
+        @endforeach
+    @endforeach
 
     <table class="min-w-full text-sm">
         <thead class="bg-slate-50 text-left text-slate-500">

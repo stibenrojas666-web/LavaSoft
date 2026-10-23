@@ -11,7 +11,7 @@
         🚙 Registrar Nuevo Tipo de Vehículo
     </h1>
 
-    <form action="{{ route('tipoVehiculo.store') }}" method="POST">
+    <form action="{{ route('tipoVehiculo.store') }}" method="POST" novalidate>
         @csrf
 
         {{-- nombre --}}

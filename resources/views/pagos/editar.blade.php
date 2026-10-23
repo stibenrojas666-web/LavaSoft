@@ -19,7 +19,7 @@
         </a>
     </div>
 
-    <form action="{{ route('pagos.update', $pago->id) }}" method="POST">
+    <form action="{{ route('pagos.update', $pago->id) }}" method="POST" novalidate>
         @csrf
         @method('PUT')
 

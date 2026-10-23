@@ -11,7 +11,7 @@
         🧑‍🤝‍🧑 Registrar Nuevo Cliente
     </h1>
 
-    <form action="{{ route('clientes.store') }}" method="POST">
+    <form action="{{ route('clientes.store') }}" method="POST" novalidate>
         @csrf
 
         {{-- Nombre --}}
@@ -41,7 +41,7 @@
         {{-- Teléfono --}}
         <div class="mb-4">
             <label for="telefonoCliente" class="block text-gray-700 font-semibold mb-1">Teléfono</label>
-            <input type="tel" inputmode="numeric" pattern="[0-9]{7,15}" maxlength="15" name="telefonoCliente" id="telefonoCliente"
+            <input type="tel" inputmode="numeric" name="telefonoCliente" id="telefonoCliente"
                    value="{{ old('telefonoCliente') }}"
                    class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-400
                           @error('telefonoCliente') border-red-500 @enderror">

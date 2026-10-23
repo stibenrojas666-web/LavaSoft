@@ -11,7 +11,7 @@
         🕒 Registrar Nuevo Turno
     </h1>
 
-    <form action="{{ route('turnos.store') }}" method="POST">
+    <form action="{{ route('turnos.store') }}" method="POST" novalidate>
         @csrf
 
         {{-- empleado --}}

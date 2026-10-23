@@ -36,7 +36,7 @@
         <a href="{{ route('agenda.index') }}" class="text-sm font-medium text-cyan-600 hover:text-cyan-800">← Volver al listado</a>
     </div>
 
-    <form action="{{ $esEdicion ? route('agenda.update', $agenda->id) : route('agenda.store') }}" method="POST" id="formularioAgenda">
+    <form action="{{ $esEdicion ? route('agenda.update', $agenda->id) : route('agenda.store') }}" method="POST" novalidate id="formularioAgenda">
         @csrf
         @if($esEdicion)
             @method('PUT')
@@ -314,7 +314,6 @@
         if (!config) {
             contenedorPrecio.classList.add('hidden');
             entradaPrecio.disabled = true;
-            entradaPrecio.required = false;
             opcionPrecioAcordado.classList.add('hidden');
             textoPrecio.textContent = '';
             return;
@@ -324,13 +323,11 @@
             opcionPrecioAcordado.classList.add('hidden');
             contenedorPrecio.classList.remove('hidden');
             entradaPrecio.disabled = false;
-            entradaPrecio.required = true;
             textoPrecio.textContent = 'El precio se acuerda con el cliente.';
         } else {
             opcionPrecioAcordado.classList.remove('hidden');
             contenedorPrecio.classList.toggle('hidden', !precioAcordadoActivo.checked);
             entradaPrecio.disabled = !precioAcordadoActivo.checked;
-            entradaPrecio.required = precioAcordadoActivo.checked;
             textoPrecio.textContent = precioAcordadoActivo.checked
                 ? 'Se usará el valor acordado para esta cita.'
                 : config.modalidad === 'desde'

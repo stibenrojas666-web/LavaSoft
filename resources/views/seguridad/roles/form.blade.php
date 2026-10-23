@@ -7,7 +7,7 @@
 
 @include('seguridad._errores')
 
-<form action="{{ $rol ? route('seguridad.roles.update', $rol) : route('seguridad.roles.store') }}" method="POST"
+<form action="{{ $rol ? route('seguridad.roles.update', $rol) : route('seguridad.roles.store') }}" method="POST" novalidate
       class="bg-white rounded-xl border border-slate-200 p-6 space-y-6">
     @csrf
     @if ($rol)
@@ -23,10 +23,12 @@
                        class="w-full rounded-md border border-slate-300 bg-slate-100 px-3 py-2 text-slate-500">
                 <p class="mt-1 text-xs text-slate-400">Rol protegido: no se puede renombrar ni eliminar.</p>
             @else
-                <input type="text" name="name" id="name" value="{{ old('name', $rol?->name) }}" maxlength="50" required
+                <input type="text" name="name" id="name" value="{{ old('name', $rol?->name) }}"
                        class="w-full rounded-md border border-slate-300 px-3 py-2">
+                @error('name')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
             @endif
         </div>
+        @error('activo')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
 
         <div>
             <span class="block text-sm font-medium text-slate-700 mb-1">Estado</span>
@@ -76,6 +78,12 @@
                 <p class="text-sm text-slate-500">Aún no hay permisos. Créalos en la sección Permisos.</p>
             @endif
         </div>
+        @error('permissions')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
+        @foreach ($errors->get('permissions.*') as $mensajes)
+            @foreach ($mensajes as $mensaje)
+                <p class="mt-1 text-sm text-red-600">{{ $mensaje }}</p>
+            @endforeach
+        @endforeach
     </div>
 
     <div class="flex justify-end gap-3 border-t border-slate-100 pt-4">

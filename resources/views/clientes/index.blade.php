@@ -44,6 +44,10 @@
                             <dt class="w-20 shrink-0 text-slate-500">Correo</dt>
                             <dd class="break-all font-medium text-slate-800">{{ $cliente->emailCliente ?: 'Sin registrar' }}</dd>
                         </div>
+                    <div class="flex gap-3">
+                        <dt class="w-36 shrink-0 text-slate-500">Vehículos registrados</dt>
+                      <dd class="font-medium text-slate-800">{{ $cliente->vehiculo_count }}</dd>
+                      </div>
                     </dl>
 
                     <div class="mt-auto flex flex-wrap items-center justify-between gap-2 border-t border-slate-100 pt-4">

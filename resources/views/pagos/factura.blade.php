@@ -10,7 +10,7 @@
             <a href="{{ route('agenda.index') }}" class="text-sm font-medium text-cyan-700 hover:text-cyan-900">← Volver a la agenda</a>
             <div class="flex flex-wrap gap-2">
                 @if($agenda->pago?->RequerirFactura)
-                    <form action="{{ route('agenda.factura.correo', $agenda->id) }}" method="POST">
+                    <form action="{{ route('agenda.factura.correo', $agenda->id) }}" method="POST" novalidate>
                         @csrf
                         <button type="submit" class="rounded-lg bg-cyan-700 px-3 py-1.5 text-sm font-semibold text-white hover:bg-cyan-800">Enviar por correo</button>
                     </form>
@@ -40,7 +40,7 @@
                 <p>Monto: ${{ number_format((float) $agenda->pago->Monto, 0, ',', '.') }} · Requiere factura: {{ $agenda->pago->RequerirFactura ? 'Sí' : 'No' }}</p>
             </section>
         @elseif($agenda->estado === 'confirmada')
-            <form action="{{ route('agenda.pago.registrar', $agenda->id) }}" method="POST" class="mx-auto mb-5 max-w-[34rem] border-t border-slate-200 px-5 pt-4 no-imprimir sm:px-7">
+            <form action="{{ route('agenda.pago.registrar', $agenda->id) }}" method="POST" novalidate class="mx-auto mb-5 max-w-[34rem] border-t border-slate-200 px-5 pt-4 no-imprimir sm:px-7">
                 @csrf
                 <h2 class="mb-3 text-lg font-semibold text-slate-800">Registrar pago único</h2>
                 <p class="mb-4 text-sm text-slate-600">Se cobrará el total calculado arriba. No se permiten abonos.</p>
@@ -48,7 +48,7 @@
                 <div class="grid gap-4 sm:grid-cols-2">
                     <div>
                         <label for="MetodoPago" class="mb-1 block font-medium text-slate-700">Método de pago</label>
-                        <select id="MetodoPago" name="MetodoPago" required class="w-full rounded-lg border px-3 py-2 @error('MetodoPago') border-red-500 @enderror">
+                        <select id="MetodoPago" name="MetodoPago" class="w-full rounded-lg border px-3 py-2 @error('MetodoPago') border-red-500 @enderror">
                             <option value="">Selecciona un método</option>
                             @foreach(['Efectivo', 'Transferencia', 'Tarjeta'] as $metodo)
                                 <option value="{{ $metodo }}" @selected(old('MetodoPago') === $metodo)>{{ $metodo }}</option>

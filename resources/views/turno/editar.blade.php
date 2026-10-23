@@ -18,7 +18,7 @@
         </a>
     </div>
 
-    <form action="{{ route('turnos.update', $turno->id) }}" method="POST">
+    <form action="{{ route('turnos.update', $turno->id) }}" method="POST" novalidate>
         @csrf
         @method('PUT')
 
