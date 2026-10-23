@@ -10,12 +10,29 @@ class AgendaServicioRepository
 {
     public function getAll()
     {
-        return agendaServicios::with(['agenda.cliente', 'vehiculo', 'servicio'])->get();
+        return agendaServicios::query()
+            ->select(['id', 'agendaId', 'vehiculoId', 'servicioId', 'Precio'])
+            ->with([
+                'agenda:id,clienteId,empleadoId,fecha,hora,estado',
+                'agenda.cliente:id,nombreCliente,apellidoCliente',
+                'vehiculo:id,clienteID,tipoVehiculoId,placa,modelo',
+                'vehiculo.tipoVehiculo:id,nombre',
+                'servicio:id,nombre',
+            ])
+            ->get();
     }
 
     public function buscar(string $texto, array $filtros = [])
     {
-        return TextoBusqueda::aplicar(agendaServicios::with(['agenda.cliente', 'vehiculo', 'servicio']), $texto, fn ($consulta, $termino) => $consulta
+        return TextoBusqueda::aplicar(agendaServicios::query()
+            ->select(['id', 'agendaId', 'vehiculoId', 'servicioId', 'Precio'])
+            ->with([
+                'agenda:id,clienteId,empleadoId,fecha,hora,estado',
+                'agenda.cliente:id,nombreCliente,apellidoCliente',
+                'vehiculo:id,clienteID,tipoVehiculoId,placa,modelo',
+                'vehiculo.tipoVehiculo:id,nombre',
+                'servicio:id,nombre',
+            ]), $texto, fn ($consulta, $termino) => $consulta
                 ->where('Precio', 'like', $termino)
                 ->orWhereHas('agenda', fn ($agenda) => $agenda->where('id', 'like', $termino)
                     ->orWhere('fecha', 'like', $termino)

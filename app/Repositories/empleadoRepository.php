@@ -11,12 +11,18 @@ class empleadoRepository
 {
     public function listarTodo()
     {
-        return empleado::all();
+        return empleado::query()
+            ->select(['id', 'nombre', 'apellido'])
+            ->orderBy('nombre')
+            ->orderBy('apellido')
+            ->get();
     }
 
     public function buscar(string $texto, array $filtros = [])
     {
-        return TextoBusqueda::aplicar(empleado::query(), $texto, fn ($filtros, $termino) => $filtros
+        return TextoBusqueda::aplicar(empleado::query()->select([
+            'id', 'nombre', 'apellido', 'identificacion', 'telefono', 'rh', 'eps', 'estado',
+        ]), $texto, fn ($filtros, $termino) => $filtros
                 ->where('nombre', 'like', $termino)
                 ->orWhere('apellido', 'like', $termino)
                 ->orWhere('identificacion', 'like', $termino)
@@ -34,6 +40,7 @@ class empleadoRepository
         $horaCompleta = $hora . ':00';
 
         return empleado::query()
+            ->select(['id', 'nombre', 'apellido'])
             ->where('estado', true)
             ->whereHas('turnos', function ($query) use ($dia, $horaCompleta) {
                 $query->where('dia', $dia)
@@ -47,7 +54,9 @@ class empleadoRepository
                     ->where('estado', '!=', 'cancelada')
                     ->when($agendaId, fn ($subquery) => $subquery->where('id', '!=', $agendaId));
             })
-            ->with(['turnos' => fn ($query) => $query->where('dia', $dia)
+            ->with(['turnos' => fn ($query) => $query
+                ->select(['id', 'empleado_id', 'dia', 'horaInicio', 'horaFin'])
+                ->where('dia', $dia)
                 ->where('horaInicio', '<=', $horaCompleta)
                 ->where('horaFin', '>', $horaCompleta)])
             ->orderBy('nombre')

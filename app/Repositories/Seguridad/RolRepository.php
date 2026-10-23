@@ -10,12 +10,20 @@ class RolRepository
 {
     public function listar(): Collection
     {
-        return Role::with('permissions')->withCount('users')->orderBy('name')->get();
+        return Role::query()
+            ->select(['id', 'name', 'guard_name', 'activo'])
+            ->with('permissions:id,name,guard_name')
+            ->withCount('users')
+            ->orderBy('name')
+            ->get();
     }
 
     public function buscar(string $texto)
     {
-        $consulta = TextoBusqueda::aplicar(Role::with('permissions')->withCount('users'), $texto, fn ($filtros, $termino) => $filtros
+        $consulta = TextoBusqueda::aplicar(Role::query()
+            ->select(['id', 'name', 'guard_name', 'activo'])
+            ->with('permissions:id,name,guard_name')
+            ->withCount('users'), $texto, fn ($filtros, $termino) => $filtros
             ->where('name', 'like', $termino)
             ->orWhereHas('permissions', fn ($permiso) => $permiso->where('name', 'like', $termino)));
 

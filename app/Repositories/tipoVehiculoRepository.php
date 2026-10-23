@@ -11,12 +11,12 @@ class tipoVehiculoRepository
 {
     public function listarTodo()
     {
-        return tipoVehiculo::all();
+        return tipoVehiculo::query()->select(['id', 'nombre'])->orderBy('nombre')->get();
     }
 
     public function buscar(string $texto)
     {
-        return TextoBusqueda::aplicar(tipoVehiculo::query(), $texto, fn ($query, $termino) => $query->where('nombre', 'like', $termino))
+        return TextoBusqueda::aplicar(tipoVehiculo::query()->select(['id', 'nombre']), $texto, fn ($query, $termino) => $query->where('nombre', 'like', $termino))
             ->orderBy('nombre')
             ->paginate(12)
             ->withQueryString();

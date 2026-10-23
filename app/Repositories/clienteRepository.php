@@ -7,30 +7,52 @@ use App\Models\agenda;
 use App\Models\vehiculo;
 use App\Support\TextoBusqueda;
 
-class clienteRepository {
-public function listarTodo(){
-    return clientes::all();
-}
+class clienteRepository
+{
+    public function listarTodo()
+    {
+        return clientes::query()
+            ->select(['id', 'nombreCliente', 'apellidoCliente'])
+            ->orderBy('apellidoCliente')
+            ->orderBy('nombreCliente')
+            ->get();
+    }
 
     public function buscar(string $texto)
     {
-        return TextoBusqueda::aplicar(clientes::query(), $texto, fn ($filtros, $termino) => $filtros
+        $consulta = clientes::query()
+            ->select([
+                'id',
+                'nombreCliente',
+                'apellidoCliente',
+                'telefonoCliente',
+                'emailCliente',
+            ])
+            ->withCount('vehiculo');
+
+        return TextoBusqueda::aplicar(
+            $consulta,
+            $texto,
+            fn ($filtros, $termino) => $filtros
                 ->where('nombreCliente', 'like', $termino)
                 ->orWhere('apellidoCliente', 'like', $termino)
                 ->orWhere('telefonoCliente', 'like', $termino)
-                ->orWhere('emailCliente', 'like', $termino))
+                ->orWhere('emailCliente', 'like', $termino)
+        )
             ->orderBy('apellidoCliente')
             ->orderBy('nombreCliente')
             ->paginate(12)
             ->withQueryString();
     }
 
-public function guardar(array $datos){
-    return clientes::create($datos);
+    public function guardar(array $datos)
+    {
+        return clientes::create($datos);
     }
-    
- public function eliminar(int $id){
-    return clientes::destroy($id);
+
+    public function eliminar(int $id)
+    {
+        return clientes::destroy($id);
     }
 
     public function tieneDependencias(int $id): bool
@@ -39,7 +61,8 @@ public function guardar(array $datos){
             || agenda::where('clienteId', $id)->exists();
     }
 
-    public function buscarPorId(int $id){
+    public function buscarPorId(int $id)
+    {
         return clientes::findOrFail($id);
     }
 
@@ -48,7 +71,10 @@ public function guardar(array $datos){
         return clientes::with([
             'vehiculo.tipoVehiculo',
             'vehiculo.agendaServicios' => function ($query) {
-                $query->whereHas('agenda', fn ($agenda) => $agenda->where('estado', 'terminada'))
+                $query->whereHas(
+                    'agenda',
+                    fn ($agenda) => $agenda->where('estado', 'terminada')
+                )
                     ->with(['agenda.empleado', 'agenda.pago', 'servicio'])
                     ->orderByDesc('agendaId')
                     ->orderByDesc('id');
@@ -58,8 +84,9 @@ public function guardar(array $datos){
 
     public function actualizar(int $id, array $datos)
     {
-        $cliente= clientes::findOrFail($id);
+        $cliente = clientes::findOrFail($id);
         $cliente->update($datos);
-        return $cliente;    
+
+        return $cliente;
     }
- }
+}

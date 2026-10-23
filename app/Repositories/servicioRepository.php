@@ -11,12 +11,15 @@ class servicioRepository
 {
     public function listarTodo()
     {
-        return servicio::all();
+        return servicio::query()
+            ->select(['id', 'nombre', 'descripcion', 'estado'])
+            ->orderBy('nombre')
+            ->get();
     }
 
     public function buscar(string $texto, array $filtros = [])
     {
-        return TextoBusqueda::aplicar(servicio::query(), $texto, fn ($consulta, $termino) => $consulta
+        return TextoBusqueda::aplicar(servicio::query()->select(['id', 'nombre', 'descripcion', 'estado']), $texto, fn ($consulta, $termino) => $consulta
                 ->where('nombre', 'like', $termino)
                 ->orWhere('descripcion', 'like', $termino))
             ->when(($filtros['estado'] ?? '') !== '', fn ($query) => $query->where('estado', $filtros['estado'] === 'activo'))
@@ -27,7 +30,12 @@ class servicioRepository
 
     public function listarActivosConPrecios()
     {
-        return servicio::with('precios')->where('estado', true)->get();
+        return servicio::query()
+            ->select(['id', 'nombre', 'estado'])
+            ->with('precios:id,servicio_id,tipo_vehiculo_id,modalidad,precio')
+            ->where('estado', true)
+            ->orderBy('nombre')
+            ->get();
     }
 
     public function guardar(array $datos)
