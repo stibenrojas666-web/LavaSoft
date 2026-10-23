@@ -7,7 +7,7 @@
 
 @include('seguridad._errores')
 
-<form action="{{ $usuario ? route('seguridad.cuentas.update', $usuario->getKey()) : route('seguridad.cuentas.store') }}" method="POST"
+<form action="{{ $usuario ? route('seguridad.cuentas.update', $usuario->getKey()) : route('seguridad.cuentas.store') }}" method="POST" novalidate
       class="bg-white rounded-xl border border-slate-200 p-6 space-y-6">
     @csrf
     @if ($usuario)
@@ -17,20 +17,23 @@
     <div class="grid gap-6 sm:grid-cols-2">
         <div>
             <label for="name" class="block text-sm font-medium text-slate-700 mb-1">Nombre</label>
-            <input type="text" name="name" id="name" value="{{ old('name', $usuario?->name) }}" maxlength="255" required
+            <input type="text" name="name" id="name" value="{{ old('name', $usuario?->name) }}"
                    class="w-full rounded-md border border-slate-300 px-3 py-2">
+            @error('name')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
         </div>
 
         <div>
             <label for="email" class="block text-sm font-medium text-slate-700 mb-1">Correo electrónico</label>
-            <input type="email" name="email" id="email" value="{{ old('email', $usuario?->email) }}" maxlength="255" required autocomplete="off"
+            <input type="email" name="email" id="email" value="{{ old('email', $usuario?->email) }}" autocomplete="off"
                    class="w-full rounded-md border border-slate-300 px-3 py-2">
+            @error('email')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
         </div>
 
         <div>
             <label for="password" class="block text-sm font-medium text-slate-700 mb-1">Contraseña</label>
-            <input type="password" name="password" id="password" minlength="8" autocomplete="new-password" @required(! $usuario)
+            <input type="password" name="password" id="password" minlength="8" autocomplete="new-password"
                    class="w-full rounded-md border border-slate-300 px-3 py-2">
+            @error('password')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
             @if ($usuario)
                 <p class="mt-1 text-xs text-slate-400">Déjala vacía para conservar la actual.</p>
             @else
@@ -42,6 +45,7 @@
             <label for="password_confirmation" class="block text-sm font-medium text-slate-700 mb-1">Confirmar contraseña</label>
             <input type="password" name="password_confirmation" id="password_confirmation" minlength="8" autocomplete="new-password"
                    class="w-full rounded-md border border-slate-300 px-3 py-2">
+            @error('password_confirmation')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
         </div>
     </div>
 
@@ -63,6 +67,12 @@
                 <p class="text-sm text-slate-500">Aún no hay roles. Créalos en la sección Roles.</p>
             @endif
         </div>
+        @error('roles')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
+        @foreach ($errors->get('roles.*') as $mensajes)
+            @foreach ($mensajes as $mensaje)
+                <p class="mt-1 text-sm text-red-600">{{ $mensaje }}</p>
+            @endforeach
+        @endforeach
     </div>
 
     <div class="flex justify-end gap-3 border-t border-slate-100 pt-4">

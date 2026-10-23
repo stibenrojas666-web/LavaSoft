@@ -9,7 +9,9 @@ class precioServicioRepository
 {
     public function listarTodo()
     {
-        return precioServicio::with(['servicio', 'tipoVehiculo'])
+        return precioServicio::query()
+            ->select(['id', 'servicio_id', 'tipo_vehiculo_id', 'modalidad', 'precio'])
+            ->with(['servicio:id,nombre,estado', 'tipoVehiculo:id,nombre'])
             ->whereHas('servicio', fn ($query) => $query->where('estado', true))
             ->get();
     }
@@ -17,7 +19,9 @@ class precioServicioRepository
     public function buscar(string $texto, array $filtros = [])
     {
         return TextoBusqueda::aplicar(
-                precioServicio::with(['servicio', 'tipoVehiculo'])
+                precioServicio::query()
+                    ->select(['id', 'servicio_id', 'tipo_vehiculo_id', 'modalidad', 'precio'])
+                    ->with(['servicio:id,nombre,estado', 'tipoVehiculo:id,nombre'])
                     ->whereHas('servicio', fn ($query) => $query->where('estado', true)),
                 $texto,
                 fn ($consulta, $termino) => $consulta
@@ -29,7 +33,8 @@ class precioServicioRepository
             ->when(($filtros['tipoVehiculoId'] ?? '') !== '', fn ($query) => $query->where('tipo_vehiculo_id', $filtros['tipoVehiculoId']))
             ->when(($filtros['modalidad'] ?? '') !== '', fn ($query) => $query->where('modalidad', $filtros['modalidad']))
             ->orderBy('servicio_id')
-            ->get();
+            ->paginate(12)
+            ->withQueryString();
     }
 
     public function guardar(array $datos)

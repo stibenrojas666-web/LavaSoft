@@ -11,7 +11,7 @@
         🧽 Registrar Nuevo Servicio
     </h1>
 
-    <form action="{{ route('servicios.store') }}" method="POST">
+    <form action="{{ route('servicios.store') }}" method="POST" novalidate>
         @csrf
 
         {{-- nombre --}}

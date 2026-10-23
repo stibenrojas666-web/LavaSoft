@@ -18,7 +18,7 @@
         </a>
     </div>
 
-    <form action="{{ route('precioServicio.update', $precioServicio->id) }}" method="POST">
+    <form action="{{ route('precioServicio.update', $precioServicio->id) }}" method="POST" novalidate>
         @csrf
         @method('PUT')
 
@@ -60,7 +60,7 @@
 
         <div class="mb-4">
             <label for="modalidad" class="block text-gray-700 font-semibold mb-1">Cómo se calcula</label>
-            <select name="modalidad" id="modalidad" required
+            <select name="modalidad" id="modalidad"
                     class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-400 @error('modalidad') border-red-500 @enderror">
                 <option value="fijo" {{ old('modalidad', $precioServicio->modalidad) === 'fijo' ? 'selected' : '' }}>Precio fijo</option>
                 <option value="desde" {{ old('modalidad', $precioServicio->modalidad) === 'desde' ? 'selected' : '' }}>Desde (precio inicial)</option>
@@ -105,7 +105,6 @@
         function actualizarPrecio() {
             const esConvenir = modalidad.value === 'convenir';
             precio.disabled = esConvenir;
-            precio.required = !esConvenir;
             if (esConvenir) precio.value = '';
             precio.closest('div').classList.toggle('hidden', esConvenir);
             etiqueta.textContent = modalidad.value === 'desde' ? 'Precio inicial' : 'Precio';

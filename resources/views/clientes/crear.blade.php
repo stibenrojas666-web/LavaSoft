@@ -11,66 +11,51 @@
         🧑‍🤝‍🧑 Registrar Nuevo Cliente
     </h1>
 
-    <form action="{{ route('clientes.store') }}" method="POST">
+    <form action="{{ route('clientes.store') }}" method="POST" novalidate>
         @csrf
 
         {{-- Nombre --}}
-        <div class="mb-4">
-            <label for="nombreCliente" class="block text-gray-700 font-semibold mb-1">Nombre</label>
-            <input type="text" name="nombreCliente" id="nombreCliente"
-                   value="{{ old('nombreCliente') }}"
-                   class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-400
-                          @error('nombreCliente') border-red-500 @enderror">
-            @error('nombreCliente')
-                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-            @enderror
-        </div>
+        <x-input
+           name="nombreCliente"
+           label="Nombre"
+           :value="old('nombreCliente')"
+            class="mb-4"
+        />
 
         {{-- Apellido --}}
-        <div class="mb-4">
-            <label for="apellidoCliente" class="block text-gray-700 font-semibold mb-1">Apellido</label>
-            <input type="text" name="apellidoCliente" id="apellidoCliente"
-                   value="{{ old('apellidoCliente') }}"
-                   class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-400
-                          @error('apellidoCliente') border-red-500 @enderror">
-            @error('apellidoCliente')
-                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-            @enderror
-        </div>
+        <x-input
+            name="apellidoCliente"
+            label="Apellido"
+            :value="old('apellidoCliente')"
+            class="mb-4"
+        />
 
         {{-- Teléfono --}}
-        <div class="mb-4">
-            <label for="telefonoCliente" class="block text-gray-700 font-semibold mb-1">Teléfono</label>
-            <input type="tel" inputmode="numeric" pattern="[0-9]{7,15}" maxlength="15" name="telefonoCliente" id="telefonoCliente"
-                   value="{{ old('telefonoCliente') }}"
-                   class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-400
-                          @error('telefonoCliente') border-red-500 @enderror">
-            @error('telefonoCliente')
-                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-            @enderror
-        </div>
+        <x-input
+            name="telefonoCliente"
+            label="Teléfono"
+            type="tel"
+            :value="old('telefonoCliente')"
+            inputmode="numeric"
+            class="mb-4"
+        />
 
         {{-- Email --}}
-        <div class="mb-6">
-            <label for="emailCliente" class="block text-gray-700 font-semibold mb-1">Email</label>
-            <input type="email" name="emailCliente" id="emailCliente"
-                   value="{{ old('emailCliente') }}"
-                   class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-400
-                          @error('emailCliente') border-red-500 @enderror">
-            @error('emailCliente')
-                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-            @enderror
-        </div>
+        <x-input
+            name="emailCliente"
+            label="Email"
+            type="email"
+            :value="old('emailCliente')"
+            class="mb-6"
+        />
 
         <div class="flex justify-end gap-2">
-            <a href="{{ route('clientes.index') }}"
-                class="bg-gray-500 hover:bg-gray-700 text-white font-semibold px-4 py-2 rounded-lg shadow">
+            <x-button variant="neutral" :href="route('clientes.index')">
                 Cancelar
-            </a>
-            <button type="submit"
-                class="bg-cyan-600 hover:bg-cyan-800 text-white font-semibold px-4 py-2 rounded-lg shadow">
+            </x-button>
+            <x-button variant="cyan" type="submit">
                 💾 Guardar Cliente
-            </button>
+            </x-button>
         </div>
     </form>
 </x-card>

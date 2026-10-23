@@ -48,12 +48,18 @@ class UsuarioRepository
 
     public function listarConRoles(): Collection
     {
-        return $this->modelo()::with('rolesConInactivos')->orderBy('name')->get();
+        return $this->modelo()::query()
+            ->select(['id', 'name', 'email'])
+            ->with('rolesConInactivos:id,name,guard_name,activo')
+            ->orderBy('name')
+            ->get();
     }
 
     public function buscarConRoles(string $texto)
     {
-        $consulta = TextoBusqueda::aplicar($this->modelo()::with('rolesConInactivos'), $texto, fn ($filtros, $termino) => $filtros
+        $consulta = TextoBusqueda::aplicar($this->modelo()::query()
+            ->select(['id', 'name', 'email'])
+            ->with('rolesConInactivos:id,name,guard_name,activo'), $texto, fn ($filtros, $termino) => $filtros
             ->where('name', 'like', $termino)
             ->orWhere('email', 'like', $termino)
             ->orWhereHas('rolesConInactivos', fn ($rol) => $rol->where('name', 'like', $termino)));

@@ -19,7 +19,7 @@
         </a>
     </div>
 
-    <form action="{{ route('agendaServicio.store') }}" method="POST">
+    <form action="{{ route('agendaServicio.store') }}" method="POST" novalidate>
         @csrf
 
         {{-- Cita --}}

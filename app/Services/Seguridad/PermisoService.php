@@ -6,6 +6,7 @@ use App\Repositories\Seguridad\PermisoRepository;
 use App\Repositories\Seguridad\RolRepository;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\PermissionRegistrar;
 
@@ -22,7 +23,7 @@ class PermisoService
         return $this->permisoRepository->listar();
     }
 
-    public function buscar(string $texto): Collection
+    public function buscar(string $texto): LengthAwarePaginator
     {
         return $this->permisoRepository->buscar($texto);
     }

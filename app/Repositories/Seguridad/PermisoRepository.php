@@ -3,6 +3,7 @@
 namespace App\Repositories\Seguridad;
 
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Spatie\Permission\Models\Permission;
 use App\Support\TextoBusqueda;
 
@@ -10,15 +11,19 @@ class PermisoRepository
 {
     public function listar(): Collection
     {
-        return Permission::orderBy('modulo')->orderBy('name')->get();
+        return Permission::query()
+            ->select(['id', 'name', 'guard_name', 'modulo'])
+            ->orderBy('modulo')
+            ->orderBy('name')
+            ->get();
     }
 
-    public function buscar(string $texto): Collection
+    public function buscar(string $texto): LengthAwarePaginator
     {
-        return TextoBusqueda::aplicar(Permission::query(), $texto, fn ($filtros, $termino) => $filtros
+        return TextoBusqueda::aplicar(Permission::query()->select(['id', 'name', 'guard_name', 'modulo']), $texto, fn ($filtros, $termino) => $filtros
             ->where('name', 'like', $termino)
             ->orWhere('modulo', 'like', $termino))
-            ->orderBy('modulo')->orderBy('name')->get();
+            ->orderBy('modulo')->orderBy('name')->paginate(12)->withQueryString();
     }
 
     public function listarModulos(): array

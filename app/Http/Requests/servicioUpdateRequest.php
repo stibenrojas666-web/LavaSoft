@@ -32,8 +32,11 @@ class servicioUpdateRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'nombre.required' => 'El nombre del servicio es obligatorio.',
             'nombre.string' => 'El campo Nombre debe ser una cadena de texto.',
-            'precio.numeric' => 'El campo Precio debe ser un número.',
+            'nombre.max' => 'El nombre del servicio no puede superar los 255 caracteres.',
+            'descripcion.string' => 'La descripción debe ser texto.',
+            'estado.boolean' => 'El estado seleccionado no es válido.',
         ];
     }
 }

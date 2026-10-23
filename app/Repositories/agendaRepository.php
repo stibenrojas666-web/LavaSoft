@@ -11,12 +11,18 @@ class AgendaRepository
 {
     public function getAll()
     {
-        return agenda::with([
-            'empleado',
-            'cliente',
-            'agendaServicios.vehiculo.tipoVehiculo',
-            'agendaServicios.servicio',
-        ])->withSum('agendaServicios', 'Precio')->get();
+        return agenda::query()
+            ->select(['id', 'empleadoId', 'clienteId', 'vehiculoId', 'fecha', 'hora', 'estado', 'tipoDeAtencion'])
+            ->with([
+                'empleado:id,nombre,apellido',
+                'cliente:id,nombreCliente,apellidoCliente',
+                'agendaServicios:id,agendaId,vehiculoId,servicioId,Precio',
+                'agendaServicios.vehiculo:id,clienteID,tipoVehiculoId,placa,modelo',
+                'agendaServicios.vehiculo.tipoVehiculo:id,nombre',
+                'agendaServicios.servicio:id,nombre',
+            ])
+            ->withSum('agendaServicios', 'Precio')
+            ->get();
     }
 
     public function buscar(string $texto, array $filtros = [])
@@ -57,12 +63,16 @@ class AgendaRepository
 
     private function consultaBusqueda(string $texto, array $filtros)
     {
-        $consulta = agenda::with([
-            'empleado',
-            'cliente',
-            'agendaServicios.vehiculo.tipoVehiculo',
-            'agendaServicios.servicio',
-        ])->withSum('agendaServicios', 'Precio');
+        $consulta = agenda::query()
+            ->select(['id', 'empleadoId', 'clienteId', 'vehiculoId', 'fecha', 'hora', 'estado', 'tipoDeAtencion'])
+            ->with([
+                'empleado:id,nombre,apellido',
+                'cliente:id,nombreCliente,apellidoCliente',
+                'agendaServicios:id,agendaId,vehiculoId,servicioId,Precio',
+                'agendaServicios.vehiculo:id,clienteID,tipoVehiculoId,placa,modelo',
+                'agendaServicios.vehiculo.tipoVehiculo:id,nombre',
+                'agendaServicios.servicio:id,nombre',
+            ])->withSum('agendaServicios', 'Precio');
 
         $consulta = TextoBusqueda::aplicar($consulta, $texto, fn ($coincidencias, $termino) => $coincidencias
             ->where('id', 'like', $termino)

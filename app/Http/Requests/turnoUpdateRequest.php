@@ -36,7 +36,9 @@ class turnoUpdateRequest extends FormRequest
         return [
             'empleado_id.required' => 'Debes seleccionar un empleado.',
             'dia.required' => 'Debes seleccionar el día.',
+            'dia.string' => 'El día debe ser texto.',
             'jornada.required' => 'Debes seleccionar la jornada.',
+            'jornada.string' => 'La jornada debe ser texto.',
             'horaInicio.required' => 'Debes ingresar la hora de inicio.',
             'horaInicio.date_format' => 'La hora de inicio debe tener el formato HH:MM.',
             'horaFin.required' => 'Debes ingresar la hora de fin.',

@@ -7,12 +7,20 @@ use App\Support\TextoBusqueda;
 
 class VehiculoRespository{
     public function getAll(){
-        return vehiculo::with(['cliente', 'tipoVehiculo'])->get();
+        return vehiculo::query()
+            ->select(['id', 'clienteID', 'tipoVehiculoId', 'placa', 'modelo', 'color', 'estado'])
+            ->with(['cliente:id,nombreCliente,apellidoCliente', 'tipoVehiculo:id,nombre'])
+            ->get();
     }
 
     public function buscar(string $texto, array $filtros = [])
     {
-        return TextoBusqueda::aplicar(vehiculo::with(['cliente', 'tipoVehiculo']), $texto, function ($filtros, $termino) {
+        return TextoBusqueda::aplicar(vehiculo::query()
+            ->select(['id', 'clienteID', 'tipoVehiculoId', 'placa', 'modelo', 'color', 'estado'])
+            ->with([
+                'cliente:id,nombreCliente,apellidoCliente',
+                'tipoVehiculo:id,nombre',
+            ]), $texto, function ($filtros, $termino) {
                 $filtros->where('placa', 'like', $termino)
                     ->orWhere('modelo', 'like', $termino)
                     ->orWhere('color', 'like', $termino)

@@ -12,6 +12,8 @@ use App\Http\Controllers\TipoVehiculoController;
 use App\Http\Controllers\PrecioServicioController;
 use App\Http\Controllers\TurnoController;
 use App\Http\Controllers\PagoController;
+use App\Http\Controllers\ConfiguracionLavaderoController;
+use App\Http\Controllers\ReporteController;
 use App\Http\Middleware\NoCacheHeaders;
 
 
@@ -46,4 +48,17 @@ Route::middleware(['auth', NoCacheHeaders::class])->group(function () {
     Route::resource('precioServicio', PrecioServicioController::class)->middleware('modulo:precioServicio');
     Route::resource('turnos', TurnoController::class)->middleware('modulo:turnos');
     Route::resource('agendaServicio', AgendaServiciosController::class)->middleware('modulo:agendaServicio');
+
+    Route::middleware('can:' . config('seguridad.permiso_admin'))
+        ->prefix('configuracion')
+        ->name('configuracion.')
+        ->group(function () {
+            Route::get('/lavadero', [ConfiguracionLavaderoController::class, 'edit'])->name('edit');
+            Route::put('/lavadero', [ConfiguracionLavaderoController::class, 'update'])->name('update');
+        });
+
+    Route::middleware('can:ver dashboard')->prefix('reportes')->name('reportes.')->group(function () {
+        Route::get('/diario', [ReporteController::class, 'diario'])->name('diario');
+        Route::get('/periodo', [ReporteController::class, 'periodo'])->name('periodo');
+    });
 });

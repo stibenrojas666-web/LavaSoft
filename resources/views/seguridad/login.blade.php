@@ -15,12 +15,12 @@
                 <h2 class="text-lg font-semibold">Iniciar sesión</h2>
                 <p class="text-sm text-slate-500 mb-5">Ingresa tus credenciales para continuar</p>
 
-                <form action="{{ route('login.store') }}" method="POST" class="space-y-4">
+                <form action="{{ route('login.store') }}" method="POST" novalidate class="space-y-4">
                     @csrf
 
                     <div>
                         <label for="email" class="block text-sm font-medium text-slate-700 mb-1">Correo electrónico</label>
-                        <input type="email" name="email" id="email" value="{{ old('email') }}" required autofocus autocomplete="email"
+                        <input type="email" name="email" id="email" value="{{ old('email') }}" autofocus autocomplete="email"
                                class="w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 border px-3 py-2 @error('email') border-red-500 @enderror">
                         @error('email')
                             <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
@@ -29,7 +29,7 @@
 
                     <div>
                         <label for="password" class="block text-sm font-medium text-slate-700 mb-1">Contraseña</label>
-                        <input type="password" name="password" id="password" required autocomplete="current-password"
+                        <input type="password" name="password" id="password" autocomplete="current-password"
                                class="w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 border px-3 py-2">
                         @error('password')
                             <p class="mt-1 text-xs text-red-600">{{ $message }}</p>

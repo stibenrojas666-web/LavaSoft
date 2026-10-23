@@ -19,7 +19,7 @@
         </a>
     </div>
 
-    <form action="{{ route('pagos.store') }}" method="POST">
+    <form action="{{ route('pagos.store') }}" method="POST" novalidate>
         @csrf
 
         {{-- Cita --}}

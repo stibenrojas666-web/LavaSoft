@@ -19,12 +19,19 @@ class turnoRepository
 
     public function listarTodo()
     {
-        return turno::with('empleado')->get();
+        return turno::query()
+            ->select(['id', 'empleado_id', 'dia', 'jornada', 'horaInicio', 'horaFin'])
+            ->with('empleado:id,nombre,apellido,identificacion')
+            ->orderBy('dia')
+            ->orderBy('horaInicio')
+            ->get();
     }
 
     public function buscar(string $texto, array $filtros = [])
     {
-        return TextoBusqueda::aplicar(turno::with('empleado'), $texto, function ($coincidencias, $termino) {
+        return TextoBusqueda::aplicar(turno::query()
+            ->select(['id', 'empleado_id', 'dia', 'jornada', 'horaInicio', 'horaFin'])
+            ->with('empleado:id,nombre,apellido,identificacion'), $texto, function ($coincidencias, $termino) {
                 $coincidencias->where('dia', 'like', $termino)
                     ->orWhere('jornada', 'like', $termino)
                     ->orWhere('horaInicio', 'like', $termino)

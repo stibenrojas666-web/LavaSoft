@@ -69,6 +69,9 @@
             </tbody>
         </table>
     </div>
+    @if($precioServicio->hasPages())
+        <div class="mt-6">{{ $precioServicio->links() }}</div>
+    @endif
 </x-card>
 <x-floating-action :href="route('precioServicio.create')" label="Nuevo precio" icon="plus" />
 @endsection

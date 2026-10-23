@@ -1,6 +1,6 @@
 @props(['action', 'value' => '', 'placeholder' => 'Escribe para buscar', 'filters' => [], 'hidden' => []])
 
-<form action="{{ $action }}" method="GET" class="mb-5 rounded-xl border border-slate-200 bg-white p-3 shadow-sm">
+<form action="{{ $action }}" method="GET" novalidate class="mb-5 rounded-xl border border-slate-200 bg-white p-3 shadow-sm">
     @foreach($hidden as $name => $hiddenValue)
         <input type="hidden" name="{{ $name }}" value="{{ $hiddenValue }}">
     @endforeach
@@ -9,8 +9,9 @@
             <label for="buscarListado" class="sr-only">Buscar</label>
             <div class="relative min-w-0 flex-1">
                 <span class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400">@include('layouts.partials.icons', ['icon' => 'search'])</span>
-                <input id="buscarListado" type="search" name="buscar" value="{{ $value }}" maxlength="100" placeholder="{{ $placeholder }}"
+                <input id="buscarListado" type="search" name="buscar" value="{{ $value }}" placeholder="{{ $placeholder }}"
                     style="min-height:2.25rem" class="w-full rounded-lg border border-slate-300 bg-white py-1.5 pl-9 pr-3 text-sm text-slate-800 placeholder:text-slate-400 focus:border-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-100">
+                @error('buscar')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
             </div>
             <button type="submit" class="inline-flex h-9 items-center justify-center rounded-lg bg-cyan-700 px-3 text-sm font-semibold text-white transition hover:bg-cyan-800">Buscar</button>
         </div>
@@ -38,6 +39,7 @@
                             @endforeach
                         </select>
                     @endif
+                    @error($filter['name'])<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
                 </div>
             @endforeach
                         </div>

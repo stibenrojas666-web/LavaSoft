@@ -31,6 +31,8 @@ class tipoVehiculoStoreRequest extends FormRequest
     {
         return [
             'nombre.required' => 'El campo Nombre es obligatorio.',
+            'nombre.string' => 'El nombre debe ser texto.',
+            'nombre.max' => 'El nombre no puede superar los 30 caracteres.',
         ];
     }
 }

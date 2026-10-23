@@ -11,7 +11,7 @@ Crear Vehículo
     <h1 class="text-3xl font-bold mb-6 text-cyan-700">
         🚗 Registrar Nuevo Vehículo
     </h1>
-    <form action="{{ route('vehiculos.store') }}" method="POST">
+    <form action="{{ route('vehiculos.store') }}" method="POST" novalidate>
         @csrf
 
         {{-- Cliente --}}

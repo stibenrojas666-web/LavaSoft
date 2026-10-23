@@ -11,12 +11,17 @@ class PagoRepository
 {
     public function historialPagos(string $texto = '', array $filtros = [])
     {
-        $consulta = TextoBusqueda::aplicar(pago::with([
-            'agenda.cliente',
-            'agenda.empleado',
-            'agenda.agendaServicios.vehiculo.tipoVehiculo',
-            'agenda.agendaServicios.servicio',
-        ]), $texto, fn ($coincidencias, $termino) => $coincidencias
+        $consulta = TextoBusqueda::aplicar(pago::query()
+            ->select(['id', 'agendaId', 'Monto', 'MetodoPago', 'FechaPago', 'RequerirFactura'])
+            ->with([
+                'agenda:id,clienteId,empleadoId,fecha,hora,estado',
+                'agenda.cliente:id,nombreCliente,apellidoCliente,telefonoCliente',
+                'agenda.empleado:id,nombre,apellido',
+                'agenda.agendaServicios:id,agendaId,vehiculoId,servicioId,Precio',
+                'agenda.agendaServicios.vehiculo:id,tipoVehiculoId,placa',
+                'agenda.agendaServicios.vehiculo.tipoVehiculo:id,nombre',
+                'agenda.agendaServicios.servicio:id,nombre',
+            ]), $texto, fn ($coincidencias, $termino) => $coincidencias
             ->where('MetodoPago', 'like', $termino)
             ->orWhere('Monto', 'like', $termino)
             ->orWhereHas('agenda', fn ($agenda) => $agenda->where('id', 'like', $termino)
