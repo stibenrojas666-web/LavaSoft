@@ -37,7 +37,7 @@ class PagoRepository
             ->when(($filtros['desde'] ?? '') !== '', fn ($query) => $query->whereDate('FechaPago', '>=', $filtros['desde']))
             ->when(($filtros['hasta'] ?? '') !== '', fn ($query) => $query->whereDate('FechaPago', '<=', $filtros['hasta']))
             ->orderByDesc('FechaPago')
-            ->paginate(12)
+            ->paginate(10)
             ->withQueryString();
     }
 

@@ -34,7 +34,7 @@ class VehiculoRespository{
             ->when(($filtros['estado'] ?? '') !== '', fn ($query) => $query->where('estado', ($filtros['estado'] === 'activo') ? 'Activo' : 'Inactivo'))
             ->when(($filtros['tipoVehiculoId'] ?? '') !== '', fn ($query) => $query->where('tipoVehiculoId', $filtros['tipoVehiculoId']))
             ->orderBy('placa')
-            ->paginate(12)
+            ->paginate(10)
             ->withQueryString();
     }
 

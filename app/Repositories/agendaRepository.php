@@ -37,7 +37,7 @@ class AgendaRepository
                 ->when(($filtros['hasta'] ?? '') !== '', fn ($query) => $query->whereDate('fecha', '<=', $filtros['hasta']))
                 ->orderBy('hora', $direccionHora)
                 ->orderBy('fecha')
-                ->paginate(12)
+                ->paginate(10)
                 ->withQueryString();
         }
 
@@ -46,7 +46,7 @@ class AgendaRepository
             ->when(($filtros['hasta'] ?? '') !== '', fn ($query) => $query->whereDate('fecha', '<=', $filtros['hasta']))
             ->orderBy('fecha', $orden === 'fecha_asc' ? 'asc' : 'desc')
             ->orderBy('hora', $orden === 'fecha_asc' ? 'asc' : 'desc')
-            ->paginate(12)
+            ->paginate(10)
             ->withQueryString();
     }
 

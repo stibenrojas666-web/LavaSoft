@@ -44,7 +44,7 @@ class turnoRepository
             ->when(($filtros['jornada'] ?? '') !== '', fn ($query) => $query->where('jornada', $filtros['jornada']))
             ->orderBy('dia')
             ->orderBy('horaInicio')
-            ->paginate(12)
+            ->paginate(10)
             ->withQueryString();
     }
 

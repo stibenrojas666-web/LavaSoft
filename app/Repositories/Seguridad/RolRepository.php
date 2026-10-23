@@ -27,7 +27,7 @@ class RolRepository
             ->where('name', 'like', $termino)
             ->orWhereHas('permissions', fn ($permiso) => $permiso->where('name', 'like', $termino)));
 
-        return $consulta->orderBy('name')->paginate(12)->withQueryString();
+        return $consulta->orderBy('name')->paginate(10)->withQueryString();
     }
 
     public function listarNombres(): array

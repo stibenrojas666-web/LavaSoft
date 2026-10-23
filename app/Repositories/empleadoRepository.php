@@ -31,7 +31,7 @@ class empleadoRepository
                 ->orWhere('eps', 'like', $termino))
             ->orderBy('nombre')
             ->orderBy('apellido')
-            ->paginate(12)
+            ->paginate(10)
             ->withQueryString();
     }
 

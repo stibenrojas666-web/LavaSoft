@@ -24,7 +24,7 @@ class servicioRepository
                 ->orWhere('descripcion', 'like', $termino))
             ->when(($filtros['estado'] ?? '') !== '', fn ($query) => $query->where('estado', $filtros['estado'] === 'activo'))
             ->orderBy('nombre')
-            ->paginate(12)
+            ->paginate(10)
             ->withQueryString();
     }
 

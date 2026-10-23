@@ -44,7 +44,7 @@ class AgendaServicioRepository
             ->when(($filtros['desde'] ?? '') !== '', fn ($query) => $query->whereHas('agenda', fn ($agenda) => $agenda->whereDate('fecha', '>=', $filtros['desde'])))
             ->when(($filtros['hasta'] ?? '') !== '', fn ($query) => $query->whereHas('agenda', fn ($agenda) => $agenda->whereDate('fecha', '<=', $filtros['hasta'])))
             ->latest('id')
-            ->paginate(12)
+            ->paginate(10)
             ->withQueryString();
     }
 
