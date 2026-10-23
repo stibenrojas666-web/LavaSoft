@@ -37,13 +37,25 @@ class empleadoUpdateRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'nombre.required' => 'El campo Nombre es obligatorio.',
-'apellido.required' => 'El campo Apellido es obligatorio.',
-            'identificacion.required' => 'El campo identificacion es obligatorio.',
+            'nombre.required' => 'El nombre es obligatorio.',
+            'nombre.string' => 'El nombre debe ser texto.',
+            'nombre.max' => 'El nombre no puede superar los 20 caracteres.',
+            'apellido.required' => 'El apellido es obligatorio.',
+            'apellido.string' => 'El apellido debe ser texto.',
+            'apellido.max' => 'El apellido no puede superar los 20 caracteres.',
+            'identificacion.required' => 'La identificación es obligatoria.',
+            'identificacion.string' => 'La identificación debe ser texto.',
+            'identificacion.max' => 'La identificación no puede superar los 20 caracteres.',
             'telefono.required' => 'El campo teléfono es obligatorio.',
+            'telefono.string' => 'El teléfono debe ser texto.',
+            'telefono.max' => 'El teléfono no puede superar los 15 caracteres.',
             'rh.required' => 'El campo RH es obligatorio.',
             'rh.in' => 'Selecciona un tipo de sangre válido.',
-            'eps.required' => 'El campo EPS es obligatorio.'
+            'eps.required' => 'El campo EPS es obligatorio.',
+            'eps.string' => 'La EPS debe ser texto.',
+            'eps.max' => 'La EPS no puede superar los 50 caracteres.',
+            'estado.required' => 'El estado es obligatorio.',
+            'estado.boolean' => 'El estado seleccionado no es válido.',
         ];
     }
 }

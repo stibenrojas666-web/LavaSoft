@@ -46,6 +46,7 @@ class BusquedaIndexRequest extends FormRequest
             'tipoVehiculoId.integer' => 'El tipo de vehículo seleccionado no es válido.',
             'tipoVehiculoId.exists' => 'El tipo de vehículo seleccionado ya no existe.',
             'modalidad.in' => 'La modalidad seleccionada no es válida.',
+            'metodo.in' => 'El método de pago seleccionado no es válido.',
             'desde.date' => 'La fecha inicial no es válida.',
             'hasta.date' => 'La fecha final no es válida.',
             'hasta.after_or_equal' => 'La fecha final no puede ser anterior a la inicial.',

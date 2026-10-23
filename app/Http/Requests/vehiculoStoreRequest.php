@@ -39,10 +39,18 @@ class vehiculoStoreRequest extends FormRequest
             'tipoVehiculoId.required'=>'El tipo de vehículo es obligatorio',
             'tipoVehiculoId.exists'=>'El tipo de vehículo seleccionado no existe',
             'placa.required'=>'La placa es obligatoria',
+            'placa.string'=>'La placa debe ser texto.',
+            'placa.max'=>'La placa no puede superar los 20 caracteres.',
             'placa.unique'=>'La placa ya se encuentra registrada',
             'modelo.required'=>'El modelo es obligatorio',
+            'modelo.string'=>'El modelo debe ser texto.',
+            'modelo.max'=>'El modelo no puede superar los 100 caracteres.',
             'color.required'=>'El color es obligatorio',
+            'color.string'=>'El color debe ser texto.',
+            'color.max'=>'El color no puede superar los 50 caracteres.',
             'estado.required'=>'El estado es obligatorio',
+            'estado.string'=>'El estado debe ser texto.',
+            'estado.max'=>'El estado no puede superar los 50 caracteres.',
         ];
     }
 }

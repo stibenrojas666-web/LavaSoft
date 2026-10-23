@@ -47,12 +47,16 @@ class precioServicioUpdateRequest extends FormRequest
     {
         return[
             'servicio_id.required' => 'Debes seleccionar un servicio.',
+            'servicio_id.exists' => 'El servicio seleccionado no es válido.',
             'servicio_id.unique' => 'Ya existe un precio para ese servicio y tipo de vehículo.',
             'tipo_vehiculo_id.required' => 'Debes seleccionar un tipo de vehículo.',
+            'tipo_vehiculo_id.exists' => 'El tipo de vehículo seleccionado no es válido.',
             'modalidad.required' => 'Selecciona cómo se calcula el precio.',
             'modalidad.in' => 'La modalidad de precio no es válida.',
-            'precio.required' => 'El campo Precio es obligatorio.',
+            'precio.required_if' => 'Ingresa un precio para esta modalidad.',
             'precio.numeric' => 'El campo Precio debe ser un número.',
+            'precio.min' => 'El precio debe ser mayor que cero.',
+            'precio.max' => 'El precio supera el valor permitido.',
         ];
     }
 }

@@ -32,7 +32,11 @@ class servicioStoreRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'nombre.required' => 'El campo Nombre es obligatorio.'
+            'nombre.required' => 'El nombre del servicio es obligatorio.',
+            'nombre.string' => 'El nombre del servicio debe ser texto.',
+            'nombre.max' => 'El nombre del servicio no puede superar los 255 caracteres.',
+            'descripcion.string' => 'La descripción debe ser texto.',
+            'estado.boolean' => 'El estado seleccionado no es válido.',
         ];
     }
 }

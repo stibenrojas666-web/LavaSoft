@@ -30,7 +30,9 @@ class tipoVehiculoUpdateRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'nombre.required' => 'El nombre es obligatorio.',
             'nombre.string' => 'El campo Nombre debe ser una cadena de texto.',
+            'nombre.max' => 'El nombre no puede superar los 30 caracteres.',
         ];
     }
 
