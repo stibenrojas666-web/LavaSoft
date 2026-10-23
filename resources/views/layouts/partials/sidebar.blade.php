@@ -6,9 +6,18 @@
 >
     <div class="flex h-full flex-col">
         <a href="{{ route('dashboard.index') }}" class="flex h-[76px] items-center gap-3 border-b border-slate-800 px-5">
-            <span class="grid h-10 w-10 place-items-center rounded-xl bg-primary-600 text-sm font-extrabold tracking-wide text-white shadow-lg shadow-primary-950/30">LS</span>
+            @if($configuracionLavadero->mostrar_logo)
+                @if($configuracionLavadero->logo_path)
+                    <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($configuracionLavadero->logo_path) }}"
+                        onerror="this.onerror=null;this.src='/images/LOGO.png';"
+                        alt="Logo de {{ $configuracionLavadero->nombre }}" class="h-10 w-10 rounded-xl bg-white object-contain p-1 shadow-lg">
+                @else
+                    <img src="/images/LOGO.png"
+                        alt="Logo de {{ $configuracionLavadero->nombre }}" class="h-10 w-10 rounded-xl bg-white object-contain p-1 shadow-lg">
+                @endif
+            @endif
             <span class="min-w-0">
-                <span class="block truncate text-base font-semibold tracking-tight text-white">LavaSoft</span>
+                <span class="block truncate text-base font-semibold tracking-tight text-white">{{ $configuracionLavadero->nombre ?: 'LavaSoft' }}</span>
                 <span class="mt-0.5 block text-[11px] uppercase tracking-[0.16em] text-slate-500">Centro de lavado</span>
             </span>
         </a>
@@ -77,6 +86,25 @@
                 </div>
             </section>
 
+            <section aria-labelledby="nav-reportes">
+                <h2 id="nav-reportes" class="px-3 pb-2 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500">Reportes</h2>
+                @can('ver dashboard')
+                    @foreach ([
+                        ['label' => 'Reporte diario', 'route' => 'reportes.diario', 'icon' => 'chart'],
+                        ['label' => 'Reporte por período', 'route' => 'reportes.periodo', 'icon' => 'chart'],
+                    ] as $link)
+                        @php($active = request()->routeIs($link['route']))
+                        <a href="{{ route($link['route']) }}"
+                            @if($active) aria-current="page" @endif
+                            @click="sidebarOpen = false"
+                            class="sidebar-link {{ $active ? 'sidebar-link-active' : '' }}">
+                            <span class="sidebar-icon">@include('layouts.partials.icons', ['icon' => $link['icon']])</span>
+                            <span>{{ $link['label'] }}</span>
+                        </a>
+                    @endforeach
+                @endcan
+            </section>
+
             <section aria-labelledby="nav-seguridad">
                 <h2 id="nav-seguridad" class="px-3 pb-2 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500">Seguridad</h2>
                 @can(config('seguridad.permiso_admin'))
@@ -86,6 +114,13 @@
                         class="sidebar-link {{ request()->routeIs('seguridad.*') ? 'sidebar-link-active' : '' }}">
                         <span class="sidebar-icon">@include('layouts.partials.icons', ['icon' => 'shield'])</span>
                         <span>Gestión de usuarios y permisos</span>
+                    </a>
+                    <a href="{{ route('configuracion.edit') }}"
+                        @if(request()->routeIs('configuracion.*')) aria-current="page" @endif
+                        @click="sidebarOpen = false"
+                        class="sidebar-link {{ request()->routeIs('configuracion.*') ? 'sidebar-link-active' : '' }}">
+                        <span class="sidebar-icon">@include('layouts.partials.icons', ['icon' => 'cog'])</span>
+                        <span>Configuración del lavadero</span>
                     </a>
                 @endcan
             </section>

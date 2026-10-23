@@ -11,6 +11,9 @@
         'servicios.*' => 'Servicios',
         'tipoVehiculo.*' => 'Tipos de vehículo',
         'precioServicio.*' => 'Precios de servicio',
+        'configuracion.*' => 'Configuración del lavadero',
+        'reportes.diario' => 'Reporte diario',
+        'reportes.periodo' => 'Reporte semanal y mensual',
     ];
     $tituloActual = 'LavaSoft';
     foreach ($titulosPantalla as $patron => $titulo) {

@@ -1,11 +1,20 @@
 <div class="factura-contenido mx-auto max-w-[34rem] p-5 text-slate-800 sm:p-7">
     <header class="border-b border-dashed border-slate-300 pb-4 text-center">
         <p class="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-500">Comprobante de servicio</p>
-        <h1 class="mt-1 text-xl font-bold leading-tight text-slate-950">{{ config('lavadero.nombre', 'LavaSoft') }}</h1>
-        {{-- Estos datos luego vendrán de la configuración del lavadero. --}}
-        @if(config('lavadero.nit'))<p class="mt-1 text-xs text-slate-600">NIT: {{ config('lavadero.nit') }}</p>@endif
-        @if(config('lavadero.direccion'))<p class="text-xs text-slate-600">{{ config('lavadero.direccion') }}</p>@endif
-        @if(config('lavadero.telefono'))<p class="text-xs text-slate-600">Tel. {{ config('lavadero.telefono') }}</p>@endif
+        @if($configuracionLavadero->mostrar_logo)
+            @if($configuracionLavadero->logo_path)
+                <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($configuracionLavadero->logo_path) }}"
+                    onerror="this.onerror=null;this.src='/images/LOGO.png';"
+                    alt="Logo de {{ $configuracionLavadero->nombre }}" class="mx-auto mb-2 h-14 max-w-36 object-contain">
+            @else
+                <img src="/images/LOGO.png"
+                    alt="Logo de {{ $configuracionLavadero->nombre }}" class="mx-auto mb-2 h-14 max-w-36 object-contain">
+            @endif
+        @endif
+        <h1 class="mt-1 text-xl font-bold leading-tight text-slate-950">{{ $configuracionLavadero->nombre ?: config('lavadero.nombre', 'LavaSoft') }}</h1>
+        @if($configuracionLavadero->nit ?: config('lavadero.nit'))<p class="mt-1 text-xs text-slate-600">NIT: {{ $configuracionLavadero->nit ?: config('lavadero.nit') }}</p>@endif
+        @if($configuracionLavadero->direccion ?: config('lavadero.direccion'))<p class="text-xs text-slate-600">{{ $configuracionLavadero->direccion ?: config('lavadero.direccion') }}</p>@endif
+        @if($configuracionLavadero->telefono ?: config('lavadero.telefono'))<p class="text-xs text-slate-600">Tel. {{ $configuracionLavadero->telefono ?: config('lavadero.telefono') }}</p>@endif
     </header>
 
     <section class="grid grid-cols-2 gap-x-3 gap-y-2 border-b border-dashed border-slate-300 py-3 text-xs">
