@@ -38,6 +38,16 @@
             </div>
         </x-card>
 
+        <x-card title="Valor generado por servicio" subtitle="Ingresos asociados a citas terminadas dentro del período">
+            @if($servicios->isNotEmpty())
+                <div class="h-80">
+                    <canvas id="grafico-servicios-periodo" role="img" aria-label="Gráfico del valor generado por servicio en el período"></canvas>
+                </div>
+            @else
+                <p class="py-10 text-center text-sm text-slate-500">No hay servicios de citas terminadas para mostrar en este período.</p>
+            @endif
+        </x-card>
+
         <x-card title="Totales por servicio">
             <x-table :headers="['Servicio', 'Cantidad', 'Total']">
                 @forelse($servicios as $fila)
@@ -54,3 +64,61 @@
         </x-card>
     </div>
 @endsection
+
+@push('scripts')
+    @if($servicios->isNotEmpty())
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                if (typeof Chart === 'undefined') return;
+
+                const formatoPesos = valor => '$' + Number(valor).toLocaleString('es-CO');
+
+                new Chart(document.getElementById('grafico-servicios-periodo'), {
+                    type: 'bar',
+                    data: {
+                        labels: @json($serviciosLabels),
+                        datasets: [{
+                            label: 'Valor por servicio',
+                            data: @json($serviciosValues),
+                            backgroundColor: '#22d3ee',
+                            hoverBackgroundColor: '#0891b2',
+                            borderRadius: 8,
+                            maxBarThickness: 34
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: '#0f172a',
+                                padding: 12,
+                                displayColors: false,
+                                callbacks: { label: contexto => formatoPesos(contexto.parsed.x) }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                border: { display: false },
+                                grid: { color: '#e2e8f0' },
+                                ticks: {
+                                    color: '#64748b',
+                                    font: { family: 'Inter' },
+                                    callback: valor => formatoPesos(valor)
+                                }
+                            },
+                            y: {
+                                border: { display: false },
+                                grid: { display: false },
+                                ticks: { color: '#64748b', font: { family: 'Inter' } }
+                            }
+                        }
+                    }
+                });
+            });
+        </script>
+    @endif
+@endpush

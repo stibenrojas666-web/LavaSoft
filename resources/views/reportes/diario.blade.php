@@ -32,6 +32,16 @@
             </div>
         </x-card>
 
+        <x-card title="Servicios realizados" subtitle="Cantidad por servicio en la fecha seleccionada">
+            @if($servicios->isNotEmpty())
+                <div class="h-72">
+                    <canvas id="grafico-servicios-diario" role="img" aria-label="Gráfico de servicios realizados en el día"></canvas>
+                </div>
+            @else
+                <p class="py-10 text-center text-sm text-slate-500">No hay servicios de citas terminadas para mostrar en esta fecha.</p>
+            @endif
+        </x-card>
+
         <x-card title="Detalle de citas atendidas">
             <x-table :headers="['Hora', 'Cliente', 'Servicios', 'Empleado', 'Total']">
                 @forelse($citas as $cita)
@@ -50,3 +60,54 @@
         </x-card>
     </div>
 @endsection
+
+@push('scripts')
+    @if($servicios->isNotEmpty())
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                if (typeof Chart === 'undefined') return;
+
+                new Chart(document.getElementById('grafico-servicios-diario'), {
+                    type: 'bar',
+                    data: {
+                        labels: @json($serviciosLabels),
+                        datasets: [{
+                            label: 'Servicios realizados',
+                            data: @json($serviciosValues),
+                            backgroundColor: '#22d3ee',
+                            hoverBackgroundColor: '#0891b2',
+                            borderRadius: 8,
+                            maxBarThickness: 48
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: '#0f172a',
+                                padding: 12,
+                                displayColors: false,
+                                callbacks: { label: contexto => contexto.parsed.y + ' realizado(s)' }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: { display: false },
+                                border: { display: false },
+                                ticks: { color: '#64748b', font: { family: 'Inter' } }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                border: { display: false },
+                                grid: { color: '#e2e8f0' },
+                                ticks: { precision: 0, stepSize: 1, color: '#64748b', font: { family: 'Inter' } }
+                            }
+                        }
+                    }
+                });
+            });
+        </script>
+    @endif
+@endpush
