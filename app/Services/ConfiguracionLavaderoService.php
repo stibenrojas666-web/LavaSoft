@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 use Throwable;
 
 class ConfiguracionLavaderoService
@@ -45,6 +46,12 @@ class ConfiguracionLavaderoService
         $mostrarLogo = filter_var($datos['mostrar_logo'] ?? false, FILTER_VALIDATE_BOOLEAN);
         $datos['mostrar_logo'] = $mostrarLogo;
         $rutaNueva = $logo?->store('lavadero', 'public');
+
+        if ($logo !== null && $rutaNueva === false) {
+            throw ValidationException::withMessages([
+                'logo' => 'No se pudo guardar el logo. Revisa que el archivo pese menos de 2 MB e inténtalo de nuevo.',
+            ]);
+        }
 
         if ($rutaNueva !== null) {
             $datos['logo_path'] = $rutaNueva;
