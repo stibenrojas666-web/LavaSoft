@@ -9,7 +9,7 @@
         <p class="text-center text-sm text-slate-500 sm:text-left">
             @if ($paginator->count())
                 Mostrando
-                <span class="font-semibold text-slate-700">{{ $paginator->firstItem() }}–{{ $paginator->lastItem() }}</span>
+                <span class="font-semibold text-slate-700">{{ $paginator->firstItem() }}{{ $paginator->lastItem() }}</span>
                 @if ($esPaginadorCompleto)
                     de <span class="font-semibold text-slate-700">{{ $paginator->total() }}</span>
                 @endif

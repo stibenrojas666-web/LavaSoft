@@ -33,7 +33,7 @@ class precioServicioRepository
             ->when(($filtros['tipoVehiculoId'] ?? '') !== '', fn ($query) => $query->where('tipo_vehiculo_id', $filtros['tipoVehiculoId']))
             ->when(($filtros['modalidad'] ?? '') !== '', fn ($query) => $query->where('modalidad', $filtros['modalidad']))
             ->orderBy('servicio_id')
-            ->paginate(12)
+            ->paginate(10)
             ->withQueryString();
     }
 

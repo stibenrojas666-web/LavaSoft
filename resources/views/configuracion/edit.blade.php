@@ -34,15 +34,13 @@
 
             <div class="flex items-center gap-4 rounded-xl border border-slate-200 bg-slate-50 p-4">
                 @if($configuracion->logo_path)
-                    <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($configuracion->logo_path) }}"
-                        onerror="this.onerror=null;this.src='/images/LOGO.png';"
+                    <img src="{{ '/storage/' . ltrim($configuracion->logo_path, '/') }}"
                         alt="Logo actual de {{ $configuracion->nombre }}" class="h-16 w-16 rounded-lg bg-white object-contain p-2">
                 @else
-                    <img src="/images/LOGO.png"
-                        alt="Logo inicial de {{ $configuracion->nombre }}" class="h-16 w-16 rounded-lg bg-white object-contain p-2">
+                    <div class="flex h-16 w-16 items-center justify-center rounded-lg border border-dashed border-slate-300 text-xs text-slate-400">Sin logo</div>
                 @endif
                 <div>
-                    <p class="font-semibold text-slate-800">{{ $configuracion->logo_path ? 'Logo actual' : 'Logo inicial' }}</p>
+                    <p class="font-semibold text-slate-800">{{ $configuracion->logo_path ? 'Logo actual' : 'Sin logo cargado' }}</p>
                     <p class="text-sm text-slate-500">Al desmarcar “Mostrar logo” y guardar, dejará de aparecer.</p>
                 </div>
             </div>

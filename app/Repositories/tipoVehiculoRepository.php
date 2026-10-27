@@ -18,7 +18,7 @@ class tipoVehiculoRepository
     {
         return TextoBusqueda::aplicar(tipoVehiculo::query()->select(['id', 'nombre']), $texto, fn ($query, $termino) => $query->where('nombre', 'like', $termino))
             ->orderBy('nombre')
-            ->paginate(12)
+            ->paginate(10)
             ->withQueryString();
     }
 

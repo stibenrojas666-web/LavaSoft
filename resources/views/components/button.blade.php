@@ -1,20 +1,14 @@
-{{--
-    Uso:
-    <x-button variant="primary" type="submit">Guardar</x-button>
-    <x-button variant="secondary" href="/ruta">Cancelar</x-button>
-    variant: primary | cyan | neutral | secondary | danger | ghost
---}}
 @props(['variant' => 'primary', 'href' => null, 'type' => 'button'])
 
 @php
-    $base = 'inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
+    $base = 'inline-flex min-h-[44px] items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition focus:outline-none focus:ring-4 disabled:opacity-50 disabled:cursor-not-allowed';
     $variants = [
-        'primary'   => 'bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500',
-        'cyan'      => 'bg-cyan-600 text-white hover:bg-cyan-800 focus:ring-cyan-500',
-        'neutral'   => 'bg-gray-500 text-white hover:bg-gray-700 focus:ring-gray-500',
-        'secondary' => 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 focus:ring-primary-500',
-        'danger'    => 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500',
-        'ghost'     => 'text-slate-500 hover:bg-slate-100 focus:ring-primary-500',
+        'primary'   => 'bg-primary-600 text-white shadow-sm hover:bg-primary-700 hover:-translate-y-px focus:ring-primary-200',
+        'cyan'      => 'bg-cyan-700 text-white shadow-sm hover:bg-cyan-800 hover:-translate-y-px focus:ring-cyan-200',
+        'neutral'   => 'bg-slate-600 text-white hover:bg-slate-700 focus:ring-slate-200',
+        'secondary' => 'bg-white text-slate-700 border border-slate-200 hover:border-cyan-300 hover:bg-cyan-50 focus:ring-primary-100',
+        'danger'    => 'bg-red-700 text-white hover:bg-red-800 focus:ring-red-200',
+        'ghost'     => 'text-slate-600 hover:bg-slate-100 focus:ring-primary-100',
     ];
     $classes = $base . ' ' . ($variants[$variant] ?? $variants['primary']);
 @endphp

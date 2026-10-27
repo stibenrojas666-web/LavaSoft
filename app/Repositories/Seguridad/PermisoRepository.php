@@ -23,7 +23,7 @@ class PermisoRepository
         return TextoBusqueda::aplicar(Permission::query()->select(['id', 'name', 'guard_name', 'modulo']), $texto, fn ($filtros, $termino) => $filtros
             ->where('name', 'like', $termino)
             ->orWhere('modulo', 'like', $termino))
-            ->orderBy('modulo')->orderBy('name')->paginate(12)->withQueryString();
+            ->orderBy('modulo')->orderBy('name')->paginate(10)->withQueryString();
     }
 
     public function listarModulos(): array

@@ -41,7 +41,7 @@ class clienteRepository
         )
             ->orderBy('apellidoCliente')
             ->orderBy('nombreCliente')
-            ->paginate(12)
+            ->paginate(10)
             ->withQueryString();
     }
 

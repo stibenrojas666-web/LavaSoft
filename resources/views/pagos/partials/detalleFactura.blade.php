@@ -3,11 +3,7 @@
         <p class="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-500">Comprobante de servicio</p>
         @if($configuracionLavadero->mostrar_logo)
             @if($configuracionLavadero->logo_path)
-                <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($configuracionLavadero->logo_path) }}"
-                    onerror="this.onerror=null;this.src='/images/LOGO.png';"
-                    alt="Logo de {{ $configuracionLavadero->nombre }}" class="mx-auto mb-2 h-14 max-w-36 object-contain">
-            @else
-                <img src="/images/LOGO.png"
+                <img src="{{ '/storage/' . ltrim($configuracionLavadero->logo_path, '/') }}"
                     alt="Logo de {{ $configuracionLavadero->nombre }}" class="mx-auto mb-2 h-14 max-w-36 object-contain">
             @endif
         @endif

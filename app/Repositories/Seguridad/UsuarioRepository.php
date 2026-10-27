@@ -64,7 +64,7 @@ class UsuarioRepository
             ->orWhere('email', 'like', $termino)
             ->orWhereHas('rolesConInactivos', fn ($rol) => $rol->where('name', 'like', $termino)));
 
-        return $consulta->orderBy('name')->paginate(12)->withQueryString();
+        return $consulta->orderBy('name')->paginate(10)->withQueryString();
     }
 
     public function sincronizarRoles(Authenticatable $usuario, array $nombresDeRoles): void

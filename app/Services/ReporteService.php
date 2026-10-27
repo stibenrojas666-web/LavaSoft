@@ -14,11 +14,15 @@ class ReporteService
     public function diario(string $fecha): array
     {
         $citas = $this->repository->citasAtendidasEnFecha($fecha);
+        $servicios = $this->repository->totalesPorServicio($fecha, $fecha);
 
         return [
             'citas' => $citas,
             'cantidadCitas' => $citas->count(),
             'totalRecaudado' => $this->repository->totalRecaudadoEnFecha($fecha),
+            'serviciosLabels' => $servicios->map(fn ($fila) => $fila->servicio?->nombre ?? 'Servicio eliminado')->values(),
+            'serviciosValues' => $servicios->pluck('cantidad')->map(fn ($cantidad) => (int) $cantidad)->values(),
+            'servicios' => $servicios,
         ];
     }
 
@@ -36,6 +40,8 @@ class ReporteService
             ),
             'servicios' => $servicios,
             'totalServicios' => (float) $servicios->sum('total'),
+            'serviciosLabels' => $servicios->map(fn ($fila) => $fila->servicio?->nombre ?? 'Servicio eliminado')->values(),
+            'serviciosValues' => $servicios->map(fn ($fila) => (float) $fila->total)->values(),
         ];
     }
 }
