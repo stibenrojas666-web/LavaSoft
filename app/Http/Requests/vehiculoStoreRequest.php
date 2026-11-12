@@ -4,8 +4,9 @@ namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
-class vehiculoStoreRequest extends FormRequest
+class VehiculoStoreRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -27,7 +28,7 @@ class vehiculoStoreRequest extends FormRequest
                 'placa'=>'required|string|max:20|unique:vehiculos,placa',
                 'modelo'=>'required|string|max:100',
                 'color'=>'required|string|max:50',
-                'estado'=>'required|string|max:50',
+                'estado' => ['required', Rule::in(['Activo', 'Inactivo'])],
         ];
     }
 
