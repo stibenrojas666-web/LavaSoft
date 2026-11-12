@@ -3,7 +3,8 @@
 @section('title', $rol ? 'Editar rol' : 'Nuevo rol')
 
 @section('content')
-<h1 class="text-xl font-semibold">{{ $rol ? 'Editar rol: ' . $rol->name : 'Nuevo rol' }}</h1>
+<div class="mx-auto max-w-5xl space-y-5">
+<x-module-header :title="$rol ? 'Editar rol: ' . $rol->name : 'Nuevo rol'" description="Organiza los permisos y el acceso de cada perfil." icon="shield" :back-url="route('seguridad.roles.index')" />
 
 @include('seguridad._errores')
 
@@ -107,4 +108,5 @@
         sincronizar();
     });
 </script>
+</div>
 @endsection

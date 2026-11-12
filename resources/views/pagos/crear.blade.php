@@ -5,11 +5,7 @@
 
 @section('content')
 <div class="mx-auto max-w-4xl px-4 py-6">
-    <div class="mb-6">
-        <p class="text-xs font-semibold uppercase tracking-wider text-cyan-600">Finanzas</p>
-        <h1 class="text-2xl font-semibold text-slate-800">Registrar nuevo pago</h1>
-        <p class="mt-1 text-sm text-slate-500">Registra el pago correspondiente a una cita.</p>
-    </div>
+    <x-module-header title="Registrar nuevo pago" description="Registra el pago correspondiente a una cita." icon="credit-card" :back-url="route('pagos.historial')" />
 
     <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
         <form action="{{ route('pagos.store') }}" method="POST" novalidate>

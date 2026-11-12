@@ -5,17 +5,7 @@
 
 @section('content')
 <div class="max-w-5xl mx-auto px-4 py-6">
-    <div class="flex items-center justify-between mb-7">
-        <div>
-            <div class="flex items-center gap-2 mb-1">
-                <span class="w-2 h-2 rounded-full bg-cyan-500"></span>
-                <p class="text-xs font-semibold uppercase tracking-widest text-slate-400">Configuración de vehículos</p>
-            </div>
-            <h1 class="text-2xl font-bold text-slate-800">Registrar tipo de vehículo</h1>
-            <p class="text-sm text-slate-500 mt-1">Agrega una nueva categoría de vehículo.</p>
-        </div>
-        <a href="{{ route('tipoVehiculo.index') }}" class="text-sm font-medium text-slate-500 hover:text-cyan-600">← Volver</a>
-    </div>
+    <x-module-header title="Registrar tipo de vehículo" description="Agrega una nueva categoría de vehículo." icon="box" :back-url="route('tipoVehiculo.index')" />
 
     <form action="{{ route('tipoVehiculo.store') }}" method="POST" novalidate
           class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">

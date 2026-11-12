@@ -5,54 +5,57 @@
 
 @section('content')
 <div class="mx-auto w-full max-w-6xl">
-        <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between no-imprimir">
-            <div>
-                <a href="{{ route('agenda.index') }}" class="inline-flex items-center gap-2 text-sm font-semibold text-cyan-800 hover:text-cyan-950">← Volver a la agenda</a>
-                <h1 class="mt-3 text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">Factura de servicio</h1>
-                <p class="mt-1 text-sm text-slate-500">Revisa los datos y elige cómo compartir el comprobante.</p>
-            </div>
+        
+    <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between no-imprimir">
+        <div>
+            <a href="{{ route('agenda.index') }}"
+            class="inline-flex items-center gap-2 text-sm font-semibold text-cyan-800 hover:text-cyan-950">
+                ← Volver a la agenda
+            </a>
 
-            <div class="flex flex-wrap gap-2">
-                @if($agenda->pago)
-                    @if($agenda->cliente?->emailCliente)
-                        <form action="{{ route('agenda.factura.correo', $agenda->id) }}" method="POST">
-                            @csrf
-                            <button type="submit" class="inline-flex min-h-11 items-center gap-2 rounded-xl bg-cyan-800 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-cyan-950 focus:outline-none focus:ring-4 focus:ring-cyan-200">
-                                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
-                                Enviar al correo
-                            </button>
-                        </form>
-                    @endif
-                    @if($urlWhatsApp)
-                        <a href="{{ $urlWhatsApp }}" target="_blank" rel="noopener noreferrer" class="inline-flex min-h-11 items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-emerald-700 focus:outline-none focus:ring-4 focus:ring-emerald-200">
-                            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20.5 11.5a8.5 8.5 0 0 1-12.6 7.4L3 20l1.2-4.7A8.5 8.5 0 1 1 20.5 11.5Z"/><path d="M8.5 8.5c.4 2.8 2.2 4.6 5 5l1.1-1.1 2 .8c-.2 1.4-1.2 2.2-2.6 2.1-3.8-.4-6.8-3.4-7.2-7.2-.1-1.4.7-2.4 2.1-2.6l.8 2-1.2 1Z"/></svg>
-                            Preparar WhatsApp
-                        </a>
-                    @endif
-                @endif
-                <button type="button" onclick="window.print()" class="inline-flex min-h-11 items-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-bold text-slate-700 shadow-sm transition hover:border-slate-400 hover:bg-slate-50 focus:outline-none focus:ring-4 focus:ring-slate-200">
-                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 8V3h10v5M7 17H5a2 2 0 0 1-2-2v-4a3 3 0 0 1 3-3h12a3 3 0 0 1 3 3v4a2 2 0 0 1-2 2h-2"/><path d="M7 14h10v7H7z"/></svg>
-                    Imprimir / Guardar PDF
-                </button>
-            </div>
+            <h1 class="mt-3 text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
+                Factura de servicio
+            </h1>
+
+            <p class="mt-1 text-sm text-slate-500">
+                Consulta y comparte la factura.
+            </p>
         </div>
-        @if($agenda->pago && ($agenda->cliente?->emailCliente || $urlWhatsApp))
-            <p class="mt-2 text-right text-xs text-slate-500 no-imprimir">El correo se envía al dato registrado. WhatsApp abre el chat con el mensaje listo; confirma el envío allí y adjunta el PDF si lo necesitas.</p>
-        @endif
 
-        @if($agenda->pago && !$agenda->cliente?->emailCliente && !$telefonoWhatsApp)
-            <div class="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 no-imprimir">
-                Este cliente no tiene correo ni teléfono registrados. Puedes imprimir la factura; agrega sus datos desde Clientes para habilitar el envío.
-            </div>
-        @elseif($agenda->pago && !$agenda->cliente?->emailCliente && !$telefonoWhatsAppValido)
-            <div class="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 no-imprimir">No hay un correo ni un teléfono válido para WhatsApp. Actualiza los datos del cliente o imprime la factura.</div>
-        @elseif($agenda->pago && !$agenda->cliente?->emailCliente)
-            <div class="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 no-imprimir">No hay correo registrado. Puedes usar WhatsApp o imprimir la factura.</div>
-        @elseif($agenda->pago && !$telefonoWhatsApp)
-            <div class="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 no-imprimir">No hay teléfono registrado. Puedes usar el correo o imprimir la factura.</div>
-        @elseif($agenda->pago && !$telefonoWhatsAppValido)
-            <div class="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 no-imprimir">El teléfono no tiene un indicativo internacional válido para WhatsApp. Actualízalo desde Clientes; también puedes usar el correo o imprimir la factura.</div>
-        @endif
+        <div class="flex flex-wrap gap-2">
+            @if($agenda->pago && $agenda->cliente?->emailCliente)
+                <form action="{{ route('agenda.factura.correo', $agenda->id) }}" method="POST">
+                    @csrf
+                    <button type="submit"
+                        title="Enviar factura por correo" aria-label="Enviar factura por correo"
+                        class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-xl bg-cyan-800 p-3 text-sm font-bold text-white shadow-sm transition hover:bg-cyan-950 focus:outline-none focus:ring-4 focus:ring-cyan-200">
+                        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <rect x="3" y="5" width="18" height="14" rx="2"/>
+                            <path d="m3 7 9 6 9-6"/>
+                        </svg>
+                    </button>
+                </form>
+            @endif
+
+            <button type="button" onclick="window.print()"
+                title="Imprimir o guardar como PDF" aria-label="Imprimir o guardar como PDF"
+                class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-xl border border-slate-300 bg-white p-3 text-sm font-bold text-slate-700 shadow-sm transition hover:border-slate-400 hover:bg-slate-50 focus:outline-none focus:ring-4 focus:ring-slate-200">
+                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path d="M7 8V3h10v5M7 17H5a2 2 0 0 1-2-2v-4a3 3 0 0 1 3-3h12a3 3 0 0 1 3 3v4a2 2 0 0 1-2 2h-2"/>
+                    <path d="M7 14h10v7H7z"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    @if($agenda->pago && !$agenda->cliente?->emailCliente)
+        <div class="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 no-imprimir">
+            Este cliente no tiene un correo electrónico registrado. Puedes agregarlo desde el módulo Clientes o imprimir la factura.
+        </div>
+    @endif
+
 
         @if(session('success'))
             <p class="mb-4 rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-sm font-medium text-emerald-800 no-imprimir">{{ session('success') }}</p>

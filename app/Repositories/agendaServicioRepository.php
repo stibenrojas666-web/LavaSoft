@@ -56,7 +56,14 @@ class AgendaServicioRepository implements AgendaServicioRepositoryInterface {
 
     public function findById(int $id)
     {
-        return AgendaServicios::findOrFail($id);
+        return AgendaServicios::query()
+            ->with([
+                'agenda.cliente',
+                'agenda.empleado',
+                'vehiculo.tipoVehiculo',
+                'servicio',
+            ])
+            ->findOrFail($id);
     }
 
     public function update(int $id, array $datos)

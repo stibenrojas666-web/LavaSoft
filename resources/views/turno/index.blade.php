@@ -5,13 +5,9 @@
 
 @section('content')
     <x-card>
-        <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
-            <div>
-                <p class="text-sm text-slate-500">Horario del equipo</p>
-                <h1 class="text-2xl font-bold text-cyan-800">Turnos</h1>
-            </div>
-            <span class="rounded-full bg-cyan-50 px-3 py-1 text-sm font-medium text-cyan-800">{{ $turnos->total() }} encontrados</span>
-        </div>
+        <x-module-header variant="list" title="Turnos" description="Horario del equipo.">
+            <x-slot:actions><span class="rounded-full bg-cyan-50 px-3 py-1 text-sm font-semibold text-cyan-800">{{ $turnos->total() }} encontrados</span></x-slot:actions>
+        </x-module-header>
 
         @if(session('success'))<p class="mb-5 rounded-lg bg-green-50 p-3 text-sm text-green-800">{{ session('success') }}</p>@endif
         @if(session('error'))<p class="mb-5 rounded-lg bg-red-50 p-3 text-sm text-red-800">{{ session('error') }}</p>@endif

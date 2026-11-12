@@ -10,24 +10,37 @@
 <div class="cliente-page">
 
     {{-- Encabezado --}}
-    <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
+    
+<div class="mb-5">
+    <div class="mb-2 flex flex-wrap items-center gap-2 text-xs font-medium text-slate-400">
+        <a href="{{ route('dashboard.index') }}" class="hover:text-cyan-700">
+            Inicio
+        </a>
+        <span>/</span>
+        <a href="{{ route('clientes.index') }}" class="hover:text-cyan-700">
+            Clientes
+        </a>
+        <span>/</span>
+        <span class="font-semibold text-cyan-700">Historial del cliente</span>
+    </div>
+
+    <div class="flex flex-wrap items-center justify-between gap-3">
         <div>
-
-
-            <h1 class="text-2xl font-extrabold text-slate-800">
+            <h1 class="text-2xl font-extrabold tracking-tight text-slate-800">
                 Historial del cliente
             </h1>
-
             <p class="mt-1 text-sm text-slate-500">
                 Consulta los vehículos y servicios realizados.
             </p>
         </div>
 
-        <a href="{{ route('clientes.index') }}"
-           class="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-600 transition hover:border-cyan-200 hover:bg-cyan-50 hover:text-cyan-800">
-            ← Volver a clientes
-        </a>
+        <span class="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-700">
+            <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
+            Sistema activo
+        </span>
     </div>
+</div>
+
 
     {{-- Tarjeta de identificación --}}
     <div class="cliente-banner mb-6 flex items-center gap-4 rounded-2xl px-6 py-6 sm:px-8">
@@ -118,7 +131,7 @@
                             @include('layouts.partials.icons', ['icon' => 'history'])
                         </span>
                         <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-600">
-                            Historial de servicios
+                            Historial de vehiculos
                         </h3>
                     </div>
 
@@ -169,12 +182,13 @@
 
                                 <div class="mt-4 flex justify-end">
                                     <a href="{{ route('agenda.factura', $linea->agenda->id) }}"
-                                       class="inline-flex items-center gap-2 rounded-lg border border-cyan-200 bg-white px-3 py-2 text-xs font-bold text-cyan-800 transition hover:bg-cyan-50">
-                                        @include('layouts.partials.icons', ['icon' => 'receipt'])
+                                    class="inline-flex items-center gap-1.5 rounded-lg border border-cyan-200 bg-white px-2.5 py-1.5 text-[11px] font-semibold text-cyan-800 transition hover:border-cyan-300 hover:bg-cyan-50">
+                                        <span class="inline-flex h-3.5 w-3.5 shrink-0 items-center justify-center [&>svg]:h-3.5 [&>svg]:w-3.5">
+                                            @include('layouts.partials.icons', ['icon' => 'receipt'])
+                                        </span>
                                         Ver factura →
                                     </a>
                                 </div>
-
                             </div>
                         </article>
 

@@ -83,24 +83,16 @@
 
 <div class="empleado-page">
 
-    {{-- Encabezado --}}
-    <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
-        <div>
-            <h1 class="text-2xl font-extrabold text-slate-800">
-                Equipo de trabajo
-            </h1>
-            <p class="mt-1 text-sm text-slate-500">
-                Consulta y administra la información de los empleados del lavadero.
-            </p>
-        </div>
-
+    <x-module-header variant="list" title="Equipo de trabajo" description="Consulta y administra la información de los empleados del lavadero.">
+        <x-slot:actions>
         <a href="{{ route('empleados.create') }}" class="empleado-btn-nuevo">
             <span class="h-4 w-4">
                 @include('layouts.partials.icons', ['icon' => 'plus'])
             </span>
             Nuevo empleado
         </a>
-    </div>
+        </x-slot:actions>
+    </x-module-header>
 
     {{-- Resumen --}}
     <div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2">

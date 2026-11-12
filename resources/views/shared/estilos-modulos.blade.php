@@ -35,6 +35,32 @@
     background: linear-gradient(115deg, #082b3b, #0b3b50, #087e99);
 }
 
+.lavasoft-module-header { border-radius: 20px; }
+
+.modulo-banner::before,
+.modulo-banner::after {
+    content: "";
+    position: absolute;
+    z-index: 0;
+    border: 2px solid rgb(34 211 238 / 18%);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.modulo-banner::before {
+    width: 230px;
+    height: 230px;
+    right: 35px;
+    top: -125px;
+}
+
+.modulo-banner::after {
+    width: 145px;
+    height: 145px;
+    right: 135px;
+    bottom: -100px;
+}
+
 .modulo-banner h1,
 .modulo-banner h2,
 .modulo-banner p {
@@ -46,6 +72,70 @@
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 22px 25px;
+}
+
+/* Acabado común para las páginas de mantenimiento de los módulos. */
+main h1:not(.modulo-banner h1) {
+    font-size: 1.5rem;
+    line-height: 2rem;
+    color: #17394d;
+    font-weight: 800;
+    letter-spacing: -.025em;
+}
+
+main h2:not(.modulo-banner h2) { color: #17394d; font-weight: 800; }
+
+main :is(label, legend) { color: #334e5e; }
+
+main :is(.modulo-panel, .modulo-card, .cliente-stat, .empleado-stat, .empleado-card, .cliente-card, .as-panel) {
+    border-color: var(--lava-borde);
+    border-radius: 17px;
+    box-shadow: 0 5px 16px rgb(11 42 58 / 5%);
+}
+
+main form[method="POST"][class*="bg-white"][class*="border"] {
+    border-color: var(--lava-borde);
+    border-radius: 18px;
+    box-shadow: 0 10px 28px rgb(11 42 58 / 6%);
+}
+
+main :is(.modulo-actions, .cliente-actions) {
+    border-top: 1px solid #eaf0f4;
+    background: #fbfdff;
+}
+
+main table:not(.lavasoft-table--invoice) {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    color: #334e5e;
+    font-size: .875rem;
+}
+
+main table:not(.lavasoft-table--invoice) thead th {
+    padding: .9rem 1rem;
+    border-bottom: 1px solid var(--lava-borde);
+    background-color: #eef6f9;
+    color: #476171;
+    font-size: .68rem;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+main table:not(.lavasoft-table--invoice) tbody td {
+    padding: .9rem 1rem;
+    border-bottom: 1px solid #edf3f6;
+    color: #334e5e;
+    vertical-align: middle;
+}
+
+main table:not(.lavasoft-table--invoice) tbody tr:nth-child(even) > td { background: #fbfdfe; }
+main table:not(.lavasoft-table--invoice) tbody tr:last-child > td { border-bottom: 0; }
+main table:not(.lavasoft-table--invoice) tbody tr { transition: background-color .14s ease; }
+
+main table:not(.lavasoft-table--invoice) tbody tr:hover > td {
+    background-color: #effbfc;
 }
 
 .modulo-field label {

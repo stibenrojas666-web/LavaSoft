@@ -3,23 +3,12 @@
 
 <div class="mx-auto max-w-5xl px-4 py-6">
 
-    {{-- Encabezado --}}
-    <div class="mb-7 flex items-center justify-between">
-        <div>
-            <h1 class="text-2xl font-bold text-slate-800">
-                {{ $esEdicion ? 'Editar cita' : 'Agendar nueva cita' }}
-            </h1>
-
-            <p class="mt-1 text-sm text-slate-500">
-                {{ $esEdicion ? 'Actualiza la información de la cita.' : 'Ingresa los datos para registrar una nueva cita.' }}
-            </p>
-        </div>
-
-        <a href="{{ route('agenda.index') }}"
-           class="text-sm font-medium text-slate-500 transition hover:text-cyan-600">
-            ← Volver
-        </a>
-    </div>
+    <x-module-header
+        :title="$esEdicion ? 'Editar cita' : 'Agendar nueva cita'"
+        :description="$esEdicion ? 'Actualiza la información de la cita.' : 'Ingresa los datos para registrar una nueva cita.'"
+        icon="calendar"
+        :back-url="route('agenda.index')"
+    />
 
     <form action="{{ $esEdicion ? route('agenda.update', $agenda->id) : route('agenda.store') }}"
           method="POST"

@@ -1,7 +1,8 @@
 
 @extends('layouts.app')
 
-@section('title', 'Servicios por Cita')
+@section('title', 'Historial de citas')
+@section('page-title', 'Historial de citas')
 
 @push('styles')
 <style>
@@ -39,32 +40,6 @@
         background: white;
         box-shadow: 0 9px 26px rgba(11,42,58,.055);
     }
-    .as-table {
-        width: 100%;
-        min-width: 850px;
-        border-collapse: separate;
-        border-spacing: 0;
-        font-size: 13px;
-    }
-    .as-table thead th {
-        padding: 15px 17px;
-        background: #f0f8fa;
-        color: #527080;
-        font-size: 10px;
-        font-weight: 800;
-        letter-spacing: .09em;
-        text-align: left;
-        text-transform: uppercase;
-        white-space: nowrap;
-    }
-    .as-table tbody td {
-        padding: 16px 17px;
-        border-top: 1px solid #edf3f6;
-        color: #526b79;
-        vertical-align: middle;
-    }
-    .as-table tbody tr { transition: background .2s ease; }
-    .as-table tbody tr:hover { background: #f0fbfd; }
     .as-icon {
         display: grid;
         width: 42px;
@@ -83,10 +58,8 @@
         border-radius: 11px;
         transition: .2s ease;
     }
-    .as-edit { background: #e8f8fc; color: #087c9b; }
-    .as-edit:hover { background: #c9f0f8; transform: translateY(-2px); }
-    .as-delete { background: #fff0f1; color: #d04458; }
-    .as-delete:hover { background: #ffe0e4; transform: translateY(-2px); }
+    .as-view { background: #e8f8fc; color: #087c9b; }
+    .as-view:hover { background: #c9f0f8; transform: translateY(-2px); }
     .as-action svg { width: 17px; height: 17px; }
     @media(max-width:640px) {
         .as-hero { padding: 22px; }
@@ -104,15 +77,15 @@
             <div>
                 <div class="mb-3 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold text-cyan-100">
                     <span class="h-2 w-2 rounded-full bg-cyan-300"></span>
-                    Gestión de operaciones
+                    Historial de citas
                 </div>
 
                 <h1 class="text-2xl font-extrabold tracking-tight sm:text-3xl">
-                    Servicios por cita
+                    Historial de citas
                 </h1>
 
                 <p class="mt-2 max-w-xl text-sm leading-6 text-cyan-50/85">
-                    Administra los servicios asociados a cada cita, consulta sus precios y mantén organizada la operación del lavadero.
+                    Consulta los servicios registrados para cada cita, junto con sus vehículos y precios.
                 </p>
             </div>
 
@@ -130,7 +103,7 @@
             </div>
             <div>
                 <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">
-                    Servicios registrados
+                    Registros del historial
                 </p>
                 <p class="mt-1 text-2xl font-extrabold text-slate-800">
                     {{ $agendaServicio->total() }}
@@ -158,7 +131,7 @@
         <div class="mb-4">
             <h2 class="text-base font-bold text-slate-800">Buscar y filtrar</h2>
             <p class="mt-1 text-xs text-slate-500">
-                Encuentra servicios por cita, placa, cliente, estado o fecha.
+                Busca por cita, placa, cliente, estado o fecha.
             </p>
         </div>
 
@@ -179,7 +152,7 @@
         <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 px-5 py-5">
             <div>
                 <h2 class="text-base font-bold text-slate-800">
-                    Servicios asociados
+                    Servicios registrados por cita
                 </h2>
                 <p class="mt-1 text-xs text-slate-500">
                     Información de los servicios vinculados a las citas.
@@ -191,8 +164,8 @@
             </span>
         </div>
 
-        <div class="overflow-x-auto">
-            <table class="as-table">
+        <div class="lavasoft-table-shell overflow-x-auto">
+            <table class="as-table lavasoft-table min-w-[850px]">
                 <thead>
                     <tr>
                         <th>ID</th>
@@ -200,7 +173,7 @@
                         <th>Vehículo</th>
                         <th>Servicio</th>
                         <th>Precio</th>
-                        <th class="text-center">Acciones</th>
+                        <th class="text-center">Ver</th>
                     </tr>
                 </thead>
 
@@ -248,31 +221,15 @@
                                 </span>
                             </td>
 
-                            <td>
-                                <div class="flex items-center justify-center gap-2">
-                                    <a href="{{ route('agendaServicio.edit', $as->id) }}"
-                                       class="as-action as-edit"
-                                       title="Editar"
-                                       aria-label="Editar">
-                                        @include('layouts.partials.icons', ['icon' => 'pencil'])
-                                    </a>
-
-                                    <form action="{{ route('agendaServicio.destroy', $as->id) }}"
-                                          method="POST"
-                                          class="inline"
-                                          onsubmit="return confirm('¿Desea quitar este servicio de la cita?')">
-                                        @csrf
-                                        @method('DELETE')
-
-                                        <button type="submit"
-                                                class="as-action as-delete"
-                                                title="Eliminar"
-                                                aria-label="Eliminar">
-                                            @include('layouts.partials.icons', ['icon' => 'trash'])
-                                        </button>
-                                    </form>
-                                </div>
+                            <td class="text-center">
+                                <a href="{{ route('agendaServicio.show', $as->id) }}"
+                                   class="as-action as-view"
+                                   title="Ver detalle del registro"
+                                   aria-label="Ver detalle del registro #{{ $as->id }}">
+                                    @include('layouts.partials.icons', ['icon' => 'eye'])
+                                </a>
                             </td>
+
                         </tr>
                     @empty
                         <tr>
@@ -305,11 +262,5 @@
     </section>
 
 </div>
-
-<x-floating-action
-    :href="route('agendaServicio.create')"
-    label="Agregar servicio"
-    icon="plus"
-/>
 
 @endsection

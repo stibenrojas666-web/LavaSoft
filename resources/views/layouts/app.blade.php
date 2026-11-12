@@ -203,6 +203,7 @@
         main td button[aria-label="Eliminar"]:hover { background: #ffe4e6; color: #9f1239; transform: translateY(-1px); }
     </style>
 
+    @include('shared.estilos-modulos')
     @stack('styles')
 </head>
 <body class="h-full bg-slate-100 text-slate-800 antialiased">

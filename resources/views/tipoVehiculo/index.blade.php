@@ -8,26 +8,9 @@
 
 
         {{-- Contenido --}}
-        <div class="overflow-hidden rounded-2xl border border-cyan-100 bg-white shadow-md shadow-cyan-100/40">
-
-            {{-- Cabecera de la tarjeta --}}
-            <div class="border-b border-cyan-100 bg-gradient-to-r from-cyan-50 via-white to-sky-50 px-5 py-4 sm:px-6">
-                <div class="flex items-center gap-3">
-                    <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-500 text-white shadow-sm shadow-cyan-200">
-                        <span class="h-5 w-5">
-                            @include('layouts.partials.icons', ['icon' => 'car'])
-                        </span>
-                    </div>
-
-                    <div>
-                        <h2 class="text-base font-bold text-slate-800">
-                            Tipos de vehículos registrados
-                        </h2>
-                        <p class="mt-1 text-sm text-slate-500">
-                            Consulta, modifica o elimina los tipos de vehículos.
-                        </p>
-                    </div>
-                </div>
+        <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <div class="px-5 pt-5 sm:px-6">
+                <x-module-header variant="list" title="Tipos de vehículos" description="Consulta, modifica o elimina los tipos de vehículos." />
             </div>
 
             <div class="p-5 sm:p-6">

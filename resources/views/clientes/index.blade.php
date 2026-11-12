@@ -9,24 +9,16 @@
 
 <div class="cliente-page">
 
-    {{-- Encabezado --}}
-    <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
-        <div>
-    
-            <h1 class="text-2xl font-extrabold text-slate-800">Directorio de clientes</h1>
-            <p class="mt-1 text-sm text-slate-500">
-                Consulta y administra la información de tus clientes.
-            </p>
-        </div>
-
-        <a href="{{ route('clientes.create') }}"
-         class="cliente-btn-nuevo">
+    <x-module-header variant="list" title="Directorio de clientes" description="Consulta y administra la información de tus clientes.">
+        <x-slot:actions>
+        <a href="{{ route('clientes.create') }}" class="cliente-btn-nuevo">
             <span class="h-4 w-4">
                     @include('layouts.partials.icons', ['icon' => 'plus'])
             </span>
          Nuevo cliente
         </a>
-    </div>
+        </x-slot:actions>
+    </x-module-header>
 
     {{-- Resumen --}}
     <div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2">

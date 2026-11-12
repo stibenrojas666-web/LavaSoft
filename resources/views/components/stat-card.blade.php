@@ -22,20 +22,17 @@
     $iconClasses = $tones[$tone] ?? $tones['cyan'];
 @endphp
 
-<div class="group rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_12px_32px_rgba(11,42,58,0.06)] transition duration-200 hover:-translate-y-1 hover:shadow-[0_16px_36px_rgba(11,42,58,0.10)] sm:p-6">
-    <div class="flex items-start justify-between gap-3">
-        <div class="min-w-0">
-            <p class="text-sm font-semibold text-slate-500">{{ $label }}</p>
-            <p class="mt-2 truncate text-3xl font-extrabold tracking-tight text-slate-800">{{ $value }}</p>
-        </div>
-        <div class="grid h-12 w-12 flex-shrink-0 place-items-center rounded-2xl {{ $iconClasses }} transition group-hover:scale-105">
-            <span class="block h-6 w-6">@include('layouts.partials.icons', ['icon' => $icon])</span>
-        </div>
+<div class="group flex items-center gap-4 rounded-[15px] border border-slate-200 bg-white p-[17px] shadow-[0_5px_16px_rgba(11,42,58,0.04)] transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_10px_22px_rgba(11,42,58,0.08)]">
+    <div class="grid h-12 w-12 shrink-0 place-items-center rounded-xl {{ $iconClasses }} transition group-hover:scale-105">
+        <span class="block h-6 w-6">@include('layouts.partials.icons', ['icon' => $icon])</span>
     </div>
-
-    @if ($hint)
-        <p class="mt-4 text-sm text-slate-500">{{ $hint }}</p>
-    @endif
+    <div class="min-w-0 flex-1">
+        <p class="text-xs font-medium text-slate-500">{{ $label }}</p>
+        <p class="mt-1 truncate text-2xl font-extrabold tracking-tight text-slate-800">{{ $value }}</p>
+        @if ($hint)
+            <p class="mt-1 text-xs text-slate-500">{{ $hint }}</p>
+        @endif
+    </div>
 
     @if ($change)
         <div class="mt-4 flex items-center gap-1.5 text-sm">

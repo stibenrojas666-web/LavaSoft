@@ -5,6 +5,8 @@
 @section('page-title', 'Configuración del lavadero')
 
 @section('content')
+    <div class="mx-auto max-w-5xl space-y-5">
+    <x-module-header title="Configuración del lavadero" description="Actualiza los datos y la identidad visual del negocio." icon="cog" :back-url="route('dashboard.index')" />
     <x-card title="Datos del negocio" subtitle="Esta información aparecerá en el menú y en las facturas.">
         <form action="{{ route('configuracion.update') }}" method="POST" enctype="multipart/form-data" class="space-y-5">
             @csrf
@@ -52,4 +54,5 @@
             </div>
         </form>
     </x-card>
+    </div>
 @endsection

@@ -5,17 +5,7 @@
 
 @section('content')
 <div class="max-w-5xl mx-auto px-4 py-6">
-    <div class="flex items-center justify-between mb-7">
-        <div>
-            <div class="flex items-center gap-2 mb-1">
-                <span class="w-2 h-2 rounded-full bg-cyan-500"></span>
-                <p class="text-xs font-semibold uppercase tracking-widest text-slate-400">Tarifas del negocio</p>
-            </div>
-            <h1 class="text-2xl font-bold text-slate-800">Registrar precio de servicio</h1>
-            <p class="text-sm text-slate-500 mt-1">Define el precio según el servicio y el tipo de vehículo.</p>
-        </div>
-        <a href="{{ route('precioServicio.index') }}" class="text-sm font-medium text-slate-500 hover:text-cyan-600">← Volver</a>
-    </div>
+    <x-module-header title="Registrar precio de servicio" description="Define el precio según el servicio y el tipo de vehículo." icon="currency-dollar" :back-url="route('precioServicio.index')" />
 
     <form action="{{ route('precioServicio.store') }}" method="POST" novalidate
           class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">

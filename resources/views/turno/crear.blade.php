@@ -5,16 +5,9 @@
 
 @section('content')
 <div class="mx-auto max-w-4xl px-4 py-6">
-    <div class="flex items-center justify-between mb-7">
-    <div>
-        <h1 class="text-2xl font-bold text-slate-800">Registrar nuevo turno</h1>
-        <p class="text-sm text-slate-500 mt-1">Define el horario de trabajo del empleado.</p>
-    </div>
-
-    <a href="{{ route('turnos.index') }}" class="text-sm font-medium text-slate-500 hover:text-cyan-600">← Volver</a>
-</div>
+    <x-module-header title="Registrar nuevo turno" description="Define el horario de trabajo del empleado." icon="clock" :back-url="route('turnos.index')" />
     
-    <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
+    <div class="modulo-panel rounded-b-2xl border-t-0 p-5 sm:p-7">
         <form action="{{ route('turnos.store') }}" method="POST" novalidate>
             @csrf
 

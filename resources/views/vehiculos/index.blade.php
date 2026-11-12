@@ -5,13 +5,9 @@
 
 @section('content')
     <x-card>
-        <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
-            <div>
-                <p class="text-sm text-slate-500">Vehículos de tus clientes</p>
-                <h1 class="text-2xl font-bold text-cyan-800">Vehículos</h1>
-            </div>
-            <span class="rounded-full bg-cyan-50 px-3 py-1 text-sm font-medium text-cyan-800">{{ $vehiculo->total() }} encontrados</span>
-        </div>
+        <x-module-header variant="list" title="Vehículos" description="Vehículos de tus clientes.">
+            <x-slot:actions><span class="rounded-full bg-cyan-50 px-3 py-1 text-sm font-semibold text-cyan-800">{{ $vehiculo->total() }} encontrados</span></x-slot:actions>
+        </x-module-header>
 
         @if(session('success'))
             <p class="mb-5 rounded-lg bg-green-50 p-3 text-sm text-green-800">{{ session('success') }}</p>

@@ -8,7 +8,6 @@ use App\Repositories\Contracts\EmpleadoRepositoryInterface as EmpleadoRepository
 use App\Repositories\Contracts\PagoRepositoryInterface as PagoRepository;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\URL;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Throwable;
@@ -28,9 +27,8 @@ class PagoService
         $agenda = $this->pagoRepository->agendaParaFactura($agendaId);
         $total = $this->calcularTotal($agendaId);
         $serviciosPorVehiculo = $this->detallePorVehiculo($agenda);
-        $urlWhatsApp = $this->enlaceWhatsAppFactura($agenda);
 
-        return compact('agenda', 'total', 'serviciosPorVehiculo', 'urlWhatsApp');
+        return compact('agenda', 'total', 'serviciosPorVehiculo');
     }
 
     public function obtenerFacturaPublica(int $agendaId): array
@@ -52,32 +50,6 @@ class PagoService
             'lineas' => $lineas,
             'subtotal' => (float) $lineas->sum(fn ($linea) => (float) $linea->Precio),
         ])->values()->all();
-    }
-
-    private function enlaceWhatsAppFactura(object $agenda): ?string
-    {
-        if (! $agenda->pago) {
-            return null;
-        }
-
-        $telefono = preg_replace('/\D+/', '', (string) ($agenda->cliente?->telefonoCliente ?? ''));
-        if (strlen($telefono) === 10) {
-            $telefono = '57'.$telefono;
-        }
-        if (preg_match('/^57[0-9]{10}$/', $telefono) !== 1) {
-            return null;
-        }
-
-        $enlaceFactura = URL::temporarySignedRoute('factura.publica', now()->addDays(7), ['agendaId' => $agenda->id]);
-        $nombreCliente = $agenda->cliente?->nombreCliente ?? 'cliente';
-        $nombreLavadero = config('lavadero.nombre', 'LavaSoft');
-        $monto = number_format((float) $agenda->pago->Monto, 0, ',', '.');
-        $mensaje = "Hola {$nombreCliente}, gracias por visitarnos en {$nombreLavadero}.\n\n"
-            .'El total de tu servicio fue: $'.$monto.".\n\n"
-            .'Puedes consultar tu factura, imprimirla o guardarla como PDF en el siguiente enlace:'
-            ."\n\n{$enlaceFactura}\n\n¡Gracias por preferirnos!";
-
-        return 'https://wa.me/'.$telefono.'?text='.rawurlencode($mensaje);
     }
 
     public function calcularTotal(int $agendaId): float

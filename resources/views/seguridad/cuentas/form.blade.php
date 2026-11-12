@@ -2,7 +2,8 @@
 @section('title', $usuario ? 'Editar usuario' : 'Nuevo usuario')
 
 @section('content')
-<h1 class="text-xl font-semibold">{{ $usuario ? 'Editar usuario: ' . $usuario->name : 'Nuevo usuario' }}</h1>
+<div class="mx-auto max-w-5xl space-y-5">
+<x-module-header :title="$usuario ? 'Editar usuario: ' . $usuario->name : 'Nuevo usuario'" description="Administra la información de acceso de las cuentas." icon="user" :back-url="route('seguridad.cuentas.index')" />
 
 @include('seguridad._errores')
 
@@ -83,4 +84,5 @@
         <button type="submit" class="rounded-md bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2">Guardar</button>
     </div>
 </form>
+</div>
 @endsection

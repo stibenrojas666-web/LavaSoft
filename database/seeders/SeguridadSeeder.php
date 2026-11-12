@@ -35,7 +35,10 @@ class SeguridadSeeder extends Seeder
             foreach (config('seguridad.modulos', []) as $modulo) {
                 $modulo = mb_strtolower($modulo);
 
-                foreach (config('seguridad.acciones', []) as $accion) {
+                $acciones = config('seguridad.acciones_por_modulo.' . $modulo)
+                    ?? config('seguridad.acciones', []);
+
+                foreach ($acciones as $accion) {
                     Permission::firstOrCreate(
                         [
                             'name' => $accion . ' ' . $modulo,
@@ -107,7 +110,8 @@ class SeguridadSeeder extends Seeder
                 config('seguridad.modulos_recepcionista', [])
             )
                 ->flatMap(fn ($modulo) => collect(
-                    config('seguridad.acciones_recepcionista', [])
+                    config('seguridad.acciones_por_modulo.' . mb_strtolower($modulo))
+                        ?? config('seguridad.acciones_recepcionista', [])
                 )->map(
                     fn ($accion) => $accion . ' ' . mb_strtolower($modulo)
                 ))

@@ -13,7 +13,7 @@
         'Operación' => [
             ['label' => 'Turnos', 'route' => 'turnos.index', 'icon' => 'chart', 'can' => 'ver turnos'],
             ['label' => 'Vehículos', 'route' => 'vehiculos.index', 'icon' => 'box', 'can' => 'ver vehiculos'],
-            ['label' => 'Servicios por cita', 'route' => 'agendaServicio.index', 'icon' => 'clipboard', 'can' => 'ver agendaservicio'],
+            ['label' => 'Historial de citas', 'route' => 'agendaServicio.index', 'icon' => 'history', 'can' => 'ver agendaservicio'],
             ['label' => 'Historial de pagos', 'route' => 'pagos.historial', 'icon' => 'credit-card', 'can' => 'ver pagos'],
         ],
 

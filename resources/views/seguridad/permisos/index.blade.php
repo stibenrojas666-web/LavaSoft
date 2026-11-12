@@ -2,7 +2,7 @@
 @section('title', 'Permisos')
 
 @section('content')
-<h1 class="text-xl font-semibold">Permisos</h1>
+<x-module-header variant="list" title="Permisos" description="Consulta y administra los permisos de los módulos." />
 
 @include('seguridad._errores')
 

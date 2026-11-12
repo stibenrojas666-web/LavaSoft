@@ -7,17 +7,7 @@
 @section('content')
     <div class="mx-auto w-full max-w-7xl space-y-5">
 
-        {{-- Encabezado --}}
-        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-                <h1 class="text-xl font-semibold tracking-tight text-slate-800">
-                    Historial de pagos
-                </h1>
-                <p class="mt-1 text-sm text-slate-500">
-                    Consulta y revisa los pagos registrados por cada cita.
-                </p>
-            </div>
-        </div>
+        <x-module-header variant="list" title="Historial de pagos" description="Consulta y revisa los pagos registrados por cada cita." />
 
         {{-- Contenido --}}
         <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">

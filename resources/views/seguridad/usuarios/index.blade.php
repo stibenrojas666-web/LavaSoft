@@ -3,7 +3,7 @@
 @section('title', 'Usuarios y roles')
 
 @section('content')
-<h1 class="text-xl font-semibold">Usuarios y roles</h1>
+<x-module-header variant="list" title="Usuarios y roles" description="Administra las asignaciones de roles para cada usuario." />
 
 @include('seguridad._errores')
 

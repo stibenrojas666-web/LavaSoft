@@ -31,6 +31,11 @@ return [
 
     'acciones' => ['ver', 'crear', 'editar', 'eliminar'],
 
+    // Este módulo conserva únicamente permisos de consulta.
+    'acciones_por_modulo' => [
+        'agendaservicio' => ['ver'],
+    ],
+
     'metodos_a_acciones' => [
         'index' => 'ver',
         'show' => 'ver',

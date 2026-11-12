@@ -9,23 +9,7 @@
 <div class="max-w-5xl mx-auto px-4 py-6">
 
     {{-- Encabezado --}}
-    <div class="flex items-center justify-between mb-7">
-        <div>
-            
-            <h1 class="text-2xl font-bold text-slate-800">
-                Editar empleado
-            </h1>
-            <p class="text-sm text-slate-500 mt-1">
-                Actualiza la información del empleado registrado.
-            </p>
-        </div>
-
-        <a href="{{ route('empleados.index') }}"
-           class="inline-flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-cyan-600 transition">
-            <span class="text-lg">←</span>
-            Volver
-        </a>
-    </div>
+    <x-module-header title="Editar empleado" description="Actualiza la información del empleado registrado." icon="employee" :back-url="route('empleados.index')" />
 
     {{-- Formulario --}}
     <form action="{{ route('empleados.update', $empleado->id) }}"

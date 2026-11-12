@@ -61,7 +61,7 @@ class PermisoService
         $modulo = $this->normalizarModulo($datos['modulo']);
         $permisos = [];
 
-        foreach (config('seguridad.acciones') as $accion) {
+        foreach ($this->accionesParaModulo($modulo) as $accion) {
             $permisos[] = $this->permisoRepository->crearSiNoExiste($accion . ' ' . $modulo, $modulo);
         }
 
@@ -69,6 +69,12 @@ class PermisoService
         $this->limpiarCache();
 
         return count($permisos);
+    }
+
+    private function accionesParaModulo(string $modulo): array
+    {
+        return config('seguridad.acciones_por_modulo.' . $modulo)
+            ?? config('seguridad.acciones', []);
     }
 
     public function actualizar(Permission $permiso, array $datos): void

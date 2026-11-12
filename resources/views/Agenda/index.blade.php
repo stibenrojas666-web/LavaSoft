@@ -72,7 +72,7 @@
     @if($vista === 'lista')
         <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
             <div class="overflow-x-auto">
-                <table class="min-w-[1100px] w-full text-left text-sm">
+                <table class="lavasoft-table min-w-[1100px] text-left text-sm">
                     <thead class="border-b border-slate-200 bg-slate-50 text-[11px] uppercase tracking-wider text-slate-500">
                         <tr>
                             <th class="px-5 py-4 font-bold">ID</th>

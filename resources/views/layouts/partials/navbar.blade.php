@@ -6,7 +6,7 @@
         'turnos.*' => 'Turnos',
         'vehiculos.*' => 'Vehículos',
         'agenda.*' => 'Agenda de citas',
-        'agendaServicio.*' => 'Servicios por cita',
+        'agendaServicio.*' => 'Historial de citas',
         'pagos.*' => 'Pagos',
         'servicios.*' => 'Servicios',
         'tipoVehiculo.*' => 'Tipos de vehículo',

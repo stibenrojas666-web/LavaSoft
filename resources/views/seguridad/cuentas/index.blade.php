@@ -3,9 +3,7 @@
 @section('title', 'Cuentas de usuario')
 
 @section('content')
-    <div class="flex items-center justify-between">
-        <h1 class="text-xl font-semibold">Cuentas de usuario</h1>
-    </div>
+    <x-module-header variant="list" title="Cuentas de usuario" description="Consulta y administra las cuentas registradas." />
     <x-list-search :action="route('seguridad.cuentas.index')" :value="$buscar" placeholder="Nombre, correo o rol" />
     <p class="mb-3 text-sm text-slate-500">{{ $usuarios->total() }} usuarios encontrados</p>
 

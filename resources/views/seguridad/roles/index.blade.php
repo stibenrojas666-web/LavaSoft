@@ -3,9 +3,7 @@
 @section('title', 'Roles')
 
 @section('content')
-<div class="flex items-center justify-between">
-    <h1 class="text-xl font-semibold">Roles</h1>
-</div>
+<x-module-header variant="list" title="Roles" description="Administra los perfiles y permisos del sistema." />
 <x-list-search :action="route('seguridad.roles.index')" :value="$buscar" placeholder="Nombre del rol o permiso" />
 <p class="mb-3 text-sm text-slate-500">{{ $roles->total() }} roles encontrados</p>
 

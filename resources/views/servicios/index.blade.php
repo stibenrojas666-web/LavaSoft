@@ -7,15 +7,7 @@
 @section('content')
     <div class="mx-auto w-full max-w-7xl space-y-5">
 
-        {{-- Encabezado --}}
-        <div>
-            <h1 class="text-xl font-semibold tracking-tight text-slate-800">
-                Servicios
-            </h1>
-            <p class="mt-1 text-sm text-slate-500">
-                Administra los servicios que ofrece el establecimiento.
-            </p>
-        </div>
+        <x-module-header variant="list" title="Servicios" description="Administra los servicios que ofrece el establecimiento." />
 
         {{-- Contenido --}}
         <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
