@@ -286,7 +286,8 @@
             </span>
         </a>
 
-        <form
+        @can('eliminar empleados')
+<form
             action="{{ route('empleados.destroy', $empleado->id) }}"
             method="POST"
             onsubmit="return confirm('¿Desea eliminar este empleado?')"
@@ -305,6 +306,7 @@
                 </span>
             </button>
         </form>
+@endcan
     </div>
 
 </div>

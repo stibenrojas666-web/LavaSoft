@@ -83,7 +83,8 @@
                                                 </span>
                                             </a>
 
-                                            <form
+                                            @can('eliminar tipoVehiculo')
+<form
                                                 action="{{ route('tipoVehiculo.destroy', $tipoVehiculo->id) }}"
                                                 method="POST"
                                                 class="inline"
@@ -103,6 +104,7 @@
                                                     </span>
                                                 </button>
                                             </form>
+@endcan
 
                                         </div>
                                     </td>

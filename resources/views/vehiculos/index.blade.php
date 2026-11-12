@@ -81,7 +81,8 @@
                             <a href="{{ route('vehiculos.edit', $v->id) }}" class="grid h-9 w-9 place-items-center rounded-lg text-blue-700 transition hover:bg-blue-50" title="Editar vehículo" aria-label="Editar vehículo">
                                 <span class="h-4 w-4">@include('layouts.partials.icons', ['icon' => 'pencil'])</span>
                             </a>
-                            @if($v->agendas_count > 0)
+                            @can('eliminar vehiculos')
+                        @if($v->agendas_count > 0)
                             <button type="button"
                                 disabled
                                 class="grid h-9 w-9 cursor-not-allowed place-items-center rounded-lg text-slate-300"
@@ -98,6 +99,7 @@
                                 </button>
                             </form>
                         @endif
+                            @endcan
                         </div>
                     </div>
                 </article>

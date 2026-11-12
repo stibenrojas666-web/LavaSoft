@@ -117,7 +117,8 @@
                                             </span>
                                         </a>
 
-                                        <form action="{{ route('precioServicio.destroy', $precio->id) }}" method="POST" class="inline">
+                                        @can('eliminar precioServicio')
+<form action="{{ route('precioServicio.destroy', $precio->id) }}" method="POST" class="inline">
                                             @csrf
                                             @method('DELETE')
 
@@ -133,6 +134,7 @@
                                                 </span>
                                             </button>
                                         </form>
+@endcan
 
                                     </div>
                                 </td>

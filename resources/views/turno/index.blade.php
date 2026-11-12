@@ -50,13 +50,15 @@
                         <a href="{{ route('turnos.edit', $turno->id) }}" class="grid h-9 w-9 place-items-center rounded-lg text-blue-700 transition hover:bg-blue-50" title="Editar turno" aria-label="Editar turno">
                             <span class="h-4 w-4">@include('layouts.partials.icons', ['icon' => 'pencil'])</span>
                         </a>
-                        <form action="{{ route('turnos.destroy', $turno->id) }}" method="POST" onsubmit="return confirm('¿Desea eliminar este turno?')">
+                        @can('eliminar turnos')
+<form action="{{ route('turnos.destroy', $turno->id) }}" method="POST" onsubmit="return confirm('¿Desea eliminar este turno?')">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="grid h-9 w-9 place-items-center rounded-lg text-red-700 transition hover:bg-red-50" title="Eliminar turno" aria-label="Eliminar turno">
                                 <span class="h-4 w-4">@include('layouts.partials.icons', ['icon' => 'trash'])</span>
                             </button>
                         </form>
+@endcan
                     </div>
                 </article>
             @empty

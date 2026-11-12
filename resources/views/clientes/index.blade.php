@@ -168,7 +168,8 @@
                                 </span>
                             </a>
 
-                            <form action="{{ route('clientes.destroy', $cliente->id) }}"
+                            @can('eliminar clientes')
+<form action="{{ route('clientes.destroy', $cliente->id) }}"
                                   method="POST"
                                   onsubmit="return confirm('¿Desea eliminar este cliente?')">
                                 @csrf
@@ -182,6 +183,7 @@
                                     </span>
                                 </button>
                             </form>
+@endcan
 
                         </div>
                     </div>
