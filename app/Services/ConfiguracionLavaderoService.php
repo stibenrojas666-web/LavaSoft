@@ -41,7 +41,8 @@ class ConfiguracionLavaderoService
 
     public function actualizar(array $datos, ?UploadedFile $logo = null): ConfiguracionLavadero
     {
-        unset($datos['logo']);
+        $eliminarLogo = filter_var($datos['eliminar_logo'] ?? false, FILTER_VALIDATE_BOOLEAN);
+        unset($datos['logo'], $datos['eliminar_logo']);
         $actual = $this->repository->obtener();
         $rutaAnterior = $actual->logo_path;
         $mostrarLogo = filter_var($datos['mostrar_logo'] ?? false, FILTER_VALIDATE_BOOLEAN);
@@ -57,7 +58,7 @@ class ConfiguracionLavaderoService
         if ($rutaNueva !== null) {
             $datos['logo_path'] = $rutaNueva;
             $datos['mostrar_logo'] = true;
-        } elseif (!$mostrarLogo) {
+        } elseif ($eliminarLogo) {
             $datos['logo_path'] = null;
         }
 
@@ -71,7 +72,7 @@ class ConfiguracionLavaderoService
             throw $error;
         }
 
-        if (($rutaNueva !== null || !$mostrarLogo) && $rutaAnterior !== null) {
+        if (($rutaNueva !== null || $eliminarLogo) && $rutaAnterior !== null) {
             Storage::disk('public')->delete($rutaAnterior);
         }
 

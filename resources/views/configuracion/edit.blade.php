@@ -23,7 +23,7 @@
                     class="mt-1 h-4 w-4 rounded border-slate-300 text-cyan-600 focus:ring-cyan-500">
                 <span>
                     <span class="block text-sm font-medium text-slate-800">Mostrar logo</span>
-                    <span class="mt-1 block text-sm text-slate-500">Si lo desmarcas y guardas, se quitará del menú y de las facturas.</span>
+                    <span class="mt-1 block text-sm text-slate-500">Al desmarcar y guardar, se ocultará del menú y de las facturas. El archivo se conservará.</span>
                 </span>
             </label>
             @error('mostrar_logo')<p class="-mt-4 text-sm text-red-600">{{ $message }}</p>@enderror
@@ -35,6 +35,19 @@
                 @error('logo')<p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>@enderror
             </div>
 
+            @if($configuracion->logo_path)
+                <label for="eliminar_logo" class="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-4">
+                    <input id="eliminar_logo" name="eliminar_logo" type="checkbox" value="1"
+                        @checked(old('eliminar_logo'))
+                        class="mt-1 h-4 w-4 rounded border-red-300 text-red-600 focus:ring-red-500">
+                    <span>
+                        <span class="block text-sm font-medium text-red-800">Eliminar logo guardado</span>
+                        <span class="mt-1 block text-sm text-red-700">Solo se borrará al marcar esta opción y guardar. Si subes otro logo, reemplazará el actual.</span>
+                    </span>
+                </label>
+                @error('eliminar_logo')<p class="-mt-4 text-sm text-red-600">{{ $message }}</p>@enderror
+            @endif
+
             <div class="flex items-center gap-4 rounded-xl border border-slate-200 bg-slate-50 p-4">
                 @if($configuracion->logo_path)
                     <img src="{{ asset('storage/' . ltrim($configuracion->logo_path, '/')) }}"
@@ -44,7 +57,7 @@
                 @endif
                 <div>
                     <p class="font-semibold text-slate-800">{{ $configuracion->logo_path ? 'Logo actual' : 'Sin logo cargado' }}</p>
-                    <p class="text-sm text-slate-500">Al desmarcar “Mostrar logo” y guardar, dejará de aparecer.</p>
+                    <p class="text-sm text-slate-500">{{ $configuracion->mostrar_logo ? 'Visible en el menú y las facturas.' : 'Guardado, pero oculto.' }} Desmarcar “Mostrar logo” solo lo oculta.</p>
                 </div>
             </div>
 

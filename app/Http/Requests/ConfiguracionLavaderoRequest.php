@@ -20,6 +20,7 @@ class ConfiguracionLavaderoRequest extends FormRequest
             'telefono' => ['nullable', 'string', 'max:30'],
             'logo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             'mostrar_logo' => ['nullable', 'boolean'],
+            'eliminar_logo' => ['nullable', 'boolean'],
         ];
     }
 
@@ -36,6 +37,7 @@ class ConfiguracionLavaderoRequest extends FormRequest
             'logo.mimes' => 'El logo debe estar en formato JPG, PNG o WEBP.',
             'logo.max' => 'El logo no puede superar los 2 MB.',
             'mostrar_logo.boolean' => 'La opción de mostrar el logo no es válida.',
+            'eliminar_logo.boolean' => 'La opción de eliminar el logo no es válida.',
         ];
     }
 }
