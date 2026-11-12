@@ -1,36 +1,35 @@
 <!DOCTYPE html>
-<html lang="es" class="h-full bg-slate-50">
+<html lang="es" class="h-full bg-[#f4f8fa]">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Seguridad') - {{ config('app.name', 'Laravel') }}</title>
 
-    {{-- Tailwind CSS --}}
-    <script src="https://cdn.tailwindcss.com"></script>
+        {{-- Tailwind CSS --}}
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
+                        navy: { 800: '#0f3b4f', 900: '#0b2a3a', 950: '#071d29' },
                         primary: {
-                            50: '#eef2ff', 100: '#e0e7ff', 200: '#c7d2fe', 300: '#a5b4fc',
-                            400: '#818cf8', 500: '#6366f1', 600: '#4f46e5', 700: '#4338ca',
-                            800: '#3730a3', 900: '#312e81'
+                            50: '#ecfeff', 100: '#cffafe', 200: '#a5f3fc', 300: '#67e8f9',
+                            400: '#22d3ee', 500: '#06b6d4', 600: '#0e7490', 700: '#155e75',
+                            800: '#164e63', 900: '#083344'
                         }
                     },
                     fontFamily: {
-                        sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif']
+                        sans: ['Plus Jakarta Sans', 'ui-sans-serif', 'system-ui', 'sans-serif']
                     }
                 }
             }
         }
     </script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
         [x-cloak] { display: none !important; }
-        body { font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; }
+        body { font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif; }
     </style>
 
     @stack('styles')
@@ -49,14 +48,17 @@
         ></div>
 
         {{-- Sidebar Estilo Panel de Control --}}
-        <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'" class="fixed inset-y-0 left-0 z-40 w-64 bg-slate-900 text-slate-300 flex flex-col transition-transform duration-300 ease-in-out lg:translate-x-0">
-            <div class="h-16 flex items-center px-6 bg-slate-950 gap-3">
-                <span class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-bold">A</span>
-                <span class="text-white font-bold tracking-wide">Laravel</span>
-            </div>
+        <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'" class="fixed inset-y-0 left-0 z-40 w-64 bg-navy-900 text-slate-300 flex flex-col transition-transform duration-300 ease-in-out lg:translate-x-0">
+            <div class="h-20 flex items-center px-5 gap-3">
+    <img src="{{ asset('images/logo.png') }}" alt="LavaSoft" class="h-11 w-11 rounded-xl bg-white object-contain p-0.5">
+    <div class="leading-tight">
+        <span class="block text-white font-extrabold">LavaSoft</span>
+        <span class="block text-[11px] font-bold uppercase tracking-wider text-cyan-300">Centro de lavado</span>
+    </div>
+</div>
 
             <div class="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
-                <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider px-3 mb-2">Módulo Seguridad</div>
+               <div class="text-[11px] font-bold text-slate-500 uppercase tracking-[0.15em] px-3 mb-2">Seguridad</div>
 
                 @foreach ([
                     ['seguridad.roles.index', 'Roles', 'seguridad.roles.*', '<path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />'],
@@ -64,7 +66,7 @@
                     ['seguridad.cuentas.index', 'Cuentas de usuario', 'seguridad.cuentas.*', '<path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />'],
                     ['seguridad.usuarios.index', 'Usuarios y roles', 'seguridad.usuarios.*', '<path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.715m12 0v-.503a3.333 3.333 0 00-3-3.333h-6c-1.657 0-3 1.492-3 3.333v.503m6-9.5a3 3 0 11-6 0 3 3 0 016 0z" />'],
                 ] as [$ruta, $texto, $patron, $icono])
-                    <a href="{{ route($ruta) }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors {{ request()->routeIs($patron) ? 'bg-indigo-600 text-white shadow-sm' : 'hover:bg-slate-800 hover:text-white' }}">
+                    <a href="{{ route($ruta) }}" class="flex items-center gap-3 px-4 py-3 rounded-2x1 text-sm font-medium transition-colors {{ request()->routeIs($patron) ? 'bg-indigo [#0f4a5c] text-white shadow-sm' : 'hover:bg-slate-800 hover:text-white' }}">
                         <svg class="w-5 h-5 opacity-80" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">{!! $icono !!}</svg>
                         {{ $texto }}
                     </a>
@@ -157,7 +159,6 @@
     </div>
 
     {{-- Alpine.js --}}
-    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js" defer></script>
     <script>
         window.addEventListener('pageshow', function (event) {
             if (event.persisted) {

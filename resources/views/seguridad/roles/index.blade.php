@@ -1,4 +1,4 @@
-@extends('seguridad.layout')
+@extends('layouts.app')
 
 @section('title', 'Roles')
 
@@ -9,8 +9,8 @@
 <x-list-search :action="route('seguridad.roles.index')" :value="$buscar" placeholder="Nombre del rol o permiso" />
 <p class="mb-3 text-sm text-slate-500">{{ $roles->total() }} roles encontrados</p>
 
-<div class="bg-white rounded-xl border border-slate-200 overflow-x-auto">
-    <table class="min-w-full text-sm">
+<div class="lavasoft-table-shell">
+    <table class="lavasoft-table min-w-[640px] text-sm">
         <thead class="bg-slate-50 text-left text-slate-500">
             <tr>
                 <th class="px-4 py-3">Rol</th>
@@ -22,14 +22,10 @@
         </thead>
         <tbody class="divide-y divide-slate-100">
             @forelse ($roles as $rol)
-                @php
-                    $protegido = $rolService->esProtegido($rol);
-                    $noDesactivable = $rolService->esNoDesactivable($rol);
-                @endphp
                 <tr>
                     <td class="px-4 py-3 font-medium">
                         {{ $rol->name }}
-                        @if ($protegido)
+                        @if ($rol->protegidoParaSistema)
                             <span class="ml-1 text-xs text-slate-400">protegido</span>
                         @endif
                     </td>
@@ -46,7 +42,7 @@
                         <div class="flex flex-wrap items-center gap-3">
                             <a href="{{ route('seguridad.roles.edit', $rol) }}" class="text-indigo-600 hover:text-indigo-800">Editar</a>
 
-                            @unless ($noDesactivable)
+                            @unless ($rol->noDesactivable)
                                 <form action="{{ route('seguridad.roles.estado', $rol) }}" method="POST"
                                       @if ($rol->activo && $rol->users_count > 0)
                                           onsubmit="return confirm('Este rol tiene {{ $rol->users_count }} usuario(s). Al desactivarlo perderán sus permisos. ¿Continuar?');"

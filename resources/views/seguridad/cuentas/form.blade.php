@@ -1,5 +1,4 @@
-@extends('seguridad.layout')
-
+@extends('layouts.app')
 @section('title', $usuario ? 'Editar usuario' : 'Nuevo usuario')
 
 @section('content')
@@ -54,8 +53,12 @@
         <div class="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
             @foreach ($roles as $rol)
                 <label class="flex items-center gap-2 text-sm text-slate-600">
+                    @if (!$rol->activo && in_array($rol->name, $seleccionados, true))
+                        <input type="hidden" name="roles[]" value="{{ $rol->name }}">
+                    @endif
                     <input type="checkbox" name="roles[]" value="{{ $rol->name }}" class="rounded border-slate-300 h-4 w-4"
-                           @checked(in_array($rol->name, $seleccionados, true))>
+                        @checked(in_array($rol->name, $seleccionados, true))
+                        @disabled(!$rol->activo)>
                     {{ $rol->name }}
                     @unless ($rol->activo)
                         <span class="text-xs text-slate-400">(inactivo)</span>

@@ -2,8 +2,8 @@
 
 namespace App\Services\Seguridad;
 
-use App\Repositories\Seguridad\RolRepository;
-use App\Repositories\Seguridad\UsuarioRepository;
+use App\Repositories\Seguridad\Contracts\RolRepositoryInterface as RolRepository;
+use App\Repositories\Seguridad\Contracts\UsuarioRepositoryInterface as UsuarioRepository;
 use Exception;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Collection;
@@ -29,6 +29,16 @@ class CuentaService
         return $this->usuarioRepository->buscarConRoles($texto);
     }
 
+    public function prepararListado(array $datos): array
+    {
+        $buscar = trim((string) ($datos['buscar'] ?? ''));
+
+        return [
+            'usuarios' => $this->buscarEnListado($buscar),
+            'buscar' => $buscar,
+        ];
+    }
+
     public function listarRoles(): Collection
     {
         return $this->rolRepository->listar();
@@ -39,8 +49,15 @@ class CuentaService
         return $this->usuarioRepository->buscarPorId($id)->load('rolesConInactivos');
     }
 
-    public function crear(array $datos, array $roles): void
+    public function rolesSeleccionados(Authenticatable $usuario): array
     {
+        return $usuario->rolesConInactivos->pluck('name')->all();
+    }
+
+    public function crear(array $datos): void
+    {
+        $roles = $datos['roles'] ?? [];
+        unset($datos['roles']);
         $datos['password'] = Hash::make($datos['password']);
 
         DB::transaction(function () use ($datos, $roles): void {
@@ -51,8 +68,10 @@ class CuentaService
         $this->limpiarCache();
     }
 
-    public function actualizar(Authenticatable $usuario, array $datos, array $roles, Authenticatable $actual): void
+    public function actualizar(Authenticatable $usuario, array $datos, Authenticatable $actual): void
     {
+        $roles = $datos['roles'] ?? [];
+        unset($datos['roles']);
         $rolAdmin = config('seguridad.rol_admin');
 
         $seQuitaSuRolAdmin = $usuario->is($actual)

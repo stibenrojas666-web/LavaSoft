@@ -1,5 +1,4 @@
-@extends('seguridad.layout')
-
+@extends('layouts.app')
 @section('title', 'Permisos')
 
 @section('content')
@@ -150,8 +149,8 @@
         </div>
 
         {{-- LISTADO DE PERMISOS --}}
-        <div class="overflow-x-auto">
-            <table class="min-w-full text-sm">
+        <div class="lavasoft-table-shell">
+            <table class="lavasoft-table min-w-[600px] text-sm">
 
                 <thead>
                     <tr>

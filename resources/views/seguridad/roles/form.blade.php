@@ -1,4 +1,4 @@
-@extends('seguridad.layout')
+@extends('layouts.app')
 
 @section('title', $rol ? 'Editar rol' : 'Nuevo rol')
 

@@ -3,11 +3,10 @@
 namespace App\Http\Controllers\Seguridad;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\AsignacionRolesRequest;
 use App\Services\Seguridad\RolService;
 use Exception;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class UsuarioRolController extends Controller
@@ -19,22 +18,15 @@ class UsuarioRolController extends Controller
     public function index(): View
     {
         return view('seguridad.usuarios.index', [
-            'usuarios' => $this->rolService->listarUsuariosConRoles(),
+            'usuarios' => $this->rolService->usuariosConRolesParaListado(auth()->user()),
             'roles' => $this->rolService->listar(),
-            'rolAdmin' => config('seguridad.rol_admin'),
         ]);
     }
 
-    public function update(Request $request): RedirectResponse
+    public function update(AsignacionRolesRequest $asignacionRolesRequest): RedirectResponse
     {
-        $datos = $request->validate([
-            'roles' => ['nullable', 'array'],
-            'roles.*' => ['array'],
-            'roles.*.*' => ['string', Rule::exists(config('permission.table_names.roles'), 'name')],
-        ]);
-
         try {
-            $this->rolService->asignarRoles($datos['roles'] ?? [], $request->user());
+            $this->rolService->asignarRoles($asignacionRolesRequest->validated(), $asignacionRolesRequest->user());
         } catch (Exception $e) {
             return back()->with('error', $e->getMessage());
         }

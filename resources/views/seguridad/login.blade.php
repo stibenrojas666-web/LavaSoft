@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Iniciar sesión - {{ config('app.name') }}</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script>
         tailwind.config = { theme: { extend: {
             colors: {
@@ -14,8 +14,7 @@
             fontFamily: { sans: ['"Plus Jakarta Sans"', 'ui-sans-serif', 'system-ui', 'sans-serif'] }
         } } }
     </script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
 </head>
 <body class="h-full font-sans text-slate-800 antialiased">
     <main class="grid min-h-screen lg:grid-cols-2">
@@ -66,6 +65,13 @@
                             <input type="checkbox" name="remember" value="1" class="h-5 w-5 rounded border-slate-300 text-cyan-700 focus:ring-cyan-500">
                             Recordarme
                         </label>
+
+                        <div class="text-right">
+                            <a href="{{ route('seguridad.recuperacion.solicitar') }}"
+                            class="text-sm font-semibold text-cyan-700 hover:text-cyan-900 hover:underline">
+                                ¿Olvidaste tu contraseña?
+                            </a>
+                        </div>
 
                         <button type="submit" class="min-h-[48px] w-full rounded-xl bg-primary-600 text-sm font-bold text-white shadow-sm transition hover:bg-primary-700 focus:outline-none focus:ring-4 focus:ring-cyan-200">
                             Ingresar

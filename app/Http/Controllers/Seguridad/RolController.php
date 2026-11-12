@@ -4,13 +4,13 @@
 namespace App\Http\Controllers\Seguridad;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\RolStoreRequest;
+use App\Http\Requests\RolUpdateRequest;
 use App\Services\Seguridad\PermisoService;
 use App\Services\Seguridad\RolService;
 use App\Http\Requests\BusquedaIndexRequest;
 use Exception;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 use Spatie\Permission\Models\Role;
 
@@ -22,15 +22,11 @@ class RolController extends Controller
     ) {
     }
 
-    public function index(BusquedaIndexRequest $request): View
+    public function index(BusquedaIndexRequest $busquedaIndexRequest): View
     {
-        $datos = $request->validated();
-        $buscar = trim((string) ($datos['buscar'] ?? ''));
-        return view('seguridad.roles.index', [
-            'roles' => $this->rolService->buscar($buscar),
-            'rolService' => $this->rolService,
-            'buscar' => $buscar,
-        ]);
+        return view('seguridad.roles.index', $this->rolService->prepararListado(
+            $busquedaIndexRequest->validated()
+        ));
     }
 
     public function create(): View
@@ -44,16 +40,9 @@ class RolController extends Controller
         ]);
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(RolStoreRequest $rolStoreRequest): RedirectResponse
     {
-        $datos = $request->validate([
-            'name' => ['required', 'string', 'max:50', Rule::unique(config('permission.table_names.roles'), 'name')],
-            'activo' => ['required', 'boolean'],
-            'permissions' => ['nullable', 'array'],
-            'permissions.*' => ['string', Rule::exists(config('permission.table_names.permissions'), 'name')],
-        ]);
-
-        $this->rolService->crear($datos['name'], (bool) $datos['activo'], $datos['permissions'] ?? []);
+        $this->rolService->crear($rolStoreRequest->validated());
 
         return redirect()->route('seguridad.roles.index')->with('success', 'Rol creado correctamente.');
     }
@@ -65,21 +54,14 @@ class RolController extends Controller
             'protegido' => $this->rolService->esProtegido($rol),
             'noDesactivable' => $this->rolService->esNoDesactivable($rol),
             'permisos' => $this->permisoService->listar(),
-            'seleccionados' => old('permissions', $rol->permissions()->pluck('name')->all()),
+            'seleccionados' => old('permissions', $this->rolService->permisosSeleccionados($rol)),
         ]);
     }
 
-    public function update(Request $request, Role $rol): RedirectResponse
+    public function update(RolUpdateRequest $rolUpdateRequest, Role $rol): RedirectResponse
     {
-        $datos = $request->validate([
-            'name' => ['required', 'string', 'max:50', Rule::unique(config('permission.table_names.roles'), 'name')->ignore($rol->id)],
-            'activo' => ['required', 'boolean'],
-            'permissions' => ['nullable', 'array'],
-            'permissions.*' => ['string', Rule::exists(config('permission.table_names.permissions'), 'name')],
-        ]);
-
         try {
-            $this->rolService->actualizar($rol, $datos['name'], (bool) $datos['activo'], $datos['permissions'] ?? []);
+            $this->rolService->actualizar($rol, $rolUpdateRequest->validated());
         } catch (Exception $e) {
             return back()->withInput()->with('error', $e->getMessage());
         }

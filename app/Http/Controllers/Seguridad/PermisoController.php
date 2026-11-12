@@ -3,12 +3,13 @@
 namespace App\Http\Controllers\Seguridad;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\PermisoStoreRequest;
+use App\Http\Requests\ModuloPermisoStoreRequest;
+use App\Http\Requests\PermisoUpdateRequest;
 use App\Services\Seguridad\PermisoService;
 use App\Http\Requests\BusquedaIndexRequest;
 use Exception;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 use Spatie\Permission\Models\Permission;
 
@@ -18,51 +19,32 @@ class PermisoController extends Controller
     {
     }
 
-    public function index(BusquedaIndexRequest $request): View
+    public function index(BusquedaIndexRequest $busquedaIndexRequest): View
     {
-        $datos = $request->validated();
-        $buscar = trim((string) ($datos['buscar'] ?? ''));
-        return view('seguridad.permisos.index', [
-            'permisos' => $this->permisoService->buscar($buscar),
-            'modulos' => $this->permisoService->listarModulos(),
-            'acciones' => config('seguridad.acciones'),
-            'buscar' => $buscar,
-        ]);
+        return view('seguridad.permisos.index', $this->permisoService->prepararListado(
+            $busquedaIndexRequest->validated()
+        ));
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(PermisoStoreRequest $permisoStoreRequest): RedirectResponse
     {
-        $datos = $request->validate([
-            'name' => ['required', 'string', 'max:100', Rule::unique(config('permission.table_names.permissions'), 'name')],
-            'modulo' => ['nullable', 'string', 'max:50'],
-        ]);
-
-        $this->permisoService->crear($datos['name'], $datos['modulo'] ?? null);
+        $this->permisoService->crear($permisoStoreRequest->validated());
 
         return redirect()->route('seguridad.permisos.index')->with('success', 'Permiso creado correctamente.');
     }
 
-    public function storeModulo(Request $request): RedirectResponse
+    public function storeModulo(ModuloPermisoStoreRequest $moduloPermisoStoreRequest): RedirectResponse
     {
-        $datos = $request->validate([
-            'modulo' => ['required', 'string', 'max:50'],
-        ]);
-
-        $total = $this->permisoService->crearModulo($datos['modulo']);
+        $total = $this->permisoService->crearModulo($moduloPermisoStoreRequest->validated());
 
         return redirect()->route('seguridad.permisos.index')
             ->with('success', 'Módulo listo: ' . $total . ' permisos estándar creados o actualizados.');
     }
 
-    public function update(Request $request, Permission $permiso): RedirectResponse
+    public function update(PermisoUpdateRequest $permisoUpdateRequest, Permission $permiso): RedirectResponse
     {
-        $datos = $request->validate([
-            'name' => ['required', 'string', 'max:100', Rule::unique(config('permission.table_names.permissions'), 'name')->ignore($permiso->id)],
-            'modulo' => ['nullable', 'string', 'max:50'],
-        ]);
-
         try {
-            $this->permisoService->actualizar($permiso, $datos['name'], $datos['modulo'] ?? null);
+            $this->permisoService->actualizar($permiso, $permisoUpdateRequest->validated());
         } catch (Exception $e) {
             return back()->with('error', $e->getMessage());
         }

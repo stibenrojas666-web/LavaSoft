@@ -1,4 +1,4 @@
-@extends('seguridad.layout')
+@extends('layouts.app')
 
 @section('title', 'Cuentas de usuario')
 
@@ -9,8 +9,8 @@
     <x-list-search :action="route('seguridad.cuentas.index')" :value="$buscar" placeholder="Nombre, correo o rol" />
     <p class="mb-3 text-sm text-slate-500">{{ $usuarios->total() }} usuarios encontrados</p>
 
-    <div class="bg-white rounded-xl border border-slate-200 overflow-x-auto">
-        <table class="min-w-full text-sm">
+    <div class="lavasoft-table-shell">
+        <table class="lavasoft-table min-w-[600px] text-sm">
             <thead class="bg-slate-50 text-left text-slate-500">
                 <tr>
                     <th class="px-4 py-3">Usuario</th>

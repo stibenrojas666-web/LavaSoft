@@ -1,4 +1,4 @@
-@extends('seguridad.layout')
+@extends('layouts.app')
 
 @section('title', 'Usuarios y roles')
 
@@ -22,7 +22,8 @@
         @endforeach
     @endforeach
 
-    <table class="min-w-full text-sm">
+    <div class="lavasoft-table-shell">
+    <table class="lavasoft-table min-w-[640px] text-sm">
         <thead class="bg-slate-50 text-left text-slate-500">
             <tr>
                 <th class="px-4 py-3">Usuario</th>
@@ -44,20 +45,16 @@
                         <div class="text-xs text-slate-400">{{ $usuario->email }}</div>
                     </td>
                     @foreach ($roles as $rol)
-                        @php
-                            $loTiene = $usuario->rolesConInactivos->contains('name', $rol->name);
-                            $bloqueado = $usuario->is(auth()->user()) && $rol->name === $rolAdmin && $loTiene;
-                        @endphp
                         <td class="px-4 py-3">
-                            @if ($bloqueado)
+                            @if (in_array($rol->name, $usuario->rolesBloqueados, true))
                                 <input type="hidden" name="roles[{{ $usuario->getKey() }}][]" value="{{ $rol->name }}">
                             @endif
                             <input type="checkbox" value="{{ $rol->name }}"
-                                   @unless ($bloqueado) name="roles[{{ $usuario->getKey() }}][]" @endunless
-                                   @checked($loTiene) @disabled($bloqueado)
+                                   @unless (in_array($rol->name, $usuario->rolesBloqueados, true)) name="roles[{{ $usuario->getKey() }}][]" @endunless
+                                   @checked(in_array($rol->name, $usuario->rolesAsignados, true)) @disabled(in_array($rol->name, $usuario->rolesBloqueados, true))
                                    aria-label="{{ $rol->name }} para {{ $usuario->name }}"
                                    class="rounded border-slate-300 h-4 w-4 disabled:opacity-50">
-                            @if ($bloqueado)
+                            @if (in_array($rol->name, $usuario->rolesBloqueados, true))
                                 <span class="ml-1 text-xs text-slate-400">tu cuenta</span>
                             @endif
                         </td>
@@ -66,6 +63,7 @@
             @endforeach
         </tbody>
     </table>
+    </div>
 
     <div class="flex justify-end border-t border-slate-100 px-4 py-3">
         <button type="submit" class="rounded-md bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2">Guardar asignaciones</button>
