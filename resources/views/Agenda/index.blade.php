@@ -126,13 +126,15 @@
                                         <a href="{{ route('agenda.edit', $a->id) }}" class="grid h-9 w-9 place-items-center rounded-xl border border-blue-100 bg-blue-50 text-blue-700 transition hover:bg-blue-100" title="Editar" aria-label="Editar">
                                             <span class="h-4 w-4">@include('layouts.partials.icons', ['icon' => 'pencil'])</span>
                                         </a>
-                                        <form action="{{ route('agenda.destroy', $a->id) }}" method="POST" class="inline">
+                                        @can('eliminar agenda')
+<form action="{{ route('agenda.destroy', $a->id) }}" method="POST" class="inline">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="grid h-9 w-9 place-items-center rounded-xl border border-rose-100 bg-rose-50 text-rose-600 transition hover:bg-rose-100" title="Eliminar" aria-label="Eliminar" onclick="return confirm('¿Desea eliminar esta cita?')">
                                                 <span class="h-4 w-4">@include('layouts.partials.icons', ['icon' => 'trash'])</span>
                                             </button>
                                         </form>
+@endcan
                                     </div>
                                 </td>
                             </tr>

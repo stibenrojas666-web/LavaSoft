@@ -81,10 +81,8 @@ class AgendaController extends Controller
     {
         $agenda = $this->agendaService->findById($id);
         if (! $this->agendaService->puedeEditar($agenda)) {
-           return redirect()->route('agenda.index')
-          ->with('error', 'Una cita terminada ya no se puede editar.');
-          
-}
+            return redirect()->route('agenda.index')
+            ->with('error', 'Una cita terminada ya no se puede editar.');}
         $cliente = $this->clienteService->listarTodo();
         $empleado = $agenda->empleado ? collect([$agenda->empleado]) : collect();
         $propios = $this->agendaService->vehiculosDeAgenda($agenda);
