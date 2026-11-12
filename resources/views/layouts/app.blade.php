@@ -71,7 +71,7 @@
         main form:not(.inline) input[type="checkbox"],
         main form:not(.inline) input[type="radio"] { accent-color: var(--lava-cyan); }
         main form:not(.inline) label { color: #334e5e; font-weight: 600; }
-        main button[type="submit"], main input[type="submit"] {
+        main button[type="submit"]:not([role="switch"]), main input[type="submit"] {
             min-height: 2.75rem;
             border-radius: .8rem;
             font-weight: 700;

@@ -13,7 +13,7 @@
         </svg>
         <div class="relative max-w-2xl">
             <p class="text-sm font-semibold text-cyan-300">Resumen del día</p>
-            <h2 class="mt-2 text-2xl font-extrabold tracking-tight sm:text-3xl">Hola, {{ $nombreUsuario }}. Tu lavadero está listo para brillar.</h2>
+            <h2 class="mt-2 text-2xl font-extrabold tracking-tight !text-white sm:text-3xl">Hola, {{ $nombreUsuario }}. Tu lavadero está listo para brillar.</h2>
             <p class="mt-3 text-sm text-slate-300 sm:text-base">
                 Hoy hay <strong class="text-white">{{ number_format($citasHoy) }}</strong> {{ $citasHoy == 1 ? 'cita' : 'citas' }}
                 y <strong class="text-white">{{ number_format($citasPendientes) }}</strong> {{ $citasPendientes == 1 ? 'cita pendiente' : 'citas pendientes' }} en total.
