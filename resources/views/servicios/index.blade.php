@@ -122,7 +122,8 @@
                                                 </span>
                                             </a>
 
-                                            <form
+                                            @can('eliminar servicios')
+<form
                                                 action="{{ route('servicios.destroy', $servicio->id) }}"
                                                 method="POST"
                                                 class="inline"
@@ -142,6 +143,7 @@
                                                     </span>
                                                 </button>
                                             </form>
+@endcan
 
                                         </div>
                                     </td>
