@@ -2,21 +2,22 @@
 
 namespace App\Repositories;
 
-use App\Models\agenda;
-use App\Models\agendaServicios;
-use App\Models\pago;
+use App\Repositories\Contracts\AgendaRepositoryInterface;
+
+use App\Models\Agenda;
+use App\Models\AgendaServicios;
+use App\Models\Pago;
 use App\Support\TextoBusqueda;
 
-class AgendaRepository
-{
+class AgendaRepository implements AgendaRepositoryInterface {
     public function getAll()
     {
-        return agenda::query()
+        return Agenda::query()
             ->select(['id', 'empleadoId', 'clienteId', 'vehiculoId', 'fecha', 'hora', 'estado', 'tipoDeAtencion'])
             ->with([
                 'empleado:id,nombre,apellido',
                 'cliente:id,nombreCliente,apellidoCliente',
-                'agendaServicios:id,agendaId,vehiculoId,servicioId,Precio',
+                'agendaServicios:id,agendaId,vehiculoId,servicioId,Precio,duracionMinutos',
                 'agendaServicios.vehiculo:id,clienteID,tipoVehiculoId,placa,modelo',
                 'agendaServicios.vehiculo.tipoVehiculo:id,nombre',
                 'agendaServicios.servicio:id,nombre',
@@ -61,15 +62,21 @@ class AgendaRepository
             ->get();
     }
 
+    public function totalServicios(int $agendaId): float
+    {
+        return (float) AgendaServicios::query()
+            ->where('agendaId', $agendaId)
+            ->sum('Precio');
+    }
+
     private function consultaBusqueda(string $texto, array $filtros)
     {
-        $consulta = agenda::query()
+        $consulta = Agenda::query()
             ->select(['id', 'empleadoId', 'clienteId', 'vehiculoId', 'fecha', 'hora', 'estado', 'tipoDeAtencion'])
             ->with([
                 'empleado:id,nombre,apellido',
                 'cliente:id,nombreCliente,apellidoCliente',
-                'agendaServicios:id,agendaId,vehiculoId,servicioId,Precio',
-                'agendaServicios.vehiculo:id,clienteID,tipoVehiculoId,placa,modelo',
+                'agendaServicios:id,agendaId,vehiculoId,servicioId,Precio,duracionMinutos',                'agendaServicios.vehiculo:id,clienteID,tipoVehiculoId,placa,modelo',
                 'agendaServicios.vehiculo.tipoVehiculo:id,nombre',
                 'agendaServicios.servicio:id,nombre',
             ])->withSum('agendaServicios', 'Precio');
@@ -96,12 +103,12 @@ class AgendaRepository
     public function keep(array $datos)
     {
         $datos['vehiculoId'] = null;
-        return agenda::create($datos);
+        return Agenda::create($datos);
     }
 
     public function findById(int $id)
     {
-        return agenda::with([
+        return Agenda::with([
             'empleado',
             'cliente',
             'agendaServicios.vehiculo.tipoVehiculo',
@@ -111,7 +118,7 @@ class AgendaRepository
 
     public function vehiculoOcupado(int $vehiculoId, string $fecha, string $hora, ?int $agendaId = null): bool
     {
-        return agenda::whereHas('agendaServicios', fn ($query) => $query->where('vehiculoId', $vehiculoId))
+        return Agenda::whereHas('agendaServicios', fn ($query) => $query->where('vehiculoId', $vehiculoId))
             ->where('fecha', $fecha)
             ->whereTime('hora', '=', $hora)
             ->where('estado', '!=', 'cancelada')
@@ -121,28 +128,42 @@ class AgendaRepository
 
     public function vehiculoPerteneceACliente(int $vehiculoId, int $clienteId): bool
     {
-        return \App\Models\vehiculo::whereKey($vehiculoId)
+        return \App\Models\Vehiculo::whereKey($vehiculoId)
             ->where('clienteID', $clienteId)
             ->exists();
     }
 
-    public function empleadoActivo(int $empleadoId): bool
+    public function vehiculoActivo(int $id): bool
     {
-        return \App\Models\empleado::whereKey($empleadoId)->where('estado', true)->exists();
+        return \App\Models\Vehiculo::whereKey($id)->where('estado', 'Activo')->exists();
     }
 
-    public function empleadoTieneTurno(int $empleadoId, string $dia, string $hora): bool
+    public function servicioActivo(int $id): bool
     {
-        return \App\Models\turno::where('empleado_id', $empleadoId)
-            ->where('dia', $dia)
-            ->where('horaInicio', '<=', $hora)
-            ->where('horaFin', '>', $hora)
-            ->exists();
+        return \App\Models\Servicio::whereKey($id)->where('estado', true)->exists();
+    }
+
+    public function empleadoActivo(int $empleadoId): bool
+    {
+        return \App\Models\Empleado::whereKey($empleadoId)->where('estado', true)->exists();
+    }
+
+    public function empleadoTieneTurno(
+    int $empleadoId,string $dia,string $hora,int $duracionMinutos): bool {
+    $horaFin = \Carbon\Carbon::createFromFormat('H:i:s', $hora)
+        ->addMinutes($duracionMinutos)
+        ->format('H:i:s');
+
+    return \App\Models\Turno::where('empleado_id', $empleadoId)
+        ->where('dia', $dia)
+        ->where('horaInicio', '<=', $hora)
+        ->where('horaFin', '>=', $horaFin)
+        ->exists();
     }
 
     public function empleadoOcupado(int $empleadoId, string $fecha, string $hora, ?int $agendaId = null): bool
     {
-        return agenda::where('empleadoId', $empleadoId)
+        return Agenda::where('empleadoId', $empleadoId)
             ->where('fecha', $fecha)
             ->whereTime('hora', '=', $hora)
             ->where('estado', '!=', 'cancelada')
@@ -152,7 +173,7 @@ class AgendaRepository
 
     public function update(int $id, array $datos)
     {
-        $agenda = agenda::findOrFail($id);
+        $agenda = Agenda::findOrFail($id);
         $datos['vehiculoId'] = null;
         $agenda->update($datos);
         return $agenda;
@@ -160,17 +181,36 @@ class AgendaRepository
 
     public function quitarLineas(int $agendaId): void
     {
-        agendaServicios::where('agendaId', $agendaId)->delete();
+        AgendaServicios::where('agendaId', $agendaId)->delete();
     }
 
     public function delete(int $id)
     {
-        return agenda::destroy($id);
+        return Agenda::destroy($id);
     }
 
     public function tieneDependencias(int $id): bool
     {
-        return agendaServicios::where('agendaId', $id)->exists()
-            || pago::where('agendaId', $id)->exists();
+        return AgendaServicios::where('agendaId', $id)->exists()
+            || Pago::where('agendaId', $id)->exists();
+    }
+
+    public function tienePago(int $id): bool
+    {
+        return Pago::where('agendaId', $id)->exists();
+    }
+
+    public function citasActivasDelDia(string $fecha, ?int $excluirId = null)
+    {
+        return Agenda::with('agendaServicios.servicio:id,duracionMinutos')
+            ->whereDate('fecha', $fecha)
+            ->where('estado', '!=', 'cancelada')
+            ->when($excluirId, fn ($q) => $q->where('id', '!=', $excluirId))
+            ->get();
+    }
+
+    public function duracionesServicios(array $ids)
+    {
+        return \App\Models\Servicio::whereIn('id', $ids)->pluck('duracionMinutos', 'id');
     }
 }

@@ -2,16 +2,17 @@
 
 namespace App\Repositories;
 
-use App\Models\agenda;
-use App\Models\agendaServicios;
-use App\Models\pago;
+use App\Repositories\Contracts\ReporteRepositoryInterface;
+
+use App\Models\Agenda;
+use App\Models\AgendaServicios;
+use App\Models\Pago;
 use Illuminate\Database\Eloquent\Collection;
 
-class ReporteRepository
-{
+class ReporteRepository implements ReporteRepositoryInterface {
     public function citasAtendidasEnFecha(string $fecha): Collection
     {
-        return agenda::query()
+        return Agenda::query()
             ->select(['id', 'clienteId', 'empleadoId', 'fecha', 'hora', 'estado'])
             ->whereDate('fecha', $fecha)
             ->where('estado', 'terminada')
@@ -28,12 +29,12 @@ class ReporteRepository
 
     public function totalRecaudadoEnFecha(string $fecha): float
     {
-        return (float) pago::query()->whereDate('FechaPago', $fecha)->sum('Monto');
+        return (float) Pago::query()->whereDate('FechaPago', $fecha)->sum('Monto');
     }
 
     public function citasAtendidasEntre(string $desde, string $hasta): int
     {
-        return agenda::query()
+        return Agenda::query()
             ->where('estado', 'terminada')
             ->whereBetween('fecha', [$desde, $hasta])
             ->count();
@@ -41,14 +42,14 @@ class ReporteRepository
 
     public function totalRecaudadoEntre(string $desde, string $hasta): float
     {
-        return (float) pago::query()
+        return (float) Pago::query()
             ->whereBetween('FechaPago', [$desde . ' 00:00:00', $hasta . ' 23:59:59'])
             ->sum('Monto');
     }
 
     public function totalesPorServicio(string $desde, string $hasta): Collection
     {
-        return agendaServicios::query()
+        return AgendaServicios::query()
             ->selectRaw('servicioId, COUNT(*) as cantidad, SUM(Precio) as total')
             ->whereHas('agenda', fn ($query) => $query
                 ->where('estado', 'terminada')
@@ -58,4 +59,49 @@ class ReporteRepository
             ->orderByDesc('total')
             ->get();
     }
+    public function comisionesPorEmpleadoEntre(string $desde, string $hasta): Collection
+    {
+        return Pago::query()
+            ->selectRaw('empleadoId, SUM(valorComision) as totalComision, COUNT(*) as cantidadPagos')
+            ->whereBetween('FechaPago', [
+                $desde . ' 00:00:00',
+                $hasta . ' 23:59:59',
+            ])
+            ->whereNotNull('empleadoId')
+            ->with('empleado:id,nombre,apellido')
+            ->groupBy('empleadoId')
+            ->orderByDesc('totalComision')
+            ->get();
+    }
+    public function totalComisionesEntre(string $desde, string $hasta): float
+    {
+        return (float) Pago::query()
+            ->whereBetween('FechaPago', [
+                $desde . ' 00:00:00',
+                $hasta . ' 23:59:59',
+            ])
+            ->sum('valorComision');
+    }
+
+    public function mejorEmpleadoEntre(string $desde, string $hasta)
+    {
+        return AgendaServicios::query()
+            ->join('agendas', 'agenda_servicios.agendaId', '=', 'agendas.id')
+            ->join('empleados', 'agendas.empleadoId', '=', 'empleados.id')
+            ->selectRaw('
+                empleados.id as empleadoId,
+                empleados.nombre,
+                empleados.apellido,
+                COUNT(*) as cantidadServicios,
+                SUM(agenda_servicios.Precio) as totalGenerado
+            ')
+            ->where('agendas.estado', 'terminada')
+            ->whereBetween('agendas.fecha', [$desde, $hasta])
+            ->groupBy('empleados.id', 'empleados.nombre', 'empleados.apellido')
+            ->orderByDesc('totalGenerado')
+            ->orderByDesc('cantidadServicios')
+            ->first();
+    }
+
+    
 }

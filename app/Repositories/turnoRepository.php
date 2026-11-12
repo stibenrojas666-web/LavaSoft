@@ -2,14 +2,15 @@
 
 namespace App\Repositories;
 
-use App\Models\turno;
+use App\Repositories\Contracts\TurnoRepositoryInterface;
+
+use App\Models\Turno;
 use App\Support\TextoBusqueda;
 
-class turnoRepository
-{
+class TurnoRepository implements TurnoRepositoryInterface {
     public function tieneCruce(int $empleadoId, string $dia, string $horaInicio, string $horaFin, ?int $turnoId = null): bool
     {
-        return turno::where('empleado_id', $empleadoId)
+        return Turno::where('empleado_id', $empleadoId)
             ->where('dia', $dia)
             ->where('horaInicio', '<', $horaFin)
             ->where('horaFin', '>', $horaInicio)
@@ -19,7 +20,7 @@ class turnoRepository
 
     public function listarTodo()
     {
-        return turno::query()
+        return Turno::query()
             ->select(['id', 'empleado_id', 'dia', 'jornada', 'horaInicio', 'horaFin'])
             ->with('empleado:id,nombre,apellido,identificacion')
             ->orderBy('dia')
@@ -29,7 +30,7 @@ class turnoRepository
 
     public function buscar(string $texto, array $filtros = [])
     {
-        return TextoBusqueda::aplicar(turno::query()
+        return TextoBusqueda::aplicar(Turno::query()
             ->select(['id', 'empleado_id', 'dia', 'jornada', 'horaInicio', 'horaFin'])
             ->with('empleado:id,nombre,apellido,identificacion'), $texto, function ($coincidencias, $termino) {
                 $coincidencias->where('dia', 'like', $termino)
@@ -50,22 +51,22 @@ class turnoRepository
 
     public function guardar(array $datos)
     {
-        return turno::create($datos);
+        return Turno::create($datos);
     }
 
     public function eliminar(int $id)
     {
-        turno::destroy($id);
+        Turno::destroy($id);
     }
 
     public function buscarPorId(int $id)
     {
-        return turno::findOrfail($id);
+        return Turno::findOrFail($id);
     }
 
     public function actualizar(int $id, array $datos)
     {
-        $turno = turno::findOrFail($id);
+        $turno = Turno::findOrFail($id);
         $turno->update($datos);
         return $turno;
     }

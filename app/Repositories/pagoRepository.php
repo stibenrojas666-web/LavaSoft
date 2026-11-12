@@ -2,16 +2,17 @@
 
 namespace App\Repositories;
 
-use App\Models\agenda;
-use App\Models\agendaServicios;
-use App\Models\pago;
+use App\Repositories\Contracts\PagoRepositoryInterface;
+
+use App\Models\Agenda;
+use App\Models\AgendaServicios;
+use App\Models\Pago;
 use App\Support\TextoBusqueda;
 
-class PagoRepository
-{
+class PagoRepository implements PagoRepositoryInterface {
     public function historialPagos(string $texto = '', array $filtros = [])
     {
-        $consulta = TextoBusqueda::aplicar(pago::query()
+        $consulta = TextoBusqueda::aplicar(Pago::query()
             ->select(['id', 'agendaId', 'Monto', 'MetodoPago', 'FechaPago', 'RequerirFactura'])
             ->with([
                 'agenda:id,clienteId,empleadoId,fecha,hora,estado',
@@ -43,7 +44,7 @@ class PagoRepository
 
     public function agendaParaFactura(int $agendaId): agenda
     {
-        return agenda::with([
+        return Agenda::with([
             'cliente',
             'empleado',
             'pago',
@@ -54,9 +55,9 @@ class PagoRepository
 
     public function bloquearAgendaConfirmadaSinPago(int $agendaId): ?agenda
     {
-        $agenda = agenda::whereKey($agendaId)->lockForUpdate()->first();
+        $agenda = Agenda::whereKey($agendaId)->lockForUpdate()->first();
 
-        if (!$agenda || $agenda->estado !== 'confirmada' || pago::where('agendaId', $agendaId)->exists()) {
+        if (!$agenda || $agenda->estado !== 'confirmada' || Pago::where('agendaId', $agendaId)->exists()) {
             return null;
         }
 
@@ -65,16 +66,16 @@ class PagoRepository
 
     public function totalServiciosDeAgenda(int $agendaId): float
     {
-        return (float) agendaServicios::where('agendaId', $agendaId)->sum('Precio');
+        return (float) AgendaServicios::where('agendaId', $agendaId)->sum('Precio');
     }
 
     public function crear(array $datos): pago
     {
-        return pago::create($datos);
+        return Pago::create($datos);
     }
 
     public function marcarTerminada(int $agendaId): void
     {
-        agenda::whereKey($agendaId)->update(['estado' => 'terminada']);
+        Agenda::whereKey($agendaId)->update(['estado' => 'terminada']);
     }
 }

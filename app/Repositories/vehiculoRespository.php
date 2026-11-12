@@ -1,13 +1,15 @@
 <?php
 
 namespace App\Repositories;
-use App\Models\vehiculo;
-use App\Models\agendaServicios;
+
+use App\Repositories\Contracts\VehiculoRepositoryInterface;
+use App\Models\Vehiculo;
+use App\Models\AgendaServicios;
 use App\Support\TextoBusqueda;
 
-class VehiculoRespository{
+class VehiculoRespository implements VehiculoRepositoryInterface {
     public function getAll(){
-        return vehiculo::query()
+        return Vehiculo::query()
             ->select(['id', 'clienteID', 'tipoVehiculoId', 'placa', 'modelo', 'color', 'estado'])
             ->with(['cliente:id,nombreCliente,apellidoCliente', 'tipoVehiculo:id,nombre'])
             ->get();
@@ -15,12 +17,14 @@ class VehiculoRespository{
 
     public function buscar(string $texto, array $filtros = [])
     {
-        return TextoBusqueda::aplicar(vehiculo::query()
+        return TextoBusqueda::aplicar(Vehiculo::query()
             ->select(['id', 'clienteID', 'tipoVehiculoId', 'placa', 'modelo', 'color', 'estado'])
             ->with([
                 'cliente:id,nombreCliente,apellidoCliente',
                 'tipoVehiculo:id,nombre',
-            ]), $texto, function ($filtros, $termino) {
+            ])
+            ->withCount('agendas'),
+            $texto, function ($filtros, $termino) {
                 $filtros->where('placa', 'like', $termino)
                     ->orWhere('modelo', 'like', $termino)
                     ->orWhere('color', 'like', $termino)
@@ -40,7 +44,7 @@ class VehiculoRespository{
 
     public function cambiarEstado(int $id): bool
     {
-        $vehiculo = vehiculo::findOrFail($id);
+        $vehiculo = Vehiculo::findOrFail($id);
         $vehiculo->estado = strtolower((string) $vehiculo->estado) === 'activo' ? 'Inactivo' : 'Activo';
         $vehiculo->save();
 
@@ -48,16 +52,16 @@ class VehiculoRespository{
     }
 
     public function keep(array $datos){
-    return vehiculo::create($datos);
+    return Vehiculo::create($datos);
     }
 
     public function finById(int $id){
-        return vehiculo::with(['cliente', 'tipoVehiculo'])->findOrFail($id);
+        return Vehiculo::with(['cliente', 'tipoVehiculo'])->findOrFail($id);
     }
 
     public function historialServicios(int $vehiculoId)
     {
-        return agendaServicios::with(['agenda.cliente', 'agenda.empleado', 'agenda.pago', 'servicio'])
+        return AgendaServicios::with(['agenda.cliente', 'agenda.empleado', 'agenda.pago', 'servicio'])
             ->where('vehiculoId', $vehiculoId)
             ->whereHas('agenda', fn ($query) => $query->where('estado', 'terminada'))
             ->orderByDesc('agendaId')
@@ -66,17 +70,26 @@ class VehiculoRespository{
     }
 
     public function update (int $id, array $datos){
-        $vehiculo= vehiculo::findOrFail($id);
+        $vehiculo= Vehiculo::findOrFail($id);
         $vehiculo->update($datos);
         return $vehiculo; 
     }
 
     public function delete (int $id){
-        return vehiculo::destroy($id);
+        return Vehiculo::destroy($id);
     }
 
     public function tieneDependencias(int $id): bool
-    {
-        return agendaServicios::where('vehiculoId', $id)->exists();
-    }
+{
+    $tieneServicios = \App\Models\AgendaServicios::where(
+        'vehiculoId',
+        $id
+    )->exists();
+
+    $tieneAgendasAntiguas = \Illuminate\Support\Facades\DB::table('agendas')
+        ->where('vehiculoId', $id)
+        ->exists();
+
+    return $tieneServicios || $tieneAgendasAntiguas;
+}
 }

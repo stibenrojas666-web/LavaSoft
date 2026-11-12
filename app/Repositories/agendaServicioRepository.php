@@ -2,16 +2,17 @@
 
 namespace App\Repositories;
 
-use App\Models\agendaServicios;
-use App\Models\pago;
+use App\Repositories\Contracts\AgendaServicioRepositoryInterface;
+
+use App\Models\AgendaServicios;
+use App\Models\Pago;
 use App\Support\TextoBusqueda;
 
-class AgendaServicioRepository
-{
+class AgendaServicioRepository implements AgendaServicioRepositoryInterface {
     public function getAll()
     {
-        return agendaServicios::query()
-            ->select(['id', 'agendaId', 'vehiculoId', 'servicioId', 'Precio'])
+        return AgendaServicios::query()
+            ->select(['id', 'agendaId', 'vehiculoId', 'servicioId', 'Precio','duracionMinutos'])
             ->with([
                 'agenda:id,clienteId,empleadoId,fecha,hora,estado',
                 'agenda.cliente:id,nombreCliente,apellidoCliente',
@@ -24,8 +25,8 @@ class AgendaServicioRepository
 
     public function buscar(string $texto, array $filtros = [])
     {
-        return TextoBusqueda::aplicar(agendaServicios::query()
-            ->select(['id', 'agendaId', 'vehiculoId', 'servicioId', 'Precio'])
+        return TextoBusqueda::aplicar(AgendaServicios::query()
+            ->select(['id', 'agendaId', 'vehiculoId', 'servicioId', 'Precio','duracionMinutos'])
             ->with([
                 'agenda:id,clienteId,empleadoId,fecha,hora,estado',
                 'agenda.cliente:id,nombreCliente,apellidoCliente',
@@ -50,33 +51,33 @@ class AgendaServicioRepository
 
     public function keep(array $datos)
     {
-        return agendaServicios::create($datos);
+        return AgendaServicios::create($datos);
     }
 
     public function findById(int $id)
     {
-        return agendaServicios::findOrFail($id);
+        return AgendaServicios::findOrFail($id);
     }
 
     public function update(int $id, array $datos)
     {
-        $agendaServicio = agendaServicios::findOrFail($id);
+        $agendaServicio = AgendaServicios::findOrFail($id);
         $agendaServicio->update($datos);
         return $agendaServicio;
     }
 
     public function delete(int $id)
     {
-        return agendaServicios::destroy($id);
+        return AgendaServicios::destroy($id);
     }
 
     public function agendaTienePago(int $agendaId): bool
     {
-        return pago::where('agendaId', $agendaId)->exists();
+        return Pago::where('agendaId', $agendaId)->exists();
     }
 
     public function buscarAgenda(int $agendaId)
     {
-        return \App\Models\agenda::with('cliente')->findOrFail($agendaId);
+        return \App\Models\Agenda::with('cliente')->findOrFail($agendaId);
     }
 }

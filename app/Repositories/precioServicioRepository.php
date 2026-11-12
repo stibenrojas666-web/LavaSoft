@@ -2,15 +2,16 @@
 
 namespace App\Repositories;
 
-use App\Models\precioServicio;
+use App\Repositories\Contracts\PrecioServicioRepositoryInterface;
+
+use App\Models\PrecioServicio;
 use App\Support\TextoBusqueda;
 
-class precioServicioRepository
-{
+class PrecioServicioRepository implements PrecioServicioRepositoryInterface {
     public function listarTodo()
     {
-        return precioServicio::query()
-            ->select(['id', 'servicio_id', 'tipo_vehiculo_id', 'modalidad', 'precio'])
+        return PrecioServicio::query()
+            ->select(['id','servicio_id','tipo_vehiculo_id','modalidad','precio','duracionMinutos',])
             ->with(['servicio:id,nombre,estado', 'tipoVehiculo:id,nombre'])
             ->whereHas('servicio', fn ($query) => $query->where('estado', true))
             ->get();
@@ -19,8 +20,8 @@ class precioServicioRepository
     public function buscar(string $texto, array $filtros = [])
     {
         return TextoBusqueda::aplicar(
-                precioServicio::query()
-                    ->select(['id', 'servicio_id', 'tipo_vehiculo_id', 'modalidad', 'precio'])
+                PrecioServicio::query()
+                    ->select(['id','servicio_id','tipo_vehiculo_id','modalidad','precio','duracionMinutos',])
                     ->with(['servicio:id,nombre,estado', 'tipoVehiculo:id,nombre'])
                     ->whereHas('servicio', fn ($query) => $query->where('estado', true)),
                 $texto,
@@ -39,36 +40,36 @@ class precioServicioRepository
 
     public function guardar(array $datos)
     {
-        return precioServicio::create($datos);
+        return PrecioServicio::create($datos);
     }
 
     public function eliminar(int $id)
     {
-        precioServicio::destroy($id);
+        PrecioServicio::destroy($id);
     }
 
     public function buscarPorId(int $id)
     {
-        return precioServicio::findOrfail($id);
+        return PrecioServicio::findOrfail($id);
     }
 
     public function buscarPrecio(int $servicioId, int $tipoVehiculoId)
 {
-    return precioServicio::where('servicio_id', $servicioId)
+    return PrecioServicio::where('servicio_id', $servicioId)
         ->where('tipo_vehiculo_id', $tipoVehiculoId)
         ->value('precio');
 }
 
     public function buscarConfiguracion(int $servicioId, int $tipoVehiculoId): ?precioServicio
     {
-        return precioServicio::where('servicio_id', $servicioId)
+        return PrecioServicio::where('servicio_id', $servicioId)
             ->where('tipo_vehiculo_id', $tipoVehiculoId)
             ->first();
     }
 
     public function actualizar(int $id, array $datos)
     {
-        $precioServicio = precioServicio::findOrFail($id);
+        $precioServicio = PrecioServicio::findOrFail($id);
         $precioServicio->update($datos);
         return $precioServicio;
     }

@@ -2,61 +2,65 @@
 
 namespace App\Repositories;
 
-use App\Models\agenda;
-use App\Models\agendaServicios;
-use App\Models\clientes;
-use App\Models\empleado;
-use App\Models\pago;
-use App\Models\vehiculo;
+use App\Repositories\Contracts\DashboardRepositoryInterface;
+
+use App\Models\Agenda;
+use App\Models\AgendaServicios;
+use App\Models\Cliente;
+use App\Models\Empleado;
+use App\Models\Pago;
+use App\Models\Vehiculo;
 use Illuminate\Support\Carbon;
 
-class DashboardRepository
-{
+class DashboardRepository implements DashboardRepositoryInterface {
     public function serviciosHoy(Carbon $hoy): int
     {
-        return agendaServicios::whereHas('agenda', fn ($query) => $query->whereDate('fecha', $hoy))->count();
+         return AgendaServicios::whereHas('agenda', fn ($query) => $query
+        ->whereDate('fecha', $hoy)
+        ->where('estado', '!=', 'cancelada'))->count();
     }
 
     public function cajaHoy(Carbon $hoy): float
     {
-        return (float) pago::whereDate('FechaPago', $hoy)->sum('Monto');
+        return (float) Pago::whereDate('FechaPago', $hoy)->sum('Monto');
     }
 
     public function lavadoresActivos(): int
     {
-        return empleado::where('estado', true)->count();
+        return Empleado::where('estado', true)->count();
     }
 
     public function citasPendientes(): int
     {
-        return agenda::where('estado', 'pendiente')->count();
+        return Agenda::where('estado', 'pendiente')->count();
     }
 
     public function totalClientes(): int
     {
-        return clientes::count();
+        return Cliente::count();
     }
 
     public function totalVehiculos(): int
     {
-        return vehiculo::count();
+        return Vehiculo::count();
     }
 
     public function citasEnFecha(Carbon $fecha): int
     {
-        return agenda::whereDate('fecha', $fecha)->count();
+        return Agenda::whereDate('fecha', $fecha)->where('estado', '!=', 'cancelada')->count();
     }
 
     public function ingresosEntre(Carbon $inicio, Carbon $fin)
     {
-        return pago::whereBetween('FechaPago', [$inicio->copy()->startOfDay(), $fin->copy()->endOfDay()])
+        return Pago::whereBetween('FechaPago', [$inicio->copy()->startOfDay(), $fin->copy()->endOfDay()])
             ->get(['FechaPago', 'Monto']);
     }
 
     public function topServicios()
     {
-        return agendaServicios::selectRaw('servicioId, count(*) as total')
+        return AgendaServicios::selectRaw('servicioId, count(*) as total')
             ->with('servicio')
+            ->whereHas('agenda', fn ($q) => $q->where('estado', 'terminada'))
             ->groupBy('servicioId')
             ->orderByDesc('total')
             ->take(5)
@@ -65,7 +69,7 @@ class DashboardRepository
 
     public function ultimasCitas()
     {
-        return agenda::with(['cliente', 'empleado', 'agendaServicios.vehiculo.tipoVehiculo', 'agendaServicios.servicio'])
+        return Agenda::with(['cliente', 'empleado', 'agendaServicios.vehiculo.tipoVehiculo', 'agendaServicios.servicio'])
             ->withSum('agendaServicios', 'Precio')
             ->latest('created_at')
             ->take(6)

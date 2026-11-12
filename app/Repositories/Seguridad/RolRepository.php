@@ -2,12 +2,13 @@
 
 namespace App\Repositories\Seguridad;
 
+use App\Repositories\Seguridad\Contracts\RolRepositoryInterface;
+
 use Illuminate\Database\Eloquent\Collection;
 use Spatie\Permission\Models\Role;
 use App\Support\TextoBusqueda;
 
-class RolRepository
-{
+class RolRepository implements RolRepositoryInterface {
     public function listar(): Collection
     {
         return Role::query()
@@ -33,6 +34,21 @@ class RolRepository
     public function listarNombres(): array
     {
         return Role::orderBy('name')->pluck('name')->all();
+    }
+
+    public function nombresActivos(array $nombres): array
+    {
+        return Role::query()
+            ->whereIn('name', $nombres)
+            ->where('guard_name', config('seguridad.guard'))
+            ->where('activo', true)
+            ->pluck('name')
+            ->all();
+    }
+
+    public function permisosSeleccionados(Role $rol): array
+    {
+        return $rol->permissions()->pluck('name')->all();
     }
 
     public function crear(string $nombre, bool $activo, array $permisos): Role
