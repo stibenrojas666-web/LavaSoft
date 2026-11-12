@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class tipoVehiculo extends Model
+class TipoVehiculo extends Model
 {
     use HasFactory;
     protected $table = 'tipo_vehiculos';
@@ -16,6 +16,6 @@ class tipoVehiculo extends Model
 
     public function vehiculos()
     {
-        return $this->hasMany(vehiculo::class, 'tipoVehiculoId');
+        return $this->hasMany(Vehiculo::class, 'tipoVehiculoId');
     }
 }

@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Models\ConfiguracionLavadero;
-use App\Repositories\ConfiguracionLavaderoRepository;
+use App\Repositories\Contracts\ConfiguracionLavaderoRepositoryInterface as ConfiguracionLavaderoRepository;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -41,6 +41,7 @@ class ConfiguracionLavaderoService
 
     public function actualizar(array $datos, ?UploadedFile $logo = null): ConfiguracionLavadero
     {
+        unset($datos['logo']);
         $actual = $this->repository->obtener();
         $rutaAnterior = $actual->logo_path;
         $mostrarLogo = filter_var($datos['mostrar_logo'] ?? false, FILTER_VALIDATE_BOOLEAN);

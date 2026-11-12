@@ -6,19 +6,19 @@ use App\Http\Requests\VehiculoStoreRequest;
 use App\Http\Requests\VehiculoUpdateRequest;
 use App\Http\Requests\VehiculoIndexRequest;
 use App\Services\VehiculoService;
-use App\Services\clienteService;
-use App\Services\tipoVehiculoService;
+use App\Services\ClienteService;
+use App\Services\TipoVehiculoService;
 
 /**use App\Services\*/
 class VehiculoController extends Controller
 {
-private VehiculoService $VehiculoService;
-private clienteService $clienteService;
-private tipoVehiculoService $tipoVehiculoService;
+    private VehiculoService $vehiculoService;
+    private ClienteService $clienteService;
+    private TipoVehiculoService $tipoVehiculoService;
 
-    public function __construct(VehiculoService $VehiculoService, clienteService $clienteService,tipoVehiculoService $tipoVehiculoService)
+    public function __construct(VehiculoService $vehiculoService, ClienteService $clienteService, TipoVehiculoService $tipoVehiculoService)
     {
-        $this->VehiculoService = $VehiculoService;
+        $this->vehiculoService = $vehiculoService;
         $this->clienteService = $clienteService;
         $this->tipoVehiculoService = $tipoVehiculoService;
     }
@@ -26,20 +26,16 @@ private tipoVehiculoService $tipoVehiculoService;
     /**
      * Display a listing of the resource.
      */
-    public function index(VehiculoIndexRequest $request)
+    public function index(VehiculoIndexRequest $vehiculoIndexRequest)
     {
-        $datos = $request->validated();
-        $buscar = trim((string) ($datos['buscar'] ?? ''));
-        $filtros = array_intersect_key($datos, array_flip(['estado', 'tipoVehiculoId']));
-        $vehiculo = $this->VehiculoService->buscar($buscar, $filtros);
-
-        $tipoVehiculos = $this->tipoVehiculoService->listarTodo();
-        return view('vehiculos.index', compact('vehiculo', 'buscar', 'filtros', 'tipoVehiculos'));
+        $datosListado = $this->vehiculoService->prepararListado($vehiculoIndexRequest->validated());
+        $tipoVehiculosOpciones = $this->tipoVehiculoService->opcionesParaFiltro();
+        return view('vehiculos.index', [...$datosListado, 'tipoVehiculosOpciones' => $tipoVehiculosOpciones]);
     }
 
     public function cambiarEstado(int $id)
     {
-        $activo = $this->VehiculoService->cambiarEstado($id);
+        $activo = $this->vehiculoService->cambiarEstado($id);
 
         return redirect()->route('vehiculos.index')->with(
             'success',
@@ -63,8 +59,7 @@ private tipoVehiculoService $tipoVehiculoService;
      */
     public function store(VehiculoStoreRequest $vehiculoStoreRequest)
     {
-        $datos = $vehiculoStoreRequest->validated();
-        $this->VehiculoService->keep($datos);
+        $this->vehiculoService->keep($vehiculoStoreRequest->validated());
         return redirect()->route('vehiculos.index')->with('success','Vehículo creado correctamente.');
     }
 
@@ -73,7 +68,7 @@ private tipoVehiculoService $tipoVehiculoService;
      */
     public function show(int $id)
     {
-        return view('vehiculos.historial', $this->VehiculoService->historial($id));
+        return view('vehiculos.historial', $this->vehiculoService->historial($id));
     }
 
     /**
@@ -81,7 +76,7 @@ private tipoVehiculoService $tipoVehiculoService;
      */
     public function edit(int $id)
     {
-        $vehiculo = $this->VehiculoService->findById($id);
+        $vehiculo = $this->vehiculoService->findById($id);
         $cliente = $this->clienteService->listarTodo();
         $tipoVehiculo = $this->tipoVehiculoService->listarTodo();
         return view('vehiculos.editar',compact('vehiculo','cliente','tipoVehiculo'));
@@ -93,8 +88,7 @@ private tipoVehiculoService $tipoVehiculoService;
      */
     public function update(int $id,VehiculoUpdateRequest $vehiculoUpdateRequest)
     {
-        $datos = $vehiculoUpdateRequest->validated();
-        $this->VehiculoService->update($id,$datos);
+        $this->vehiculoService->update($id, $vehiculoUpdateRequest->validated());
         return redirect()->route('vehiculos.index')->with('success', 'Vehículo actualizado correctamente.');      
     }
 
@@ -103,7 +97,7 @@ private tipoVehiculoService $tipoVehiculoService;
      */
     public function destroy(int $id)
     {
-        if (!$this->VehiculoService->delete($id)) {
+        if (!$this->vehiculoService->delete($id)) {
             return redirect()->route('vehiculos.index')->with('error', 'No se puede eliminar el vehículo porque tiene citas relacionadas.');
         }
 

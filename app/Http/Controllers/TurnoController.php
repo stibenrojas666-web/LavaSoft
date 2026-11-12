@@ -2,19 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\turnoService;
-use App\Services\empleadoService;
-use App\Http\Requests\turnoStoreRequest;
-use App\Http\Requests\turnoUpdateRequest;
+use App\Services\TurnoService;
+use App\Services\EmpleadoService;
+use App\Http\Requests\TurnoStoreRequest;
+use App\Http\Requests\TurnoUpdateRequest;
 use App\Http\Requests\BusquedaIndexRequest;
 
 
 class TurnoController extends Controller
 {
 
-private turnoService $turnoService;
-private empleadoService $empleadoService;
-public function __construct(turnoService $turnoService, empleadoService $empleadoService)
+private TurnoService $turnoService;
+private EmpleadoService $empleadoService;
+public function __construct(TurnoService $turnoService, EmpleadoService $empleadoService)
 {
     $this->turnoService = $turnoService;
     $this->empleadoService = $empleadoService;
@@ -22,13 +22,11 @@ public function __construct(turnoService $turnoService, empleadoService $emplead
     /**
      * Display a listing of the resource.
      */
-    public function index(BusquedaIndexRequest $request)
+    public function index(BusquedaIndexRequest $busquedaIndexRequest)
     {
-        $datos = $request->validated();
-        $buscar = trim((string) ($datos['buscar'] ?? ''));
-        $filtros = array_intersect_key($datos, array_flip(['dia', 'jornada']));
-        $turnos = $this->turnoService->buscar($buscar, $filtros);
-        return view('turno.index', compact('turnos', 'buscar', 'filtros'));
+        return view('turno.index', $this->turnoService->prepararListado(
+            $busquedaIndexRequest->validated()
+        ));
     }
 
     /**
@@ -43,10 +41,9 @@ public function __construct(turnoService $turnoService, empleadoService $emplead
     /**
      * Store a newly created resource in storage.
      */
-    public function store(turnoStoreRequest $request)
+    public function store(TurnoStoreRequest $turnoStoreRequest)
     {
-        $datos = $request->validated();
-        $this->turnoService->guardar($datos);
+        $this->turnoService->guardar($turnoStoreRequest->validated());
         return redirect()->route('turnos.index')->with('success','Turno creado correctamente.');
     }
 
@@ -71,9 +68,9 @@ public function __construct(turnoService $turnoService, empleadoService $emplead
     /**
      * Update the specified resource in storage.
      */
-    public function update(turnoUpdateRequest $request, int $id)
+    public function update(TurnoUpdateRequest $turnoUpdateRequest, int $id)
     {
-        $this->turnoService->actualizar($id, $request->validated());
+        $this->turnoService->actualizar($id, $turnoUpdateRequest->validated());
         return redirect()->route('turnos.index')->with('success', 'Turno actualizado correctamente.');
     }
 

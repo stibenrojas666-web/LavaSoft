@@ -2,13 +2,13 @@
 
 namespace App\Services;
 
-use App\Repositories\servicioRepository;
+use App\Repositories\Contracts\ServicioRepositoryInterface as ServicioRepository;
 
-class servicioService
+class ServicioService
 {
-    private servicioRepository $servicioRepository;
+    private ServicioRepository $servicioRepository;
     
-    public function __construct(servicioRepository $servicioRepository)
+    public function __construct(ServicioRepository $servicioRepository)
 {
     $this->servicioRepository = $servicioRepository;    
 }
@@ -20,6 +20,18 @@ public function listarTodo(){
 public function buscar(string $texto, array $filtros = [])
 {
     return $this->servicioRepository->buscar($texto, $filtros);
+}
+
+public function prepararListado(array $datos): array
+{
+    $buscar = trim((string) ($datos['buscar'] ?? ''));
+    $filtros = array_intersect_key($datos, array_flip(['estado']));
+
+    return [
+        'servicios' => $this->buscar($buscar, $filtros),
+        'buscar' => $buscar,
+        'filtros' => $filtros,
+    ];
 }
 
 public function listarActivosConPrecios(){
@@ -36,6 +48,7 @@ public function catalogoActivosConPrecios(): array
                 $precio->tipo_vehiculo_id => [
                     'modalidad' => $precio->modalidad,
                     'precio' => $precio->precio,
+                    'duracionMinutos' => $precio->duracionMinutos,
                 ],
             ])->all(),
         ])

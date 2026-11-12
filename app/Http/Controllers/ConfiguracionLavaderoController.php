@@ -18,10 +18,12 @@ class ConfiguracionLavaderoController extends Controller
         return view('configuracion.edit', ['configuracion' => $this->service->obtener()]);
     }
 
-    public function update(ConfiguracionLavaderoRequest $request): RedirectResponse
+    public function update(ConfiguracionLavaderoRequest $configuracionLavaderoRequest): RedirectResponse
     {
-        $datos = $request->safe()->except('logo');
-        $this->service->actualizar($datos, $request->file('logo'));
+        $this->service->actualizar(
+            $configuracionLavaderoRequest->validated(),
+            $configuracionLavaderoRequest->file('logo')
+        );
 
         return redirect()->route('configuracion.edit')->with('success', 'Configuración del lavadero actualizada.');
     }

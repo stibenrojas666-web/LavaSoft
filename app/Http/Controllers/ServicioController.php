@@ -2,29 +2,27 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\servicioService;
-use App\Http\Requests\servicioStoreRequest;
-use App\Http\Requests\servicioUpdateRequest;
+use App\Services\ServicioService;
+use App\Http\Requests\ServicioStoreRequest;
+use App\Http\Requests\ServicioUpdateRequest;
 use App\Http\Requests\BusquedaIndexRequest;
 
 class ServicioController extends Controller
 {
-    private servicioService $servicioService;
+    private ServicioService $servicioService;
 
-    public function __construct(servicioService $servicioService)
+    public function __construct(ServicioService $servicioService)
     {
         $this->servicioService = $servicioService;
     }
     /**
      * Display a listing of the resource.
      */
-    public function index(BusquedaIndexRequest $request)
+    public function index(BusquedaIndexRequest $busquedaIndexRequest)
     {
-        $datos = $request->validated();
-        $buscar = trim((string) ($datos['buscar'] ?? ''));
-        $filtros = array_intersect_key($datos, array_flip(['estado']));
-        $servicios = $this->servicioService->buscar($buscar, $filtros);
-        return view('servicios.index', compact('servicios', 'buscar', 'filtros'));
+        return view('servicios.index', $this->servicioService->prepararListado(
+            $busquedaIndexRequest->validated()
+        ));
     }
 
     /**
@@ -38,10 +36,9 @@ class ServicioController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(servicioStoreRequest $request)
+    public function store(ServicioStoreRequest $servicioStoreRequest)
     {
-        $datos = $request->validated();
-        $this->servicioService->guardar($datos);
+        $this->servicioService->guardar($servicioStoreRequest->validated());
         return redirect()->route('servicios.index')->with('success', 'Servicio creado correctamente.');
     }
 
@@ -75,9 +72,9 @@ class ServicioController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(servicioUpdateRequest $request, int $id)
+    public function update(ServicioUpdateRequest $servicioUpdateRequest, int $id)
     {
-        $this->servicioService->actualizar($id, $request->validated());
+        $this->servicioService->actualizar($id, $servicioUpdateRequest->validated());
         return redirect()->route('servicios.index')->with('success', 'Servicio actualizado correctamente.');
     }
 

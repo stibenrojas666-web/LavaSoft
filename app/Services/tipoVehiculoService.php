@@ -2,13 +2,13 @@
 
 namespace App\Services;
 
-use App\Repositories\tipoVehiculoRepository;
+use App\Repositories\Contracts\TipoVehiculoRepositoryInterface as TipoVehiculoRepository;
 
-class tipoVehiculoService
+class TipoVehiculoService
 {
-    private tipoVehiculoRepository $tipoVehiculoRepository;
+    private TipoVehiculoRepository $tipoVehiculoRepository;
     
-    public function __construct(tipoVehiculoRepository $tipoVehiculoRepository)
+    public function __construct(TipoVehiculoRepository $tipoVehiculoRepository)
 {
     $this->tipoVehiculoRepository = $tipoVehiculoRepository;    
 }
@@ -17,9 +17,24 @@ public function listarTodo(){
     return $this->tipoVehiculoRepository->listarTodo();
 }
 
+public function opcionesParaFiltro(): array
+{
+    return $this->listarTodo()->pluck('nombre', 'id')->all();
+}
+
 public function buscar(string $texto)
 {
     return $this->tipoVehiculoRepository->buscar($texto);
+}
+
+public function prepararListado(array $datos): array
+{
+    $buscar = trim((string) ($datos['buscar'] ?? ''));
+
+    return [
+        'tipoVehiculos' => $this->buscar($buscar),
+        'buscar' => $buscar,
+    ];
 }
 
 public function guardar(array $datos){

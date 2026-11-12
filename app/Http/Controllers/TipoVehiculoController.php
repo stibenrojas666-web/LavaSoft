@@ -3,27 +3,27 @@
 namespace App\Http\Controllers;
 
 
-use App\Services\tipoVehiculoService;
-use App\Http\Requests\tipoVehiculoStoreRequest;
-use App\Http\Requests\tipoVehiculoUpdateRequest;
+use App\Services\TipoVehiculoService;
+use App\Http\Requests\TipoVehiculoStoreRequest;
+use App\Http\Requests\TipoVehiculoUpdateRequest;
 use App\Http\Requests\BusquedaIndexRequest;
 
 class TipoVehiculoController extends Controller
 {
-    private tipoVehiculoService $tipoVehiculoService;
+    private TipoVehiculoService $tipoVehiculoService;
 
-    public function __construct(tipoVehiculoService $tipoVehiculoService)
+    public function __construct(TipoVehiculoService $tipoVehiculoService)
     {
         $this->tipoVehiculoService = $tipoVehiculoService;
     }
     /**
      * Display a listing of the resource.
      */
-    public function index(BusquedaIndexRequest $request)
+    public function index(BusquedaIndexRequest $busquedaIndexRequest)
     {
-        $buscar = trim((string) $request->validated('buscar', ''));
-        $tipoVehiculos = $this->tipoVehiculoService->buscar($buscar);
-        return view('tipoVehiculo.index', compact('tipoVehiculos', 'buscar'));
+        return view('tipoVehiculo.index', $this->tipoVehiculoService->prepararListado(
+            $busquedaIndexRequest->validated()
+        ));
     }
 
     /**
@@ -37,10 +37,9 @@ class TipoVehiculoController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(tipoVehiculoStoreRequest $request)
+    public function store(TipoVehiculoStoreRequest $tipoVehiculoStoreRequest)
     {
-        $datos = $request->validated();
-        $this->tipoVehiculoService->guardar($datos);
+        $this->tipoVehiculoService->guardar($tipoVehiculoStoreRequest->validated());
         return redirect()->route('tipoVehiculo.index')->with('success', 'tipoVehiculo creado correctamente.');
     }
     /**
@@ -63,9 +62,9 @@ class TipoVehiculoController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(tipoVehiculoUpdateRequest $request, int $id)
+    public function update(TipoVehiculoUpdateRequest $tipoVehiculoUpdateRequest, int $id)
     {
-        $this->tipoVehiculoService->actualizar($id, $request->validated());
+        $this->tipoVehiculoService->actualizar($id, $tipoVehiculoUpdateRequest->validated());
         return redirect()->route('tipoVehiculo.index')->with('success', 'tipoVehiculo actualizado correctamente.');
     }
 

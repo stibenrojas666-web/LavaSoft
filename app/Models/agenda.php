@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class agenda extends Model
+class Agenda extends Model
 {
     protected $table = 'agendas';
 
@@ -20,34 +20,28 @@ class agenda extends Model
 
     public function empleado()
     {
-        return $this->belongsTo(empleado::class, 'empleadoId');
+        return $this->belongsTo(Empleado::class, 'empleadoId');
     }
 
     public function cliente()
     {
-        return $this->belongsTo(clientes::class, 'clienteId');
+        return $this->belongsTo(Cliente::class, 'clienteId');
     }
 
     public function pago()
     {
-        return $this->hasOne(pago::class, 'agendaId');
+        return $this->hasOne(Pago::class, 'agendaId');
     }
 
     public function agendaServicios()
     {
-        return $this->hasMany(agendaServicios::class, 'agendaId')->with(['vehiculo.tipoVehiculo', 'servicio']);
+        return $this->hasMany(AgendaServicios::class, 'agendaId')->with(['vehiculo.tipoVehiculo', 'servicio']);
     }
 
     public function vehiculos()
     {
-        return $this->belongsToMany(vehiculo::class, 'agenda_servicios', 'agendaId', 'vehiculoId')
+        return $this->belongsToMany(Vehiculo::class, 'agenda_servicios', 'agendaId', 'vehiculoId')
             ->distinct();
-    }
-
-    /** Total vigente de los precios guardados para los servicios de esta cita. */
-    public function totalServicios(): float
-    {
-        return (float) $this->agendaServicios()->sum('Precio');
     }
 
 }

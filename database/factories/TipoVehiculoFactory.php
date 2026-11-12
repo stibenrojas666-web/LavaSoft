@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 
 class TipoVehiculoFactory extends Factory
 {
-    protected $model = \App\Models\tipoVehiculo::class;
+    protected $model = \App\Models\TipoVehiculo::class;
 
     public function definition(): array
     {

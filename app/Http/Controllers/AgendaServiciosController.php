@@ -7,21 +7,21 @@ use App\Http\Requests\AgendaServicioUpdateRequest;
 use App\Http\Requests\BusquedaIndexRequest;
 use App\Services\AgendaService;
 use App\Services\AgendaServicioService;
-use App\Services\servicioService;
-use App\Services\vehiculoService;
+use App\Services\ServicioService;
+use App\Services\VehiculoService;
 
 class AgendaServiciosController extends Controller
 {
     private AgendaServicioService $agendaServicioService;
     private AgendaService $agendaService;
-    private servicioService $servicioService;
-    private vehiculoService $vehiculoService;
+    private ServicioService $servicioService;
+    private VehiculoService $vehiculoService;
 
     public function __construct(
         AgendaServicioService $agendaServicioService,
         AgendaService $agendaService,
-        servicioService $servicioService,
-        vehiculoService $vehiculoService
+        ServicioService $servicioService,
+        VehiculoService $vehiculoService
     ) {
         $this->agendaServicioService = $agendaServicioService;
         $this->agendaService = $agendaService;
@@ -29,14 +29,11 @@ class AgendaServiciosController extends Controller
         $this->vehiculoService = $vehiculoService;
     }
 
-    public function index(BusquedaIndexRequest $request)
+    public function index(BusquedaIndexRequest $busquedaIndexRequest)
     {
-        $datos = $request->validated();
-        $buscar = trim((string) ($datos['buscar'] ?? ''));
-        $filtros = array_intersect_key($datos, array_flip(['estado', 'desde', 'hasta']));
-        $agendaServicio = $this->agendaServicioService->buscar($buscar, $filtros);
-
-        return view('agendaServicios.index', compact('agendaServicio', 'buscar', 'filtros'));
+        return view('agendaServicios.index', $this->agendaServicioService->prepararListado(
+            $busquedaIndexRequest->validated()
+        ));
     }
 
     public function create()
@@ -48,9 +45,9 @@ class AgendaServiciosController extends Controller
         return view('agendaServicios.crear', compact('agenda', 'servicio', 'vehiculo'));
     }
 
-    public function store(AgendaServicioStoreRequest $request)
+    public function store(AgendaServicioStoreRequest $agendaServicioStoreRequest)
     {
-        $this->agendaServicioService->keep($request->validated());
+        $this->agendaServicioService->keep($agendaServicioStoreRequest->validated());
 
         return redirect()->route('agendaServicio.index')
             ->with('success', 'Servicio agregado a la cita correctamente.');
@@ -71,9 +68,9 @@ class AgendaServiciosController extends Controller
         return view('agendaServicios.editar', compact('agendaServicio', 'agenda', 'servicio', 'vehiculo'));
     }
 
-    public function update(int $id, AgendaServicioUpdateRequest $request)
+    public function update(int $id, AgendaServicioUpdateRequest $agendaServicioUpdateRequest)
     {
-        $this->agendaServicioService->update($id, $request->validated());
+        $this->agendaServicioService->update($id, $agendaServicioUpdateRequest->validated());
 
         return redirect()->route('agendaServicio.index')
             ->with('success', 'Servicio de la cita actualizado correctamente.');

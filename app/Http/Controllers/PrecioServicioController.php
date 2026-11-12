@@ -2,20 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\precioServicioService;
-use App\Services\servicioService;
-use App\Services\tipoVehiculoService;
-use App\Http\Requests\precioServicioStoreRequest;
-use App\Http\Requests\precioServicioUpdateRequest;
+use App\Services\PrecioServicioService;
+use App\Services\ServicioService;
+use App\Services\TipoVehiculoService;
+use App\Http\Requests\PrecioServicioStoreRequest;
+use App\Http\Requests\PrecioServicioUpdateRequest;
 use App\Http\Requests\BusquedaIndexRequest;
 
 class PrecioServicioController extends Controller 
 {
-    private precioServicioService $precioServicioService;
-    private servicioService $servicioService;
-    private tipoVehiculoService $tipoVehiculoService;
+    private PrecioServicioService $precioServicioService;
+    private ServicioService $servicioService;
+    private TipoVehiculoService $tipoVehiculoService;
 
-    public function __construct(precioServicioService $precioServicioService, servicioService $servicioService, tipoVehiculoService $tipoVehiculoService)
+    public function __construct(PrecioServicioService $precioServicioService, ServicioService $servicioService, TipoVehiculoService $tipoVehiculoService)
     {
         $this->precioServicioService = $precioServicioService;
         $this->servicioService = $servicioService;
@@ -24,14 +24,13 @@ class PrecioServicioController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(BusquedaIndexRequest $request)
+    public function index(BusquedaIndexRequest $busquedaIndexRequest)
     {
-        $datos = $request->validated();
-        $buscar = trim((string) ($datos['buscar'] ?? ''));
-        $filtros = array_intersect_key($datos, array_flip(['tipoVehiculoId', 'modalidad']));
-        $precioServicio = $this->precioServicioService->buscar($buscar, $filtros);
-        $tipoVehiculos = $this->tipoVehiculoService->listarTodo();
-        return view('precioServicio.index', compact('precioServicio', 'buscar', 'filtros', 'tipoVehiculos'));
+        $datosListado = $this->precioServicioService->prepararListado(
+            $busquedaIndexRequest->validated()
+        );
+        $tipoVehiculosOpciones = $this->tipoVehiculoService->opcionesParaFiltro();
+        return view('precioServicio.index', [...$datosListado, 'tipoVehiculosOpciones' => $tipoVehiculosOpciones]);
     }
 
     /**
@@ -41,16 +40,16 @@ class PrecioServicioController extends Controller
     {
         $servicios = $this->servicioService->listarActivosConPrecios();
         $tipoVehiculos = $this->tipoVehiculoService->listarTodo();
-        return view('precioServicio.crear', compact('servicios', 'tipoVehiculos'));
+        $duraciones = $this->precioServicioService->opcionesDuracion((int) old('duracionMinutos', 30));
+        return view('precioServicio.crear', compact('servicios', 'tipoVehiculos', 'duraciones'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(precioServicioStoreRequest $request)
+    public function store(PrecioServicioStoreRequest $precioServicioStoreRequest)
     {
-        $datos = $request->validated();
-        $this->precioServicioService->guardar($datos);
+        $this->precioServicioService->guardar($precioServicioStoreRequest->validated());
         return redirect()->route('precioServicio.index')->with('success','precio del servicio creado correctamente.');
     }
 
@@ -70,15 +69,17 @@ class PrecioServicioController extends Controller
         $precioServicio = $this->precioServicioService->buscarPorId($id);
         $servicios = $this->servicioService->listarActivosConPrecios();
         $tipoVehiculos = $this->tipoVehiculoService->listarTodo();
-        return view('precioServicio.editar', compact('precioServicio', 'servicios', 'tipoVehiculos'));
+        $duracionActual = (int) old('duracionMinutos', $precioServicio->duracionMinutos ?? 30);
+        $duraciones = $this->precioServicioService->opcionesDuracion($duracionActual);
+        return view('precioServicio.editar', compact('precioServicio', 'servicios', 'tipoVehiculos', 'duraciones', 'duracionActual'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(precioServicioUpdateRequest $request, int $id)
+    public function update(PrecioServicioUpdateRequest $precioServicioUpdateRequest, int $id)
     {
-        $this->precioServicioService->actualizar($id, $request->validated());
+        $this->precioServicioService->actualizar($id, $precioServicioUpdateRequest->validated());
         return redirect()->route('precioServicio.index')->with('success','precio del servicio actualizado correctamente.');
     }
 

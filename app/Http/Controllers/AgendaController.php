@@ -1,30 +1,30 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Http\Requests\agendaStoreRequest;
-use App\Http\Requests\agendaUpdateRequest;
+use App\Http\Requests\AgendaStoreRequest;
+use App\Http\Requests\AgendaUpdateRequest;
 use App\Http\Requests\BusquedaIndexRequest;
 use App\Http\Requests\EmpleadosDisponiblesRequest;
 use App\Services\AgendaService;
-use App\Services\clienteService;
-use App\Services\empleadoService;
-use App\Services\vehiculoService;
-use App\Services\servicioService;
+use App\Services\ClienteService;
+use App\Services\EmpleadoService;
+use App\Services\VehiculoService;
+use App\Services\ServicioService;
 
 class AgendaController extends Controller
 {
     private AgendaService $agendaService;
-    private clienteService $clienteService;
-    private empleadoService $empleadoService;
-    private vehiculoService $vehiculoService;
-    private servicioService $servicioService;
+    private ClienteService $clienteService;
+    private EmpleadoService $empleadoService;
+    private VehiculoService $vehiculoService;
+    private ServicioService $servicioService;
 
     public function __construct(
         AgendaService $agendaService,
-        clienteService $clienteService,
-        empleadoService $empleadoService,
-        vehiculoService $vehiculoService,
-        servicioService $servicioService
+        ClienteService $clienteService,
+        EmpleadoService $empleadoService,
+        VehiculoService $vehiculoService,
+        ServicioService $servicioService
     ) {
         $this->agendaService = $agendaService;
         $this->clienteService = $clienteService;
@@ -36,27 +36,9 @@ class AgendaController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(BusquedaIndexRequest $request)
+    public function index(BusquedaIndexRequest $busquedaAgendaRequest)
     {
-        $datos = $request->validated();
-        $buscar = trim((string) ($datos['buscar'] ?? ''));
-        $filtros = array_intersect_key($datos, array_flip(['estado', 'desde', 'hasta', 'orden']));
-        $agenda = $this->agendaService->buscar($buscar, $filtros);
-        $vista = $datos['vista'] ?? 'lista';
-        $mes = $datos['mes'] ?? now()->format('Y-m');
-        $inicioMes = \Illuminate\Support\Carbon::createFromFormat('!Y-m', $mes)->startOfMonth();
-        $finMes = $inicioMes->copy()->endOfMonth();
-        $fechaCalendario = $datos['fecha'] ?? ($inicioMes->isCurrentMonth() ? today()->toDateString() : $inicioMes->toDateString());
-        $citasCalendario = $vista === 'calendario'
-            ? $this->agendaService->buscarParaCalendario(
-                $buscar,
-                array_intersect_key($datos, array_flip(['estado', 'desde', 'hasta'])),
-                $inicioMes->toDateString(),
-                $finMes->toDateString()
-            )
-            : collect();
-
-        return view('Agenda.index', compact('agenda', 'buscar', 'filtros', 'mes', 'vista', 'citasCalendario', 'fechaCalendario'));
+        return view('Agenda.index', $this->agendaService->prepararIndice($busquedaAgendaRequest->validated()));
     }
 
     /**
@@ -66,19 +48,20 @@ class AgendaController extends Controller
     {
         $cliente = $this->clienteService->listarTodo();
         $empleado = collect();
-        $vehiculo = $this->vehiculoService->getAll();
+        $vehiculo = $this->vehiculoService->listarParaAgenda();
         $serviciosPrecios = $this->servicioService->catalogoActivosConPrecios();
 
-        return view('Agenda.crear', compact('cliente', 'empleado', 'vehiculo', 'serviciosPrecios'));
+        $bloquesIniciales = $this->agendaService->bloquesIniciales(null, old('vehiculos'), $serviciosPrecios);
+
+        return view('Agenda.crear', compact('cliente', 'empleado', 'vehiculo', 'serviciosPrecios', 'bloquesIniciales'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(agendaStoreRequest $agendaStoreRequest)
+    public function store(AgendaStoreRequest $agendaStoreRequest)
     {
-        $datos = $agendaStoreRequest->validated();
-        $this->agendaService->keep($datos);
+        $this->agendaService->keep($agendaStoreRequest->validated());
 
         return redirect()->route('agenda.index')->with('success', 'Cita agendada correctamente.');
     }
@@ -97,39 +80,37 @@ class AgendaController extends Controller
     public function edit(int $id)
     {
         $agenda = $this->agendaService->findById($id);
+        if (! $this->agendaService->puedeEditar($agenda)) {
+           return redirect()->route('agenda.index')
+          ->with('error', 'Una cita terminada ya no se puede editar.');
+          
+}
         $cliente = $this->clienteService->listarTodo();
         $empleado = $agenda->empleado ? collect([$agenda->empleado]) : collect();
-        $vehiculo = $this->vehiculoService->getAll();
+        $propios = $this->agendaService->vehiculosDeAgenda($agenda);
+        $vehiculo = $this->vehiculoService->listarParaAgenda($propios);
         $serviciosPrecios = $this->servicioService->catalogoActivosConPrecios();
 
-        return view('Agenda.editar', compact('agenda', 'cliente', 'empleado', 'vehiculo', 'serviciosPrecios'));
+        $bloquesIniciales = $this->agendaService->bloquesIniciales($agenda, old('vehiculos'), $serviciosPrecios);
+
+        return view('Agenda.editar', compact('agenda', 'cliente', 'empleado', 'vehiculo', 'serviciosPrecios', 'bloquesIniciales'));
     }
 
     /** Retorna empleados con turno en ese día/hora y sin otra cita activa. */
-    public function empleadosDisponibles(EmpleadosDisponiblesRequest $request)
-    {
-        $datos = $request->validated();
-
-        $empleados = $this->empleadoService->disponiblesEnHorario(
-            $datos['fecha'],
-            $datos['hora'],
-            isset($datos['agendaId']) ? (int) $datos['agendaId'] : null
-        );
-
-        return response()->json($empleados->map(fn ($persona) => [
-            'id' => $persona->id,
-            'nombre' => trim($persona->nombre . ' ' . $persona->apellido),
-            'jornada' => $persona->turnos->pluck('jornada')->unique()->implode(', '),
-        ]));
-    }
+    /** Retorna empleados con turno completo y sin cruces de citas. */
+public function empleadosDisponibles(EmpleadosDisponiblesRequest $empleadosDisponiblesRequest)
+{
+    return response()->json($this->empleadoService->disponiblesParaAgenda(
+        $empleadosDisponiblesRequest->validated()
+    ));
+}
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(int $id, agendaUpdateRequest $agendaUpdateRequest)
+    public function update(int $id, AgendaUpdateRequest $agendaUpdateRequest)
     {
-        $datos = $agendaUpdateRequest->validated();
-        $this->agendaService->update($id, $datos);
+        $this->agendaService->update($id, $agendaUpdateRequest->validated());
 
         return redirect()->route('agenda.index')->with('success', 'Cita actualizada correctamente.');
     }
@@ -140,7 +121,7 @@ class AgendaController extends Controller
     public function destroy(int $id)
     {
         if (!$this->agendaService->delete($id)) {
-            return redirect()->route('agenda.index')->with('error', 'No se puede eliminar la cita porque tiene servicios o pagos relacionados.');
+            return redirect()->route('agenda.index')->with('error', 'No se puede eliminar la cita porque ya tiene un pago registrado.');
         }
 
         return redirect()->route('agenda.index')->with('success', 'Cita eliminada correctamente.');
