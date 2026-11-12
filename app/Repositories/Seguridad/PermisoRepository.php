@@ -13,8 +13,9 @@ class PermisoRepository implements PermisoRepositoryInterface {
     public function listar(): Collection
     {
         return Permission::query()
-    ->where('guard_name', config('seguridad.guard'))
-    ->select(['id', 'name', 'guard_name', 'modulo']);
+            ->where('guard_name', config('seguridad.guard'))
+            ->select(['id', 'name', 'guard_name', 'modulo'])
+            ->get();
     }
 
     public function buscar(string $texto): LengthAwarePaginator

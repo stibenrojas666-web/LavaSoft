@@ -53,7 +53,7 @@
                                 </form>
                             @endunless
 
-                            @unless ($protegido)
+                            @unless ($rol->protegidoParaSistema)
                                 <form action="{{ route('seguridad.roles.destroy', $rol) }}" method="POST"
                                       onsubmit="return confirm('¿Eliminar el rol {{ $rol->name }}?');">
                                     @csrf
