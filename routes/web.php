@@ -18,6 +18,11 @@ use App\Http\Middleware\NoCacheHeaders;
 
 
 
+Route::get('factura/{agendaId}', [PagoController::class, 'facturaPublica'])
+    ->whereNumber('agendaId')
+    ->name('factura.publica')
+    ->middleware(['signed', NoCacheHeaders::class]);
+
 Route::middleware(['auth', NoCacheHeaders::class])->group(function () {
 
     Route::get('/dashboard', [DashboardController::class, 'index'])

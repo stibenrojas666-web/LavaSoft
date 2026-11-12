@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
-use App\Models\precioServicio;
-use App\Models\servicio;
-use App\Models\tipoVehiculo;
+use App\Models\PrecioServicio;
+use App\Models\Servicio;
+use App\Models\TipoVehiculo;
 use Illuminate\Database\Seeder;
 
 class PrecioServicioSeeder extends Seeder
@@ -36,16 +36,27 @@ class PrecioServicioSeeder extends Seeder
         ];
 
         foreach ($catalogo as $tipoNombre => $servicios) {
-            $tipo = tipoVehiculo::where('nombre', $tipoNombre)->firstOrFail();
+            $tipo = TipoVehiculo::where('nombre', $tipoNombre)->firstOrFail();
+
             foreach ($servicios as $nombre => [$modalidad, $precio]) {
-                $servicio = servicio::where('nombre', $nombre)->firstOrFail();
-                precioServicio::updateOrCreate([
+                $servicio = Servicio::where('nombre', $nombre)->firstOrFail();
+
+                $configuracion = PrecioServicio::firstOrNew([
                     'servicio_id' => $servicio->id,
                     'tipo_vehiculo_id' => $tipo->id,
-                ], [
-                    'precio' => $precio,
-                    'modalidad' => $modalidad,
                 ]);
+
+                $configuracion->precio = $precio;
+                $configuracion->modalidad = $modalidad;
+
+                // Conserva la duración existente.
+                // Si no existe, utiliza la duración general del servicio.
+                if (empty($configuracion->duracionMinutos)) {
+                    $configuracion->duracionMinutos =
+                        $servicio->duracionMinutos ?: 30;
+                }
+
+                $configuracion->save();
             }
         }
     }

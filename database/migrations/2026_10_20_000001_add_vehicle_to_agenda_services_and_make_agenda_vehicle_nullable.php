@@ -15,10 +15,22 @@ return new class extends Migration
             });
         }
 
-        DB::table('agenda_servicios as linea')
-            ->join('agendas as agenda', 'agenda.id', '=', 'linea.agendaId')
-            ->whereNull('linea.vehiculoId')
-            ->update(['linea.vehiculoId' => DB::raw('agenda.vehiculoId')]);
+        DB::table('agenda_servicios')
+            ->whereNull('vehiculoId')
+            ->orderBy('id')
+            ->chunkById(200, function ($lineas): void {
+                foreach ($lineas as $linea) {
+                    $vehiculoId = DB::table('agendas')
+                        ->where('id', $linea->agendaId)
+                        ->value('vehiculoId');
+
+                    if ($vehiculoId !== null) {
+                        DB::table('agenda_servicios')
+                            ->where('id', $linea->id)
+                            ->update(['vehiculoId' => $vehiculoId]);
+                    }
+                }
+            });
 
         if (DB::table('agenda_servicios')->whereNull('vehiculoId')->exists()) {
             throw new RuntimeException('No se pudo asignar un vehículo a todas las líneas de agenda existentes.');
@@ -35,8 +47,17 @@ return new class extends Migration
             });
         }
 
-        Schema::table('agenda_servicios', function (Blueprint $table) {
-            $table->dropUnique(['agendaId', 'servicioId']);
+        $indices = collect(Schema::getIndexes('agenda_servicios'));
+        $indiceAnterior = $indices->first(fn (array $indice) =>
+            $indice['columns'] === ['agendaId', 'servicioId']
+        );
+        if ($indiceAnterior !== null) {
+            Schema::table('agenda_servicios', function (Blueprint $table) use ($indiceAnterior): void {
+                $table->dropUnique($indiceAnterior['name']);
+            });
+        }
+
+        Schema::table('agenda_servicios', function (Blueprint $table): void {
             $table->foreign('vehiculoId')->references('id')->on('vehiculos');
             $table->unsignedBigInteger('vehiculoId')->nullable(false)->change();
             $table->unique(['agendaId', 'vehiculoId', 'servicioId']);
@@ -59,29 +80,35 @@ return new class extends Migration
             throw new RuntimeException('No se puede revertir: hay citas con varios vehículos que el esquema anterior no puede representar.');
         }
 
-        DB::table('agendas as agenda')
-            ->joinSub(
-                DB::table('agenda_servicios')
-                    ->select('agendaId', DB::raw('MIN(vehiculoId) as vehiculoId'))
-                    ->groupBy('agendaId'),
-                'linea',
-                'linea.agendaId',
-                '=',
-                'agenda.id'
-            )
-            ->whereNull('agenda.vehiculoId')
-            ->update(['agenda.vehiculoId' => DB::raw('linea.vehiculoId')]);
+        DB::table('agenda_servicios')
+            ->select('agendaId')
+            ->selectRaw('MIN(vehiculoId) as vehiculoId')
+            ->groupBy('agendaId')
+            ->orderBy('agendaId')
+            ->chunk(200, function ($lineas): void {
+                foreach ($lineas as $linea) {
+                    DB::table('agendas')
+                        ->where('id', $linea->agendaId)
+                        ->whereNull('vehiculoId')
+                        ->update(['vehiculoId' => $linea->vehiculoId]);
+                }
+            });
 
         if (DB::table('agendas')->whereNull('vehiculoId')->exists()) {
             throw new RuntimeException('No se puede revertir: hay citas sin vehículo que no pueden representarse en el esquema anterior.');
         }
 
-        Schema::table('agenda_servicios', function (Blueprint $table) {
-            $table->unique(['agendaId', 'servicioId']);
-        });
+        $indiceNuevo = collect(Schema::getIndexes('agenda_servicios'))->first(fn (array $indice) =>
+            $indice['columns'] === ['agendaId', 'vehiculoId', 'servicioId']
+        );
+        if ($indiceNuevo !== null) {
+            Schema::table('agenda_servicios', function (Blueprint $table) use ($indiceNuevo): void {
+                $table->dropUnique($indiceNuevo['name']);
+            });
+        }
 
-        Schema::table('agenda_servicios', function (Blueprint $table) {
-            $table->dropUnique(['agendaId', 'vehiculoId', 'servicioId']);
+        Schema::table('agenda_servicios', function (Blueprint $table): void {
+            $table->unique(['agendaId', 'servicioId']);
             $table->dropForeign(['vehiculoId']);
             $table->dropColumn('vehiculoId');
             $table->dropIndex(['agendaId']);

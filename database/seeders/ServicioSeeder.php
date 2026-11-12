@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\servicio;
+use App\Models\Servicio;
 use Illuminate\Database\Seeder;
 
 class ServicioSeeder extends Seeder
@@ -11,7 +11,7 @@ class ServicioSeeder extends Seeder
     {
         // Se conservan las filas anteriores para no alterar citas históricas,
         // pero se ocultan del formulario de nuevas citas.
-        servicio::whereIn('nombre', ['lavado', 'jabón', 'cera para brillar autos'])
+        Servicio::whereIn('nombre', ['lavado', 'jabón', 'cera para brillar autos'])
             ->update(['estado' => false]);
 
         foreach ([
@@ -31,13 +31,13 @@ class ServicioSeeder extends Seeder
             'Todo menos motor' => 'Lavado completo de turbo, excepto el motor.',
             'General' => 'Lavado general de turbo.',
         ] as $nombre => $descripcion) {
-            servicio::firstOrCreate(['nombre' => $nombre], [
+            Servicio::firstOrCreate(['nombre' => $nombre], [
                 'descripcion' => $descripcion,
                 'estado' => true,
             ]);
         }
 
-        servicio::whereIn('nombre', [
+        Servicio::whereIn('nombre', [
             'Lavada solo por fuera', 'Lavada por dentro y por fuera',
             'Lavada por dentro, por fuera y por debajo', 'Lavada básica (limpiando motor)',
             'Lavado de motor en seco', 'Lavado de motor a vapor', 'Enceradas',

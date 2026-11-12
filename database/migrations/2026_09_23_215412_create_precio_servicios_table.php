@@ -15,13 +15,10 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('servicio_id');
             $table->unsignedBigInteger('tipo_vehiculo_id');
+            $table->decimal('precio', 10, 2)->nullable();
             $table->foreign('servicio_id')->references('id')->on('servicios');
             $table->foreign('tipo_vehiculo_id')->references('id')->on('tipo_vehiculos');
-            $table->decimal('precio',10,2);
             $table->timestamps();
-            
-
-            
         });
     }
 

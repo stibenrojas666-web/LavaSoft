@@ -1,4 +1,4 @@
-<?php
+php -l app/Services/AgendaService.php<?php
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
