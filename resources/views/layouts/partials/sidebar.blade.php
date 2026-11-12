@@ -3,27 +3,29 @@
         'Principal' => [
             ['label' => 'Dashboard', 'route' => 'dashboard.index', 'icon' => 'home', 'can' => 'ver dashboard'],
         ],
+
         'Gestión' => [
             ['label' => 'Clientes', 'route' => 'clientes.index', 'icon' => 'users', 'can' => 'ver clientes'],
             ['label' => 'Empleados', 'route' => 'empleados.index', 'icon' => 'users', 'can' => 'ver empleados'],
+            ['label' => 'Agenda', 'route' => 'agenda.index', 'icon' => 'calendar', 'can' => 'ver agenda'],
+        ],
+
+        'Operación' => [
             ['label' => 'Turnos', 'route' => 'turnos.index', 'icon' => 'chart', 'can' => 'ver turnos'],
             ['label' => 'Vehículos', 'route' => 'vehiculos.index', 'icon' => 'box', 'can' => 'ver vehiculos'],
-            ['label' => 'Agenda', 'route' => 'agenda.index', 'icon' => 'calendar', 'can' => 'ver agenda'],
             ['label' => 'Servicios por cita', 'route' => 'agendaServicio.index', 'icon' => 'clipboard', 'can' => 'ver agendaservicio'],
             ['label' => 'Historial de pagos', 'route' => 'pagos.historial', 'icon' => 'credit-card', 'can' => 'ver pagos'],
         ],
+
         'Catálogo' => [
             ['label' => 'Servicios', 'route' => 'servicios.index', 'icon' => 'sparkles', 'can' => 'ver servicios'],
             ['label' => 'Tipos de vehículo', 'route' => 'tipoVehiculo.index', 'icon' => 'box', 'can' => 'ver tipovehiculo'],
             ['label' => 'Precios de servicio', 'route' => 'precioServicio.index', 'icon' => 'tag', 'can' => 'ver precioservicio'],
         ],
+
         'Reportes' => [
             ['label' => 'Reporte diario', 'route' => 'reportes.diario', 'icon' => 'chart', 'can' => 'ver dashboard'],
             ['label' => 'Reporte por período', 'route' => 'reportes.periodo', 'icon' => 'chart', 'can' => 'ver dashboard'],
-        ],
-        'Seguridad' => [
-            ['label' => 'Usuarios y permisos', 'route' => 'seguridad.permisos.index', 'icon' => 'shield', 'can' => config('seguridad.permiso_admin'), 'match' => 'seguridad.*'],
-            ['label' => 'Configuración del lavadero', 'route' => 'configuracion.edit', 'icon' => 'cog', 'can' => config('seguridad.permiso_admin'), 'match' => 'configuracion.*'],
         ],
     ];
 @endphp
@@ -38,7 +40,7 @@
         {{-- Marca --}}
         <a href="{{ route('dashboard.index') }}" class="flex h-[76px] items-center gap-3 px-6">
             @if($configuracionLavadero->mostrar_logo && $configuracionLavadero->logo_path)
-                <img src="{{ '/storage/' . ltrim($configuracionLavadero->logo_path, '/') }}"
+                <img src="{{ asset('storage/' . ltrim($configuracionLavadero->logo_path, '/')) }}"
                     alt="Logo de {{ $configuracionLavadero->nombre }}" class="h-11 w-11 rounded-2xl bg-white object-contain p-1.5 shadow-lg">
             @else
                 <span class="grid h-11 w-11 place-items-center rounded-2xl bg-primary-500 shadow-lg shadow-cyan-900/40" aria-hidden="true">
@@ -51,30 +53,199 @@
             </span>
         </a>
 
-        {{-- Navegación --}}
-        <nav class="flex-1 space-y-6 overflow-y-auto px-4 py-4" aria-label="Navegación lateral">
+        
+
+            {{-- Navegación --}}
+        <nav class="flex-1 space-y-2 overflow-y-auto px-3 py-3"
+            aria-label="Navegación lateral">
+
             @foreach ($grupos as $titulo => $enlaces)
-                @php($visibles = collect($enlaces)->filter(fn ($l) => auth()->user()?->can($l['can'])))
-                @if ($visibles->isNotEmpty())
-                    <section>
-                        <h2 class="px-3 pb-2 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500">{{ $titulo }}</h2>
-                        <div class="space-y-1">
+
+                @php
+                    $visibles = collect($enlaces)->filter(
+                        fn ($l) => auth()->user()?->can($l['can'])
+                    );
+
+                    $grupoActivo = $visibles->contains(function ($l) {
+                        $patron = $l['match'] ?? (
+                            str_ends_with($l['route'], '.index')
+                                ? str_replace('.index', '.*', $l['route'])
+                                : $l['route']
+                        );
+
+                        return request()->routeIs($patron);
+                    });
+                @endphp
+
+                @if ($visibles->isEmpty())
+                    @continue
+                @endif
+
+                {{-- Dashboard y Gestión siempre visibles --}}
+                @if (in_array($titulo, ['Principal', 'Gestión']))
+
+                    @foreach ($visibles as $link)
+
+                        @php
+                            $patron = $link['match'] ?? (
+                                str_ends_with($link['route'], '.index')
+                                    ? str_replace('.index', '.*', $link['route'])
+                                    : $link['route']
+                            );
+
+                            $active = request()->routeIs($patron);
+                        @endphp
+
+                        <a href="{{ route($link['route']) }}"
+                            @click="sidebarOpen = false"
+                            @if($active) aria-current="page" @endif
+                            class="sidebar-link {{ $active ? 'sidebar-link-active' : '' }}">
+
+                            <span class="sidebar-icon">
+                                @include('layouts.partials.icons', ['icon' => $link['icon']])
+                            </span>
+
+                            <span class="truncate">{{ $link['label'] }}</span>
+                        </a>
+
+                    @endforeach
+
+                {{-- Los demás módulos serán desplegables --}}
+                @else
+
+                    <section x-data="{ abierto: {{ $grupoActivo ? 'true' : 'false' }} }">
+
+                        <button
+                            type="button"
+                            @click="abierto = !abierto"
+                            :aria-expanded="abierto"
+                            class="flex w-full items-center justify-between rounded-xl px-3 py-2 text-left text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400 transition hover:bg-white/5 hover:text-white">
+
+                            <span>{{ $titulo }}</span>
+
+                            <svg class="h-4 w-4 transition-transform duration-200"
+                                :class="abierto ? 'rotate-180' : ''"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2">
+                                <path d="m6 9 6 6 6-6"/>
+                            </svg>
+                        </button>
+
+                        <div x-show="abierto"
+                            x-transition
+                            class="mt-1 space-y-0.5 pl-1">
+
                             @foreach ($visibles as $link)
-                                @php($patron = $link['match'] ?? (str_ends_with($link['route'], '.index') ? str_replace('.index', '.*', $link['route']) : $link['route']))
-                                @php($active = request()->routeIs($patron))
+
+                                @php
+                                    $patron = $link['match'] ?? (
+                                        str_ends_with($link['route'], '.index')
+                                            ? str_replace('.index', '.*', $link['route'])
+                                            : $link['route']
+                                    );
+
+                                    $active = request()->routeIs($patron);
+                                @endphp
+
                                 <a href="{{ route($link['route']) }}"
-                                    @if($active) aria-current="page" @endif
                                     @click="sidebarOpen = false"
+                                    @if($active) aria-current="page" @endif
                                     class="sidebar-link {{ $active ? 'sidebar-link-active' : '' }}">
-                                    <span class="sidebar-icon">@include('layouts.partials.icons', ['icon' => $link['icon']])</span>
+
+                                    <span class="sidebar-icon">
+                                        @include('layouts.partials.icons', ['icon' => $link['icon']])
+                                    </span>
+
                                     <span class="truncate">{{ $link['label'] }}</span>
                                 </a>
+
                             @endforeach
+
                         </div>
                     </section>
+
                 @endif
+
             @endforeach
+
+            {{-- Usuarios y permisos --}}
+            @if (auth()->user()?->can(config('seguridad.permiso_admin')))
+
+                @php
+                    $seguridadActiva = request()->routeIs('seguridad.*', 'configuracion.*');
+                @endphp
+
+                <section x-data="{ abierto: {{ $seguridadActiva ? 'true' : 'false' }} }">
+
+                    <button
+                        type="button"
+                        @click="abierto = !abierto"
+                        :aria-expanded="abierto"
+                        class="flex w-full items-center justify-between rounded-xl px-3 py-2 text-left text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400 transition hover:bg-white/5 hover:text-white">
+
+                        <span>Usuarios y permisos</span>
+
+                        <svg class="h-4 w-4 transition-transform duration-200"
+                            :class="abierto ? 'rotate-180' : ''"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2">
+                            <path d="m6 9 6 6 6-6"/>
+                        </svg>
+                    </button>
+
+                    <div x-show="abierto"
+                        x-transition
+                        class="mt-1 space-y-0.5 pl-1">
+
+                        @foreach ([
+                            ['Roles', 'seguridad.roles.index', 'seguridad.roles.*', 'shield'],
+                            ['Permisos', 'seguridad.permisos.index', 'seguridad.permisos.*', 'shield'],
+                            ['Cuentas de usuario', 'seguridad.cuentas.index', 'seguridad.cuentas.*', 'users'],
+                            ['Usuarios y roles', 'seguridad.usuarios.index', 'seguridad.usuarios.*', 'users'],
+                        ] as [$label, $route, $match, $icon])
+
+                            <a href="{{ route($route) }}"
+                                @click="sidebarOpen = false"
+                                @if(request()->routeIs($match)) aria-current="page" @endif
+                                class="sidebar-link {{ request()->routeIs($match) ? 'sidebar-link-active' : '' }}">
+
+                                <span class="sidebar-icon">
+                                    @include('layouts.partials.icons', ['icon' => $icon])
+                                </span>
+
+                                <span class="truncate">{{ $label }}</span>
+                            </a>
+
+                        @endforeach
+
+                    </div>
+                </section>
+
+            @endif
+
+            {{-- Configuración del lavadero --}}
+            @if (auth()->user()?->can(config('seguridad.permiso_admin')))
+
+                <a href="{{ route('configuracion.edit') }}"
+                    @click="sidebarOpen = false"
+                    @if(request()->routeIs('configuracion.*')) aria-current="page" @endif
+                    class="sidebar-link {{ request()->routeIs('configuracion.*') ? 'sidebar-link-active' : '' }}">
+
+                    <span class="sidebar-icon">
+                        @include('layouts.partials.icons', ['icon' => 'cog'])
+                    </span>
+
+                    <span class="truncate">Configuración del lavadero</span>
+                </a>
+
+            @endif
+
         </nav>
+
 
         {{-- Usuario --}}
         <div class="p-4">

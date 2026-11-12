@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Editar Cita')
+@section('title', 'Nueva Cita')
 
 @section('content')
     @include('Agenda._form')

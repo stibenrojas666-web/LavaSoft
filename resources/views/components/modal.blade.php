@@ -39,7 +39,7 @@
         <div
             x-show="show"
             x-transition
-            class="relative bg-white rounded-xl shadow-xl w-full {{ $width }} overflow-hidden"
+            class="relative w-full {{ $width }} overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl"
         >
             <div class="px-5 sm:px-6 py-4 border-b border-slate-100 flex items-center justify-between">
                 <h3 id="modal-title-{{ $name }}" class="text-base font-semibold text-slate-800">{{ $title }}</h3>

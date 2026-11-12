@@ -1,121 +1,132 @@
+
 @extends('layouts.app')
 
-@section('title')
-    Precio de Servicio - Editar
-@endsection
+@section('title', 'Editar Precio de Servicio')
 
 @section('content')
-
-<x-card>
-
-    <div class="flex items-center justify-between mb-6">
-        <h1 class="text-3xl font-bold text-cyan-700">
-            ✏️ Editar Precio de Servicio
-        </h1>
-        <a href="{{ route('precioServicio.index') }}"
-            class="text-sm text-cyan-600 hover:text-cyan-800 font-medium">
-            ← Volver al listado
-        </a>
+<div class="max-w-5xl mx-auto px-4 py-6">
+    <div class="flex items-center justify-between mb-7">
+        <div>
+            <div class="flex items-center gap-2 mb-1">
+                <span class="w-2 h-2 rounded-full bg-cyan-500"></span>
+                <p class="text-xs font-semibold uppercase tracking-widest text-slate-400">Tarifas del negocio</p>
+            </div>
+            <h1 class="text-2xl font-bold text-slate-800">Editar precio de servicio</h1>
+            <p class="text-sm text-slate-500 mt-1">Actualiza la tarifa configurada.</p>
+        </div>
+        <a href="{{ route('precioServicio.index') }}" class="text-sm font-medium text-slate-500 hover:text-cyan-600">← Volver</a>
     </div>
 
-    <form action="{{ route('precioServicio.update', $precioServicio->id) }}" method="POST" novalidate>
+    <form action="{{ route('precioServicio.update', $precioServicio->id) }}" method="POST" novalidate
+          class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
         @csrf
         @method('PUT')
 
-        {{-- servicio --}}
-        <div class="mb-4">
-            <label for="servicio_id" class="block text-gray-700 font-semibold mb-1">Servicio</label>
-            <select name="servicio_id" id="servicio_id"
-                    class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-400
-                           @error('servicio_id') border-red-500 @enderror">
-                @foreach($servicios as $servicio)
-                    <option value="{{ $servicio->id }}"
-                        {{ old('servicio_id', $precioServicio->servicio_id) == $servicio->id ? 'selected' : '' }}>
-                        {{ $servicio->nombre }}
-                    </option>
-                @endforeach
-            </select>
-            @error('servicio_id')
-                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-            @enderror
+        <div class="px-6 py-5">
+            <div class="flex items-center gap-3 mb-5">
+                <div class="w-9 h-9 rounded-lg bg-cyan-50 flex items-center justify-center text-cyan-600">💲</div>
+                <div>
+                    <h2 class="text-sm font-bold text-slate-800">Configuración de tarifa</h2>
+                    <p class="text-xs text-slate-400">Servicio, vehículo y modalidad de cobro</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
+                <div>
+                    <label for="servicio_id" class="block text-xs font-semibold text-slate-600 mb-1.5">Servicio</label>
+                    <select name="servicio_id" id="servicio_id" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100 @error('servicio_id') border-red-500 @enderror">
+                        @foreach($servicios as $servicio)
+                            <option value="{{ $servicio->id }}" @selected(old('servicio_id', $precioServicio->servicio_id) == $servicio->id)>{{ $servicio->nombre }}</option>
+                        @endforeach
+                    </select>
+                    @error('servicio_id') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
+                </div>
+
+                <div>
+                    <label for="tipo_vehiculo_id" class="block text-xs font-semibold text-slate-600 mb-1.5">Tipo de vehículo</label>
+                    <select name="tipo_vehiculo_id" id="tipo_vehiculo_id" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100 @error('tipo_vehiculo_id') border-red-500 @enderror">
+                        @foreach($tipoVehiculos as $tipoVehiculo)
+                            <option value="{{ $tipoVehiculo->id }}" @selected(old('tipo_vehiculo_id', $precioServicio->tipo_vehiculo_id) == $tipoVehiculo->id)>{{ $tipoVehiculo->nombre }}</option>
+                        @endforeach
+                    </select>
+                    @error('tipo_vehiculo_id') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
+                </div>
+
+                <div>
+                    <label for="modalidad" class="block text-xs font-semibold text-slate-600 mb-1.5">Cómo se calcula</label>
+                    <select name="modalidad" id="modalidad" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100 @error('modalidad') border-red-500 @enderror">
+                        <option value="fijo" @selected(old('modalidad', $precioServicio->modalidad) === 'fijo')>Precio fijo</option>
+                        <option value="desde" @selected(old('modalidad', $precioServicio->modalidad) === 'desde')>Desde (precio inicial)</option>
+                        <option value="convenir" @selected(old('modalidad', $precioServicio->modalidad) === 'convenir')>A convenir con el cliente</option>
+                    </select>
+                    @error('modalidad') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
+                </div>
+
+                <div>
+    <label for="duracionMinutos" class="block text-xs font-semibold text-slate-600 mb-1.5">
+        Duración del servicio
+    </label>
+
+    <select
+        name="duracionMinutos"
+        id="duracionMinutos"
+        required
+        class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100 @error('duracionMinutos') border-red-500 @enderror"
+    >
+        @foreach($duraciones as $minutos => $etiqueta)
+            <option value="{{ $minutos }}" @selected($duracionActual === (int) $minutos)>
+                {{ $etiqueta }}
+            </option>
+        @endforeach
+    </select>
+
+    <p class="text-xs text-slate-500 mt-1">
+        Selecciona cuánto tarda este servicio para el vehículo elegido.
+    </p>
+
+    @error('duracionMinutos')
+        <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
+    @enderror
+</div>
+
+                <div id="precio-contenedor">
+                    <label for="precio" id="precio-label" class="block text-xs font-semibold text-slate-600 mb-1.5">Precio</label>
+                    <input type="number" step="0.01" min="0.01" name="precio" id="precio"
+                           value="{{ old('precio', $precioServicio->precio) }}"
+                           class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100 @error('precio') border-red-500 @enderror">
+                    <p id="precio-ayuda" class="text-xs text-slate-500 mt-1"></p>
+                    @error('precio') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
+                </div>
+            </div>
         </div>
 
-        {{-- tipo de vehiculo --}}
-        <div class="mb-4">
-            <label for="tipo_vehiculo_id" class="block text-gray-700 font-semibold mb-1">Tipo de vehículo</label>
-            <select name="tipo_vehiculo_id" id="tipo_vehiculo_id"
-                    class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-400
-                           @error('tipo_vehiculo_id') border-red-500 @enderror">
-                @foreach($tipoVehiculos as $tipoVehiculo)
-                    <option value="{{ $tipoVehiculo->id }}"
-                        {{ old('tipo_vehiculo_id', $precioServicio->tipo_vehiculo_id) == $tipoVehiculo->id ? 'selected' : '' }}>
-                        {{ $tipoVehiculo->nombre }}
-                    </option>
-                @endforeach
-            </select>
-            @error('tipo_vehiculo_id')
-                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-            @enderror
-        </div>
-
-        <div class="mb-4">
-            <label for="modalidad" class="block text-gray-700 font-semibold mb-1">Cómo se calcula</label>
-            <select name="modalidad" id="modalidad"
-                    class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-400 @error('modalidad') border-red-500 @enderror">
-                <option value="fijo" {{ old('modalidad', $precioServicio->modalidad) === 'fijo' ? 'selected' : '' }}>Precio fijo</option>
-                <option value="desde" {{ old('modalidad', $precioServicio->modalidad) === 'desde' ? 'selected' : '' }}>Desde (precio inicial)</option>
-                <option value="convenir" {{ old('modalidad', $precioServicio->modalidad) === 'convenir' ? 'selected' : '' }}>A convenir con el cliente</option>
-            </select>
-            @error('modalidad') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
-        </div>
-
-        {{-- precio --}}
-        <div class="mb-6">
-            <label for="precio" id="precio-label" class="block text-gray-700 font-semibold mb-1">Precio</label>
-            <input type="number" step="0.01" min="0.01" name="precio" id="precio"
-                   value="{{ old('precio', $precioServicio->precio) }}"
-                   class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-400
-                          @error('precio') border-red-500 @enderror">
-            <p id="precio-ayuda" class="text-sm text-gray-500 mt-1"></p>
-            @error('precio')
-                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-            @enderror
-        </div>
-
-        <div class="flex justify-end gap-2">
-            <a href="{{ route('precioServicio.index') }}"
-                class="bg-gray-500 hover:bg-gray-700 text-white font-semibold px-4 py-2 rounded-lg shadow">
-                Cancelar
-            </a>
-            <button type="submit"
-                class="bg-cyan-600 hover:bg-cyan-800 text-white font-semibold px-4 py-2 rounded-lg shadow">
-                💾 Guardar cambios
-            </button>
+        <div class="flex items-center justify-end gap-3 px-6 py-4 bg-slate-50 border-t border-slate-100">
+            <a href="{{ route('precioServicio.index') }}" class="px-4 py-2 rounded-lg text-sm font-semibold text-slate-500 hover:bg-slate-200 transition">Cancelar</a>
+            <button type="submit" class="px-5 py-2 rounded-lg bg-cyan-600 text-white text-sm font-semibold hover:bg-cyan-700 transition">Guardar cambios</button>
         </div>
     </form>
-</x-card>
+</div>
 
 <script>
-    (() => {
-        const modalidad = document.getElementById('modalidad');
-        const precio = document.getElementById('precio');
-        const etiqueta = document.getElementById('precio-label');
-        const ayuda = document.getElementById('precio-ayuda');
+(() => {
+    const modalidad = document.getElementById('modalidad');
+    const precio = document.getElementById('precio');
+    const contenedor = document.getElementById('precio-contenedor');
+    const etiqueta = document.getElementById('precio-label');
+    const ayuda = document.getElementById('precio-ayuda');
 
-        function actualizarPrecio() {
-            const esConvenir = modalidad.value === 'convenir';
-            precio.disabled = esConvenir;
-            if (esConvenir) precio.value = '';
-            precio.closest('div').classList.toggle('hidden', esConvenir);
-            etiqueta.textContent = modalidad.value === 'desde' ? 'Precio inicial' : 'Precio';
-            ayuda.textContent = modalidad.value === 'desde'
-                ? 'Este valor se mostrará como precio desde.'
-                : (esConvenir ? 'El valor acordado se escribe al agendar la cita.' : '');
-        }
+    function actualizarPrecio() {
+        const esConvenir = modalidad.value === 'convenir';
+        precio.disabled = esConvenir;
+        contenedor.classList.toggle('hidden', esConvenir);
+        etiqueta.textContent = modalidad.value === 'desde' ? 'Precio inicial' : 'Precio';
+        ayuda.textContent = modalidad.value === 'desde'
+            ? 'Este valor se mostrará como precio desde.'
+            : (esConvenir ? 'El valor acordado se escribe al agendar la cita.' : '');
+    }
 
-        modalidad.addEventListener('change', actualizarPrecio);
-        actualizarPrecio();
-    })();
+    modalidad.addEventListener('change', actualizarPrecio);
+    actualizarPrecio();
+})();
 </script>
-
 @endsection

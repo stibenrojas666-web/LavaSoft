@@ -15,7 +15,7 @@
         type="{{ $type }}"
         value="{{ $value }}"
         {{ $attributes->merge([
-            'class' => 'w-full px-3.5 py-2.5 text-sm rounded-lg border ' .
+            'class' => 'min-h-11 w-full px-3.5 py-2.5 text-sm rounded-xl border ' .
                        ($errors->has($name) ? 'border-red-300 focus:ring-red-500' : 'border-slate-200 focus:ring-primary-500') .
                        ' bg-white focus:outline-none focus:ring-2 focus:border-transparent transition placeholder:text-slate-400'
         ]) }}

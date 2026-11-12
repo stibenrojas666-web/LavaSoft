@@ -26,10 +26,69 @@
         </div>
 
         <x-card title="Citas atendidas" subtitle="{{ \Illuminate\Support\Carbon::parse($fecha)->format('d/m/Y') }}">
-            <div class="grid gap-4 sm:grid-cols-2">
-                <x-stat-card label="Citas terminadas" :value="number_format($cantidadCitas)" icon="calendar" />
+             <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">                <x-stat-card label="Citas terminadas" :value="number_format($cantidadCitas)" icon="calendar" />
                 <x-stat-card label="Recaudado en pagos del día" :value="'$' . number_format($totalRecaudado, 0, ',', '.')" icon="tag" />
+                <x-stat-card label="Comisiones del día":value="'$' . number_format($totalComisiones, 0, ',', '.')"icon="tag" />
+                <x-stat-card label="Recaudado después de comisiones":value="'$' . number_format((float) $ingresoDespuesComisiones, 0, ',', '.')"icon="wallet"color="emerald" />
             </div>
+        </x-card>
+
+        <x-card title="Comisiones por empleado" subtitle="Comisiones correspondientes a los pagos registrados en esta fecha">
+            <x-table :headers="['Empleado', 'Pagos', 'Comisión']">
+                @forelse($comisionesPorEmpleado as $fila)
+                    <tr>
+                        <td>
+                            {{ $fila->empleado
+                                ? $fila->empleado->nombre . ' ' . $fila->empleado->apellido
+                                : 'Empleado no disponible' }}
+                        </td>
+                        <td class="text-right">
+                            {{ number_format((int) $fila->cantidadPagos) }}
+                        </td>
+                        <td class="text-right whitespace-nowrap">
+                            ${{ number_format((float) $fila->totalComision, 0, ',', '.') }}
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="3" class="py-8 text-center text-slate-500">
+                            No hay comisiones registradas en esta fecha.
+                        </td>
+                    </tr>
+                @endforelse
+            </x-table>
+        </x-card>
+
+        <x-card title="Mejor empleado del día" subtitle="Según el valor generado en servicios terminados">
+            @if($mejorEmpleado)
+                <div class="rounded-xl border border-cyan-100 bg-cyan-50/50 p-5">
+                    <p class="text-sm text-slate-500">Empleado destacado</p>
+
+                    <h3 class="mt-1 text-xl font-bold text-cyan-900">
+                        {{ $mejorEmpleado->nombre }} {{ $mejorEmpleado->apellido }}
+                    </h3>
+
+                    <div class="mt-4 grid gap-4 sm:grid-cols-2">
+                        <div>
+                            <p class="text-xs text-slate-500">Valor generado</p>
+                            <p class="text-lg font-bold text-slate-800">
+                                ${{ number_format((float) $mejorEmpleado->totalGenerado, 0, ',', '.') }}
+                            </p>
+                        </div>
+
+                        <div>
+                            <p class="text-xs text-slate-500">Servicios realizados</p>
+                            <p class="text-lg font-bold text-slate-800">
+                                {{ number_format((int) $mejorEmpleado->cantidadServicios) }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            @else
+                <p class="py-8 text-center text-sm text-slate-500">
+                    No hay servicios terminados con empleados asignados en esta fecha.
+                </p>
+            @endif
         </x-card>
 
         <x-card title="Servicios realizados" subtitle="Cantidad por servicio en la fecha seleccionada">
@@ -48,7 +107,7 @@
                     <tr>
                         <td>{{ substr($cita->hora, 0, 5) }}</td>
                         <td>{{ trim(($cita->cliente?->nombreCliente ?? '') . ' ' . ($cita->cliente?->apellidoCliente ?? '')) ?: 'Sin cliente' }}</td>
-                        <td>{{ $cita->agendaServicios->pluck('servicio.nombre')->filter()->implode(', ') ?: 'Sin servicios' }}</td>
+                        <td>{{ $cita->serviciosResumen }}</td>
                         <td>{{ $cita->empleado ? trim($cita->empleado->nombre . ' ' . $cita->empleado->apellido) : 'Sin asignar' }}</td>
                         <td class="text-right whitespace-nowrap">${{ number_format((float) ($cita->agenda_servicios_sum_precio ?? 0), 0, ',', '.') }}</td>
                     </tr>

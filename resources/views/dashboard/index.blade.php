@@ -50,7 +50,7 @@
         </x-card>
 
         <x-card title="Servicios más pedidos" subtitle="Los de mayor demanda">
-            @if (collect($serviciosValues)->sum() > 0)
+            @if ($serviciosValuesTotal > 0)
                 <div class="h-72"><canvas id="graficaServicios" role="img" aria-label="Gráfica de servicios más pedidos"></canvas></div>
             @else
                 <p class="grid h-72 place-items-center text-center text-sm text-slate-500">Aún no hay servicios registrados para mostrar.</p>
@@ -61,8 +61,8 @@
     {{-- Citas recientes --}}
     <div class="mt-6">
         <x-card title="Citas recientes" subtitle="Últimas citas registradas" :padding="false">
-            <div class="overflow-x-auto">
-                <table class="min-w-full">
+            <div class="lavasoft-table-shell">
+                <table class="lavasoft-table min-w-[900px]">
                     <thead>
                         <tr>
                             <th scope="col">Cliente</th>
@@ -75,21 +75,21 @@
                     </thead>
                     <tbody>
                         @forelse ($ultimasCitas as $cita)
-                            @php($nombreCliente = trim(($cita->cliente->nombreCliente ?? '') . ' ' . ($cita->cliente->apellidoCliente ?? '')) ?: 'Sin cliente')
+                            
                             <tr>
                                 <td class="text-sm text-slate-700">
                                     <div class="flex items-center gap-3">
-                                        <span class="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-cyan-100 text-xs font-bold text-cyan-800">{{ strtoupper(mb_substr($nombreCliente, 0, 1)) }}</span>
-                                        <span class="font-semibold">{{ $nombreCliente }}</span>
+                                        <span class="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-cyan-100 text-xs font-bold text-cyan-800">{{ strtoupper(mb_substr($cita->clienteNombreCompleto, 0, 1)) }}</span>
+                                        <span class="font-semibold">{{ $cita->clienteNombreCompleto }}</span>
                                     </div>
                                 </td>
                                 <td class="text-sm text-slate-700">
-                                    @forelse($cita->agendaServicios->groupBy('vehiculoId') as $lineas)
-                                        @php($vehiculoCita = $lineas->first()->vehiculo)
+                                    @forelse($cita->vehiculosResumen as $resumenVehiculo)
+                                        
                                         <div class="mb-2 last:mb-0">
-                                            <span class="font-semibold">{{ $vehiculoCita->placa ?? 'Sin placa' }}</span>
-                                            <span class="text-slate-500">({{ $vehiculoCita->tipoVehiculo->nombre ?? 'Vehículo' }})</span>
-                                            <p class="text-xs text-slate-500">{{ $lineas->pluck('servicio.nombre')->filter()->implode(', ') }}</p>
+                                            <span class="font-semibold">{{ $resumenVehiculo['vehiculo']->placa ?? 'Sin placa' }}</span>
+                                            <span class="text-slate-500">({{ $resumenVehiculo['vehiculo']->tipoVehiculo->nombre ?? 'Vehículo' }})</span>
+                                            <p class="text-xs text-slate-500">{{ $resumenVehiculo['servicios'] }}</p>
                                         </div>
                                     @empty
                                         <span class="text-slate-500">Sin vehículo o servicio</span>

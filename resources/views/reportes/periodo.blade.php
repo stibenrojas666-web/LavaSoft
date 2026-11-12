@@ -31,11 +31,71 @@
         </div>
 
         <x-card title="Resumen del período" subtitle="{{ \Illuminate\Support\Carbon::parse($desde)->format('d/m/Y') }} al {{ \Illuminate\Support\Carbon::parse($hasta)->format('d/m/Y') }}">
-            <div class="grid gap-4 sm:grid-cols-3">
+            <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
                 <x-stat-card label="Citas atendidas" :value="number_format($citasAtendidas)" icon="calendar" />
                 <x-stat-card label="Recaudado por fecha de pago" :value="'$' . number_format($totalRecaudado, 0, ',', '.')" icon="tag" />
                 <x-stat-card label="Valor de servicios terminados" :value="'$' . number_format($totalServicios, 0, ',', '.')" icon="chart" />
+                <x-stat-card label="Comisiones del período":value="'$' . number_format($totalComisiones, 0, ',', '.')"icon="tag" />
+                <x-stat-card label="Recaudado después de comisiones":value="'$' . number_format((float) $ingresoDespuesComisiones, 0, ',', '.')"icon="wallet"color="emerald" />
             </div>
+        </x-card>
+
+        <x-card title="Comisiones por empleado" subtitle="Comisiones calculadas según cada pago registrado">
+            <x-table :headers="['Empleado', 'Pagos', 'Comisión']">
+                @forelse($comisionesPorEmpleado as $fila)
+                    <tr>
+                        <td>
+                            {{ $fila->empleado
+                                ? $fila->empleado->nombre . ' ' . $fila->empleado->apellido
+                                : 'Empleado no disponible' }}
+                        </td>
+                        <td class="text-right">
+                            {{ number_format((int) $fila->cantidadPagos) }}
+                        </td>
+                        <td class="text-right whitespace-nowrap">
+                            ${{ number_format((float) $fila->totalComision, 0, ',', '.') }}
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="3" class="py-8 text-center text-slate-500">
+                            No hay comisiones registradas en este período.
+                        </td>
+                    </tr>
+                @endforelse
+            </x-table>
+        </x-card>
+
+        <x-card title="Mejor empleado" subtitle="Según el valor generado en servicios terminados">
+            @if($mejorEmpleado)
+                <div class="rounded-xl border border-cyan-100 bg-cyan-50/50 p-5">
+                    <p class="text-sm text-slate-500">Empleado destacado del período</p>
+
+                    <h3 class="mt-1 text-xl font-bold text-cyan-900">
+                        {{ $mejorEmpleado->nombre }} {{ $mejorEmpleado->apellido }}
+                    </h3>
+
+                    <div class="mt-4 grid gap-4 sm:grid-cols-2">
+                        <div>
+                            <p class="text-xs text-slate-500">Valor generado</p>
+                            <p class="text-lg font-bold text-slate-800">
+                                ${{ number_format((float) $mejorEmpleado->totalGenerado, 0, ',', '.') }}
+                            </p>
+                        </div>
+
+                        <div>
+                            <p class="text-xs text-slate-500">Servicios realizados</p>
+                            <p class="text-lg font-bold text-slate-800">
+                                {{ number_format((int) $mejorEmpleado->cantidadServicios) }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            @else
+                <p class="py-8 text-center text-sm text-slate-500">
+                    No hay servicios terminados con empleados asignados en este período.
+                </p>
+            @endif
         </x-card>
 
         <x-card title="Valor generado por servicio" subtitle="Ingresos asociados a citas terminadas dentro del período">

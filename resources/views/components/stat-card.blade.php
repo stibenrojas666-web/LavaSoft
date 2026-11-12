@@ -22,7 +22,7 @@
     $iconClasses = $tones[$tone] ?? $tones['cyan'];
 @endphp
 
-<div class="group rounded-3xl border border-slate-200/70 bg-white p-5 shadow-[0_10px_30px_rgba(11,42,58,0.06)] transition duration-200 hover:-translate-y-1 hover:shadow-[0_16px_36px_rgba(11,42,58,0.10)] sm:p-6">
+<div class="group rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_12px_32px_rgba(11,42,58,0.06)] transition duration-200 hover:-translate-y-1 hover:shadow-[0_16px_36px_rgba(11,42,58,0.10)] sm:p-6">
     <div class="flex items-start justify-between gap-3">
         <div class="min-w-0">
             <p class="text-sm font-semibold text-slate-500">{{ $label }}</p>

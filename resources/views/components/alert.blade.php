@@ -19,7 +19,7 @@
     x-show="show"
     x-transition
     role="alert"
-    {{ $attributes->merge(['class' => "flex items-start gap-3 border rounded-lg px-4 py-3 text-sm $classes"]) }}
+    {{ $attributes->merge(['class' => "flex items-start gap-3 border rounded-xl px-4 py-3.5 text-sm shadow-sm $classes"]) }}
 >
     <div class="flex-1">{{ $slot }}</div>
     <button

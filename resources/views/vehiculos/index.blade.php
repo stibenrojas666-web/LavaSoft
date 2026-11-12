@@ -22,7 +22,7 @@
 
         <x-list-search :action="route('vehiculos.index')" :value="$buscar" placeholder="Placa, modelo, cliente o tipo de vehículo" :filters="[
             ['name' => 'estado', 'label' => 'Estado', 'options' => ['' => 'Todos', 'activo' => 'Activos', 'inactivo' => 'Inactivos'], 'value' => $filtros['estado'] ?? ''],
-            ['name' => 'tipoVehiculoId', 'label' => 'Tipo de vehículo', 'options' => ['' => 'Todos'] + $tipoVehiculos->pluck('nombre', 'id')->all(), 'value' => $filtros['tipoVehiculoId'] ?? ''],
+            ['name' => 'tipoVehiculoId', 'label' => 'Tipo de vehículo', 'options' => ['' => 'Todos'] + $tipoVehiculosOpciones, 'value' => $filtros['tipoVehiculoId'] ?? ''],
         ]" />
 
         <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
@@ -56,6 +56,12 @@
                             <dt class="w-16 shrink-0 text-slate-500">Color</dt>
                             <dd class="font-medium text-slate-800">{{ $v->color ?: 'Sin registrar' }}</dd>
                         </div>
+                        <div class="flex items-center gap-3">
+                            <dt class="w-16 shrink-0 text-slate-500">Citas</dt>
+                            <dd class="font-semibold {{ $v->agendas_count > 0 ? 'text-amber-700' : 'text-emerald-700' }}">
+                                {{ $v->agendas_count }} {{ $v->agendas_count === 1 ? 'cita' : 'citas' }}
+                            </dd>
+                        </div>
                     </dl>
 
                     <div class="mt-auto flex flex-wrap items-center justify-between gap-2 border-t border-slate-100 pt-4">
@@ -79,6 +85,15 @@
                             <a href="{{ route('vehiculos.edit', $v->id) }}" class="grid h-9 w-9 place-items-center rounded-lg text-blue-700 transition hover:bg-blue-50" title="Editar vehículo" aria-label="Editar vehículo">
                                 <span class="h-4 w-4">@include('layouts.partials.icons', ['icon' => 'pencil'])</span>
                             </a>
+                            @if($v->agendas_count > 0)
+                            <button type="button"
+                                disabled
+                                class="grid h-9 w-9 cursor-not-allowed place-items-center rounded-lg text-slate-300"
+                                title="No se puede eliminar: tiene {{ $v->agendas_count }} citas relacionadas"
+                                aria-label="Vehículo con citas relacionadas">
+                                <span class="h-4 w-4">@include('layouts.partials.icons', ['icon' => 'trash'])</span>
+                            </button>
+                        @else
                             <form action="{{ route('vehiculos.destroy', $v->id) }}" method="POST" onsubmit="return confirm('¿Desea eliminar este vehículo?')">
                                 @csrf
                                 @method('DELETE')
@@ -86,6 +101,7 @@
                                     <span class="h-4 w-4">@include('layouts.partials.icons', ['icon' => 'trash'])</span>
                                 </button>
                             </form>
+                        @endif
                         </div>
                     </div>
                 </article>

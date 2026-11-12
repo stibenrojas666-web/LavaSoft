@@ -1,5 +1,6 @@
 @extends('layouts.app')
 
+
 @section('title', 'Configuración del lavadero')
 @section('page-title', 'Configuración del lavadero')
 
@@ -34,7 +35,7 @@
 
             <div class="flex items-center gap-4 rounded-xl border border-slate-200 bg-slate-50 p-4">
                 @if($configuracion->logo_path)
-                    <img src="{{ '/storage/' . ltrim($configuracion->logo_path, '/') }}"
+                    <img src="{{ asset('storage/' . ltrim($configuracion->logo_path, '/')) }}"
                         alt="Logo actual de {{ $configuracion->nombre }}" class="h-16 w-16 rounded-lg bg-white object-contain p-2">
                 @else
                     <div class="flex h-16 w-16 items-center justify-center rounded-lg border border-dashed border-slate-300 text-xs text-slate-400">Sin logo</div>

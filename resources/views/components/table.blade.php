@@ -24,8 +24,8 @@
 --}}
 @props(['headers' => []])
 
-<div class="overflow-x-auto rounded-xl border border-slate-100">
-    <table class="min-w-full divide-y divide-slate-100">
+<div class="lavasoft-table-shell">
+    <table class="lavasoft-table min-w-full">
         <thead>
             <tr class="bg-slate-50">
                 @foreach ($headers as $header)
