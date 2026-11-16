@@ -1,152 +1,149 @@
-
 @extends('layouts.app')
 
-@section('title')
-    Agregar Servicio a Cita
-@endsection
+@section('title', 'Agregar servicio a cita')
+@section('page-title', 'Agregar servicio a cita')
 
 @section('content')
-
 <div class="mx-auto max-w-3xl px-4 py-6">
 
-    {{-- Encabezado --}}
-    <div class="mb-7 flex items-center justify-between gap-3">
-        <div>
-            <h1 class="text-2xl font-bold text-slate-800">Agregar servicio a una cita</h1>
-            <p class="mt-1 text-sm text-slate-500">Asocia un servicio y un vehículo a una cita registrada.</p>
+    <x-module-header
+        title="Agregar servicio a una cita"
+        description="Asocia un servicio y un vehículo a una cita registrada."
+    />
+
+    <form
+        action="{{ route('agendaServicio.store') }}"
+        method="POST"
+        novalidate
+        class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
+    >
+        @csrf
+
+        <div class="border-b border-slate-100 px-6 py-5">
+            <div class="flex items-center gap-3">
+                <span class="grid h-10 w-10 place-items-center rounded-xl bg-cyan-50 text-cyan-800">
+                    @include('layouts.partials.icons', ['icon' => 'clipboard-list'])
+                </span>
+                <div>
+                    <h2 class="text-sm font-bold text-slate-800">Información del registro</h2>
+                    <p class="mt-0.5 text-xs text-slate-500">Selecciona la cita, el vehículo y el servicio.</p>
+                </div>
+            </div>
         </div>
 
-        <a href="{{ route('agendaServicio.index') }}"
-           class="shrink-0 text-sm font-medium text-slate-500 hover:text-cyan-600">
-            ← Volver
-        </a>
-    </div>
+        <div class="space-y-5 px-6 py-6">
 
-    {{-- Formulario --}}
-    <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+            <div>
+                <label for="agendaId" class="mb-1.5 block text-xs font-semibold text-slate-600">
+                    Cita
+                </label>
 
-        <form action="{{ route('agendaServicio.store') }}" method="POST" novalidate>
-            @csrf
+                <select
+                    name="agendaId"
+                    id="agendaId"
+                    class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-700 outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/10 @error('agendaId') border-red-400 @enderror"
+                >
+                    <option value="">Seleccione una cita</option>
 
-            <div class="space-y-5">
+                    @foreach($agenda as $a)
+                        <option value="{{ $a->id }}" {{ old('agendaId') == $a->id ? 'selected' : '' }}>
+                            #{{ $a->id }} - {{ \Carbon\Carbon::parse($a->fecha)->format('d/m/Y') }}
+                            {{ substr($a->hora, 0, 5) }} - {{ $a->cliente->nombreCliente ?? 'N/A' }}
+                        </option>
+                    @endforeach
+                </select>
 
-                {{-- Cita --}}
-                <div>
-                    <label for="agendaId" class="mb-1.5 block text-sm font-medium text-slate-700">
-                        Cita
-                    </label>
-
-                    <select name="agendaId" id="agendaId"
-                        class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none transition focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100 @error('agendaId') border-red-500 @enderror">
-
-                        <option value="">Seleccione una cita</option>
-
-                        @foreach($agenda as $a)
-                            <option value="{{ $a->id }}" {{ old('agendaId') == $a->id ? 'selected' : '' }}>
-                                #{{ $a->id }} - {{ \Carbon\Carbon::parse($a->fecha)->format('d/m/Y') }}
-                                {{ substr($a->hora, 0, 5) }} - {{ $a->cliente->nombreCliente ?? 'N/A' }}
-                            </option>
-                        @endforeach
-                    </select>
-
-                    @error('agendaId')
-                        <p class="mt-1.5 text-xs text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                {{-- Vehículo --}}
-                <div>
-                    <label for="vehiculoId" class="mb-1.5 block text-sm font-medium text-slate-700">
-                        Vehículo de la cita
-                    </label>
-
-                    <select name="vehiculoId" id="vehiculoId"
-                        class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none transition focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100 @error('vehiculoId') border-red-500 @enderror">
-
-                        <option value="">Seleccione un vehículo</option>
-
-                        @foreach($vehiculo as $v)
-                            <option value="{{ $v->id }}" @selected(old('vehiculoId') == $v->id)>
-                                {{ $v->placa }} · {{ $v->tipoVehiculo->nombre ?? 'Vehículo' }} · {{ $v->cliente->nombreCliente ?? 'Cliente' }}
-                            </option>
-                        @endforeach
-                    </select>
-
-                    @error('vehiculoId')
-                        <p class="mt-1.5 text-xs text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                {{-- Servicio --}}
-                <div>
-                    <label for="servicioId" class="mb-1.5 block text-sm font-medium text-slate-700">
-                        Servicio
-                    </label>
-
-                    <select name="servicioId" id="servicioId"
-                        class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none transition focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100 @error('servicioId') border-red-500 @enderror">
-
-                        <option value="">Seleccione un servicio</option>
-
-                        @foreach($servicio as $s)
-                            <option value="{{ $s->id }}" {{ old('servicioId') == $s->id ? 'selected' : '' }}>
-                                {{ $s->nombre }}
-                            </option>
-                        @endforeach
-                    </select>
-
-                    @error('servicioId')
-                        <p class="mt-1.5 text-xs text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                {{-- Precio --}}
-                <div>
-                    <label for="Precio" class="mb-1.5 block text-sm font-medium text-slate-700">
-                        Precio acordado
-                    </label>
-
-                    <input type="number"
-                        step="0.01"
-                        min="0.01"
-                        max="99999999.99"
-                        name="Precio"
-                        id="Precio"
-                        value="{{ old('Precio') }}"
-                        placeholder="Déjalo vacío para precios del catálogo"
-                        class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100 @error('Precio') border-red-500 @enderror">
-
-                    <p class="mt-1.5 text-xs leading-relaxed text-slate-500">
-                        Para precio fijo o “Desde”, el sistema usa el catálogo según el vehículo.
-                        Si es “A convenir”, escribe aquí el valor acordado.
-                    </p>
-
-                    @error('Precio')
-                        <p class="mt-1.5 text-xs text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
-
+                @error('agendaId')
+                    <p class="mt-1.5 text-xs font-medium text-red-600">{{ $message }}</p>
+                @enderror
             </div>
 
-            {{-- Botones --}}
-            <div class="mt-7 flex flex-wrap justify-end gap-2 border-t border-slate-100 pt-5">
+            <div>
+                <label for="vehiculoId" class="mb-1.5 block text-xs font-semibold text-slate-600">
+                    Vehículo de la cita
+                </label>
 
-                <a href="{{ route('agendaServicio.index') }}"
-                   class="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50">
-                    Cancelar
-                </a>
+                <select
+                    name="vehiculoId"
+                    id="vehiculoId"
+                    class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-700 outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/10 @error('vehiculoId') border-red-400 @enderror"
+                >
+                    <option value="">Seleccione un vehículo</option>
 
-                <button type="submit"
-                    class="rounded-lg bg-cyan-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2">
-                    Guardar
-                </button>
+                    @foreach($vehiculo as $v)
+                        <option value="{{ $v->id }}" @selected(old('vehiculoId') == $v->id)>
+                            {{ $v->placa }} · {{ $v->tipoVehiculo->nombre ?? 'Vehículo' }} · {{ $v->cliente->nombreCliente ?? 'Cliente' }}
+                        </option>
+                    @endforeach
+                </select>
 
+                @error('vehiculoId')
+                    <p class="mt-1.5 text-xs font-medium text-red-600">{{ $message }}</p>
+                @enderror
             </div>
 
-        </form>
+            <div>
+                <label for="servicioId" class="mb-1.5 block text-xs font-semibold text-slate-600">
+                    Servicio
+                </label>
 
-    </div>
+                <select
+                    name="servicioId"
+                    id="servicioId"
+                    class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-700 outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/10 @error('servicioId') border-red-400 @enderror"
+                >
+                    <option value="">Seleccione un servicio</option>
 
+                    @foreach($servicio as $s)
+                        <option value="{{ $s->id }}" {{ old('servicioId') == $s->id ? 'selected' : '' }}>
+                            {{ $s->nombre }}
+                        </option>
+                    @endforeach
+                </select>
+
+                @error('servicioId')
+                    <p class="mt-1.5 text-xs font-medium text-red-600">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div>
+                <label for="Precio" class="mb-1.5 block text-xs font-semibold text-slate-600">
+                    Precio acordado
+                </label>
+
+                <input
+                    type="number"
+                    step="0.01"
+                    min="0.01"
+                    max="99999999.99"
+                    name="Precio"
+                    id="Precio"
+                    value="{{ old('Precio') }}"
+                    placeholder="Déjalo vacío para precios del catálogo"
+                    class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/10 @error('Precio') border-red-400 @enderror"
+                >
+
+                <p class="mt-1.5 text-xs leading-relaxed text-slate-500">
+                    Para precio fijo o “Desde”, el sistema usa el catálogo según el vehículo.
+                    Si es “A convenir”, escribe aquí el valor acordado.
+                </p>
+
+                @error('Precio')
+                    <p class="mt-1.5 text-xs font-medium text-red-600">{{ $message }}</p>
+                @enderror
+            </div>
+        </div>
+
+        <div class="flex flex-col-reverse justify-end gap-3 border-t border-slate-100 bg-slate-50/70 px-6 py-4 sm:flex-row">
+            <a href="{{ route('agendaServicio.index') }}" class="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-100">Cancelar</a>
+
+            <button
+                type="submit"
+                class="inline-flex items-center justify-center rounded-xl bg-cyan-700 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-cyan-800 focus:outline-none focus:ring-4 focus:ring-cyan-500/20"
+            >
+                Guardar registro
+            </button>
+        </div>
+    </form>
 </div>
-
 @endsection

@@ -7,7 +7,6 @@
         :title="$esEdicion ? 'Editar cita' : 'Agendar nueva cita'"
         :description="$esEdicion ? 'Actualiza la información de la cita.' : 'Ingresa los datos para registrar una nueva cita.'"
         icon="calendar"
-        :back-url="route('agenda.index')"
     />
 
     <form action="{{ $esEdicion ? route('agenda.update', $agenda->id) : route('agenda.store') }}"
@@ -17,6 +16,12 @@
           class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
 
         @csrf
+
+        @foreach(request()->query() as $claveRetorno => $valorRetorno)
+            @if(in_array($claveRetorno, ['vista', 'mes', 'fecha', 'desde', 'hasta', 'buscar', 'estado', 'orden', 'page'], true) && is_scalar($valorRetorno))
+                <input type="hidden" name="_return_{{ $claveRetorno }}" value="{{ $valorRetorno }}">
+            @endif
+        @endforeach
 
         @if($esEdicion)
             @method('PUT')
