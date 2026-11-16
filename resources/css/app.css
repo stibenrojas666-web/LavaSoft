@@ -906,3 +906,100 @@ pre[class*='language-'] {
     margin-right: -60px !important;
   }
 }
+
+/* Tamaño común de acciones: referencia visual «Nuevo cliente». */
+body :is(a, button, input[type="button"], input[type="submit"], input[type="reset"]):is(
+  [class*="px-"],
+  [class*="-btn"],
+  [class*="btn-"],
+  [class*="button"]
+):not([aria-label]) {
+  display: inline-flex !important;
+  min-height: 38px !important;
+  height: auto !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 7px !important;
+  padding: 0 15px !important;
+  border-radius: 9px !important;
+  font-size: 12px !important;
+  line-height: 1.25 !important;
+}
+
+body :is(a, button, input[type="button"], input[type="submit"], input[type="reset"]):is(
+  [class*="px-"],
+  [class*="-btn"],
+  [class*="btn-"],
+  [class*="button"]
+):not([aria-label]) svg {
+  width: 16px !important;
+  height: 16px !important;
+  flex: 0 0 16px;
+}
+
+/* Las acciones solo con icono conservan su forma cuadrada y comparten medidas. */
+body :is(a, button)[class*="grid"][class*="h-"][class*="w-"] {
+  width: 38px !important;
+  min-width: 38px !important;
+  height: 38px !important;
+  min-height: 38px !important;
+  padding: 9px !important;
+}
+
+/* Acciones de editar/eliminar: misma apariencia de Clientes en todos los módulos. */
+body :is(a, button)[aria-label^="Editar"],
+body :is(a, button)[title^="Editar"] {
+  display: grid !important;
+  width: 36px !important;
+  min-width: 36px !important;
+  height: 36px !important;
+  min-height: 36px !important;
+  padding: 8px !important;
+  place-items: center !important;
+  border: 0 !important;
+  border-radius: 12px !important;
+  background: transparent !important;
+  color: #1d4ed8 !important;
+  transition: background-color 160ms ease, color 160ms ease !important;
+}
+
+body :is(a, button)[aria-label^="Editar"]:hover,
+body :is(a, button)[title^="Editar"]:hover {
+  background: #eff6ff !important;
+}
+
+body :is(a, button)[aria-label^="Eliminar"],
+body :is(a, button)[title^="Eliminar"] {
+  display: grid !important;
+  width: 36px !important;
+  min-width: 36px !important;
+  height: 36px !important;
+  min-height: 36px !important;
+  padding: 8px !important;
+  place-items: center !important;
+  border: 0 !important;
+  border-radius: 12px !important;
+  background: transparent !important;
+  color: #dc2626 !important;
+  transition: background-color 160ms ease, color 160ms ease !important;
+}
+
+body :is(a, button)[aria-label^="Eliminar"]:hover,
+body :is(a, button)[title^="Eliminar"]:hover {
+  background: #fef2f2 !important;
+}
+
+body :is(a, button)[aria-label^="Editar"] svg,
+body :is(a, button)[title^="Editar"] svg,
+body :is(a, button)[aria-label^="Eliminar"] svg,
+body :is(a, button)[title^="Eliminar"] svg {
+  width: 16px !important;
+  height: 16px !important;
+}
+
+body :is(a, button)[aria-label^="Eliminar"]:disabled,
+body :is(a, button)[title^="Eliminar"]:disabled {
+  cursor: not-allowed !important;
+  background: transparent !important;
+  color: #cbd5e1 !important;
+}
