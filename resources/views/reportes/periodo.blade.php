@@ -6,53 +6,155 @@
 @push('styles')
     <style>
         @media print {
-            body * { visibility: hidden !important; }
-            #reporte-print, #reporte-print * { visibility: visible !important; }
-            #reporte-print { position: absolute; inset: 0 auto auto 0; width: 100%; max-width: none; }
-            .no-print { display: none !important; }
-            body, #reporte-print { background: #fff !important; color: #111827 !important; }
+            body * {
+                visibility: hidden !important;
+            }
+
+            #reporte-print,
+            #reporte-print * {
+                visibility: visible !important;
+            }
+
+            #reporte-print {
+                position: absolute;
+                inset: 0 auto auto 0;
+                width: 100%;
+                max-width: none;
+                padding: 0;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            body,
+            #reporte-print {
+                background: #fff !important;
+                color: #111827 !important;
+            }
+
+            .reporte-card {
+                break-inside: avoid;
+                box-shadow: none !important;
+            }
+
+            canvas {
+                max-width: 100% !important;
+            }
         }
     </style>
 @endpush
 
 @section('content')
-    <div id="reporte-print" class="space-y-6">
-        <div class="no-print flex flex-wrap items-end justify-between gap-4">
-            <form method="GET" action="{{ route('reportes.periodo') }}" class="flex flex-wrap items-end gap-3">
-                <x-input name="desde" label="Desde" type="date" :value="$desde" />
-                <x-input name="hasta" label="Hasta" type="date" :value="$hasta" />
-                <x-button variant="cyan" type="submit">Consultar</x-button>
+<div id="reporte-print" class="space-y-6">
+
+    {{-- Encabezado y filtros --}}
+    <div class="no-print flex flex-col gap-5 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm xl:flex-row xl:items-end xl:justify-between">
+        <div>
+            <h2 class="text-lg font-bold text-slate-900">Consultar reporte por período</h2>
+            <p class="mt-1 text-sm text-slate-500">
+                Selecciona las fechas para consultar los resultados.
+            </p>
+
+            <form method="GET" action="{{ route('reportes.periodo') }}" class="mt-4 flex flex-wrap items-end gap-3">
+                <x-input
+                    name="desde"
+                    label="Desde"
+                    type="date"
+                    :value="$desde"
+                />
+
+                <x-input
+                    name="hasta"
+                    label="Hasta"
+                    type="date"
+                    :value="$hasta"
+                />
+
+                <x-button variant="cyan" type="submit">
+                    Consultar
+                </x-button>
             </form>
-            <div class="flex flex-wrap gap-2">
-                <x-button variant="secondary" :href="route('reportes.periodo', $rangoSemana)">Esta semana</x-button>
-                <x-button variant="secondary" :href="route('reportes.periodo', $rangoMes)">Este mes</x-button>
-                <x-button variant="secondary" type="button" onclick="window.print()">Imprimir / Guardar como PDF</x-button>
-            </div>
         </div>
 
-        <x-card title="Resumen del período" subtitle="{{ \Illuminate\Support\Carbon::parse($desde)->format('d/m/Y') }} al {{ \Illuminate\Support\Carbon::parse($hasta)->format('d/m/Y') }}">
+        <div class="flex flex-wrap gap-2">
+            <x-button variant="secondary" :href="route('reportes.periodo', $rangoSemana)">
+                Esta semana
+            </x-button>
+
+            <x-button variant="secondary" :href="route('reportes.periodo', $rangoMes)">
+                Este mes
+            </x-button>
+
+            <x-button variant="secondary" type="button" onclick="window.print()">
+                Imprimir / Guardar como PDF
+            </x-button>
+        </div>
+    </div>
+
+    {{-- Resumen --}}
+    <div class="reporte-card">
+        <x-card
+            title="Resumen del período"
+            subtitle="{{ \Illuminate\Support\Carbon::parse($desde)->format('d/m/Y') }} al {{ \Illuminate\Support\Carbon::parse($hasta)->format('d/m/Y') }}"
+        >
             <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
-                <x-stat-card label="Citas atendidas" :value="number_format($citasAtendidas)" icon="calendar" />
-                <x-stat-card label="Recaudado por fecha de pago" :value="'$' . number_format($totalRecaudado, 0, ',', '.')" icon="tag" />
-                <x-stat-card label="Valor de servicios terminados" :value="'$' . number_format($totalServicios, 0, ',', '.')" icon="chart" />
-                <x-stat-card label="Comisiones del período":value="'$' . number_format($totalComisiones, 0, ',', '.')"icon="tag" />
-                <x-stat-card label="Recaudado después de comisiones":value="'$' . number_format((float) $ingresoDespuesComisiones, 0, ',', '.')"icon="wallet"color="emerald" />
+                <x-stat-card
+                    label="Citas atendidas"
+                    :value="number_format($citasAtendidas)"
+                    icon="calendar"
+                />
+
+                <x-stat-card
+                    label="Recaudado por fecha de pago"
+                    :value="'$' . number_format($totalRecaudado, 0, ',', '.')"
+                    icon="tag"
+                />
+
+                <x-stat-card
+                    label="Valor de servicios terminados"
+                    :value="'$' . number_format($totalServicios, 0, ',', '.')"
+                    icon="chart"
+                />
+
+                <x-stat-card
+                    label="Comisiones del período"
+                    :value="'$' . number_format($totalComisiones, 0, ',', '.')"
+                    icon="tag"
+                />
+
+                <x-stat-card
+                    label="Recaudado después de comisiones"
+                    :value="'$' . number_format((float) $ingresoDespuesComisiones, 0, ',', '.')"
+                    icon="wallet"
+                    color="emerald"
+                />
             </div>
         </x-card>
+    </div>
 
-        <x-card title="Comisiones por empleado" subtitle="Comisiones calculadas según cada pago registrado">
+    {{-- Comisiones --}}
+    <div class="reporte-card">
+        <x-card
+            title="Comisiones por empleado"
+            subtitle="Comisiones calculadas según cada pago registrado"
+        >
             <x-table :headers="['Empleado', 'Pagos', 'Comisión']">
                 @forelse($comisionesPorEmpleado as $fila)
                     <tr>
                         <td>
-                            {{ $fila->empleado
-                                ? $fila->empleado->nombre . ' ' . $fila->empleado->apellido
-                                : 'Empleado no disponible' }}
+                            <span class="font-semibold text-slate-800">
+                                {{ $fila->empleado
+                                    ? $fila->empleado->nombre . ' ' . $fila->empleado->apellido
+                                    : 'Empleado no disponible' }}
+                            </span>
                         </td>
+
                         <td class="text-right">
                             {{ number_format((int) $fila->cantidadPagos) }}
                         </td>
-                        <td class="text-right whitespace-nowrap">
+
+                        <td class="whitespace-nowrap text-right font-semibold">
                             ${{ number_format((float) $fila->totalComision, 0, ',', '.') }}
                         </td>
                     </tr>
@@ -65,27 +167,41 @@
                 @endforelse
             </x-table>
         </x-card>
+    </div>
 
-        <x-card title="Mejor empleado" subtitle="Según el valor generado en servicios terminados">
+    {{-- Mejor empleado --}}
+    <div class="reporte-card">
+        <x-card
+            title="Mejor empleado"
+            subtitle="Según el valor generado en servicios terminados"
+        >
             @if($mejorEmpleado)
                 <div class="rounded-xl border border-cyan-100 bg-cyan-50/50 p-5">
-                    <p class="text-sm text-slate-500">Empleado destacado del período</p>
+                    <p class="text-sm font-medium text-slate-500">
+                        Empleado destacado del período
+                    </p>
 
                     <h3 class="mt-1 text-xl font-bold text-cyan-900">
                         {{ $mejorEmpleado->nombre }} {{ $mejorEmpleado->apellido }}
                     </h3>
 
-                    <div class="mt-4 grid gap-4 sm:grid-cols-2">
-                        <div>
-                            <p class="text-xs text-slate-500">Valor generado</p>
-                            <p class="text-lg font-bold text-slate-800">
+                    <div class="mt-5 grid gap-4 sm:grid-cols-2">
+                        <div class="rounded-xl border border-cyan-100 bg-white p-4">
+                            <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                                Valor generado
+                            </p>
+
+                            <p class="mt-2 text-xl font-extrabold text-slate-900">
                                 ${{ number_format((float) $mejorEmpleado->totalGenerado, 0, ',', '.') }}
                             </p>
                         </div>
 
-                        <div>
-                            <p class="text-xs text-slate-500">Servicios realizados</p>
-                            <p class="text-lg font-bold text-slate-800">
+                        <div class="rounded-xl border border-cyan-100 bg-white p-4">
+                            <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                                Servicios realizados
+                            </p>
+
+                            <p class="mt-2 text-xl font-extrabold text-slate-900">
                                 {{ number_format((int) $mejorEmpleado->cantidadServicios) }}
                             </p>
                         </div>
@@ -97,32 +213,67 @@
                 </p>
             @endif
         </x-card>
+    </div>
 
-        <x-card title="Valor generado por servicio" subtitle="Ingresos asociados a citas terminadas dentro del período">
+    {{-- Gráfico --}}
+    <div class="reporte-card">
+        <x-card
+            title="Valor generado por servicio"
+            subtitle="Ingresos asociados a citas terminadas dentro del período"
+        >
             @if($servicios->isNotEmpty())
                 <div class="h-80">
-                    <canvas id="grafico-servicios-periodo" role="img" aria-label="Gráfico del valor generado por servicio en el período"></canvas>
+                    <canvas
+                        id="grafico-servicios-periodo"
+                        role="img"
+                        aria-label="Gráfico del valor generado por servicio en el período"
+                    ></canvas>
                 </div>
             @else
-                <p class="py-10 text-center text-sm text-slate-500">No hay servicios de citas terminadas para mostrar en este período.</p>
+                <p class="py-10 text-center text-sm text-slate-500">
+                    No hay servicios de citas terminadas para mostrar en este período.
+                </p>
             @endif
         </x-card>
+    </div>
 
-        <x-card title="Totales por servicio">
+    {{-- Totales por servicio --}}
+    <div class="reporte-card">
+        <x-card
+            title="Totales por servicio"
+            subtitle="Cantidad e importe de los servicios realizados"
+        >
             <x-table :headers="['Servicio', 'Cantidad', 'Total']">
                 @forelse($servicios as $fila)
                     <tr>
-                        <td>{{ $fila->servicio?->nombre ?? 'Servicio eliminado' }}</td>
-                        <td class="text-right">{{ number_format((int) $fila->cantidad) }}</td>
-                        <td class="text-right whitespace-nowrap">${{ number_format((float) $fila->total, 0, ',', '.') }}</td>
+                        <td class="font-semibold text-slate-800">
+                            {{ $fila->servicio?->nombre ?? 'Servicio eliminado' }}
+                        </td>
+
+                        <td class="text-right">
+                            {{ number_format((int) $fila->cantidad) }}
+                        </td>
+
+                        <td class="whitespace-nowrap text-right font-semibold">
+                            ${{ number_format((float) $fila->total, 0, ',', '.') }}
+                        </td>
                     </tr>
                 @empty
-                    <tr><td colspan="3" class="py-8 text-center text-slate-500">No hay servicios en citas terminadas dentro del rango.</td></tr>
+                    <tr>
+                        <td colspan="3" class="py-8 text-center text-slate-500">
+                            No hay servicios en citas terminadas dentro del rango.
+                        </td>
+                    </tr>
                 @endforelse
             </x-table>
-            <p class="mt-4 text-xs text-slate-500">Los totales por servicio se calculan con los precios guardados en las citas terminadas según la fecha de la cita.</p>
+
+            <p class="mt-4 text-xs text-slate-500">
+                Los totales por servicio se calculan con los precios guardados en las citas terminadas según la fecha de la cita.
+            </p>
         </x-card>
     </div>
+
+</div>
 @endsection
 
 @push('scripts')
@@ -131,9 +282,14 @@
             document.addEventListener('DOMContentLoaded', () => {
                 if (typeof Chart === 'undefined') return;
 
-                const formatoPesos = valor => '$' + Number(valor).toLocaleString('es-CO');
+                const elemento = document.getElementById('grafico-servicios-periodo');
 
-                new Chart(document.getElementById('grafico-servicios-periodo'), {
+                if (!elemento) return;
+
+                const formatoPesos = valor =>
+                    '$' + Number(valor).toLocaleString('es-CO');
+
+                new Chart(elemento, {
                     type: 'bar',
                     data: {
                         labels: @json($serviciosLabels),
@@ -151,29 +307,48 @@
                         responsive: true,
                         maintainAspectRatio: false,
                         plugins: {
-                            legend: { display: false },
+                            legend: {
+                                display: false
+                            },
                             tooltip: {
                                 backgroundColor: '#0f172a',
                                 padding: 12,
                                 displayColors: false,
-                                callbacks: { label: contexto => formatoPesos(contexto.parsed.x) }
+                                callbacks: {
+                                    label: contexto => formatoPesos(contexto.parsed.x)
+                                }
                             }
                         },
                         scales: {
                             x: {
                                 beginAtZero: true,
-                                border: { display: false },
-                                grid: { color: '#e2e8f0' },
+                                border: {
+                                    display: false
+                                },
+                                grid: {
+                                    color: '#e2e8f0'
+                                },
                                 ticks: {
                                     color: '#64748b',
-                                    font: { family: 'Inter' },
+                                    font: {
+                                        family: 'Inter'
+                                    },
                                     callback: valor => formatoPesos(valor)
                                 }
                             },
                             y: {
-                                border: { display: false },
-                                grid: { display: false },
-                                ticks: { color: '#64748b', font: { family: 'Inter' } }
+                                border: {
+                                    display: false
+                                },
+                                grid: {
+                                    display: false
+                                },
+                                ticks: {
+                                    color: '#64748b',
+                                    font: {
+                                        family: 'Inter'
+                                    }
+                                }
                             }
                         }
                     }
