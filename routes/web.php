@@ -23,6 +23,9 @@ Route::get('factura/{agendaId}', [PagoController::class, 'facturaPublica'])
     ->name('factura.publica')
     ->middleware(['signed', NoCacheHeaders::class]);
 
+Route::get('lavadero/logo', [ConfiguracionLavaderoController::class, 'logo'])
+    ->name('lavadero.logo');
+
 Route::middleware(['auth', NoCacheHeaders::class])->group(function () {
 
     Route::get('/dashboard', [DashboardController::class, 'index'])

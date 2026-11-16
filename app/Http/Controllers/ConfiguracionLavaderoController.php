@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ConfiguracionLavaderoRequest;
 use App\Services\ConfiguracionLavaderoService;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class ConfiguracionLavaderoController extends Controller
 {
@@ -16,6 +18,19 @@ class ConfiguracionLavaderoController extends Controller
     public function edit(): View
     {
         return view('configuracion.edit', ['configuracion' => $this->service->obtener()]);
+    }
+
+    public function logo(): BinaryFileResponse
+    {
+        $configuracion = $this->service->obtener();
+        $ruta = $configuracion->logo_path;
+        $disco = Storage::disk('public');
+
+        abort_unless($configuracion->mostrar_logo && $ruta && $disco->exists($ruta), 404);
+
+        return response()->file($disco->path($ruta), [
+            'Cache-Control' => 'public, max-age=0, must-revalidate',
+        ]);
     }
 
     public function update(ConfiguracionLavaderoRequest $configuracionLavaderoRequest): RedirectResponse

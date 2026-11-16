@@ -61,9 +61,20 @@ class AgendaController extends Controller
      */
     public function store(AgendaStoreRequest $agendaStoreRequest)
     {
-        $this->agendaService->keep($agendaStoreRequest->validated());
+        $datos = $agendaStoreRequest->validated();
+        $this->agendaService->keep($datos);
 
-        return redirect()->route('agenda.index')->with('success', 'Cita agendada correctamente.');
+        $parametrosRetorno = $this->parametrosRetorno($agendaStoreRequest);
+        if (($parametrosRetorno['vista'] ?? null) !== 'lista') {
+            $fechaCita = \Carbon\Carbon::parse($datos['fecha']);
+            $parametrosRetorno = array_merge($parametrosRetorno, [
+                'vista' => 'calendario',
+                'mes' => $fechaCita->format('Y-m'),
+                'fecha' => $fechaCita->toDateString(),
+            ]);
+        }
+
+        return redirect()->route('agenda.index', $parametrosRetorno)->with('success', 'Cita agendada correctamente.');
     }
 
     /**
@@ -110,20 +121,52 @@ public function empleadosDisponibles(EmpleadosDisponiblesRequest $empleadosDispo
      */
     public function update(int $id, AgendaUpdateRequest $agendaUpdateRequest)
     {
-        $this->agendaService->update($id, $agendaUpdateRequest->validated());
+        $datos = $agendaUpdateRequest->validated();
+        $this->agendaService->update($id, $datos);
 
-        return redirect()->route('agenda.index')->with('success', 'Cita actualizada correctamente.');
+        $parametrosRetorno = $this->parametrosRetorno($agendaUpdateRequest);
+        if (($parametrosRetorno['vista'] ?? null) !== 'lista') {
+            $fechaCita = \Carbon\Carbon::parse($datos['fecha']);
+            $parametrosRetorno = array_merge($parametrosRetorno, [
+                'vista' => 'calendario',
+                'mes' => $fechaCita->format('Y-m'),
+                'fecha' => $fechaCita->toDateString(),
+            ]);
+        }
+
+        return redirect()->route('agenda.index', $parametrosRetorno)->with('success', 'Cita actualizada correctamente.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(int $id)
+    public function destroy(\Illuminate\Http\Request $request, int $id)
     {
+        $parametrosRetorno = $this->parametrosRetorno($request);
+
         if (!$this->agendaService->delete($id)) {
-            return redirect()->route('agenda.index')->with('error', 'No se puede eliminar la cita porque ya tiene un pago registrado.');
+            return redirect()->route('agenda.index', $parametrosRetorno)->with('error', 'No se puede eliminar la cita porque ya tiene un pago registrado.');
         }
 
-        return redirect()->route('agenda.index')->with('success', 'Cita eliminada correctamente.');
+        return redirect()->route('agenda.index', $parametrosRetorno)->with('success', 'Cita eliminada correctamente.');
+    }
+
+    private function parametrosRetorno(\Illuminate\Http\Request $request): array
+    {
+        $permitidos = ['vista', 'mes', 'fecha', 'desde', 'hasta', 'buscar', 'estado', 'orden', 'page'];
+        $parametros = [];
+
+        foreach ($permitidos as $clave) {
+            $valor = $request->input('_return_' . $clave, $request->query($clave));
+            if (is_scalar($valor) && (string) $valor !== '') {
+                $parametros[$clave] = (string) $valor;
+            }
+        }
+
+        if (isset($parametros['vista']) && ! in_array($parametros['vista'], ['lista', 'calendario'], true)) {
+            unset($parametros['vista']);
+        }
+
+        return $parametros;
     }
 }

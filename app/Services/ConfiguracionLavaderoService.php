@@ -50,7 +50,7 @@ class ConfiguracionLavaderoService
 
         if ($logo !== null && $rutaNueva === false) {
             throw ValidationException::withMessages([
-                'logo' => 'No se pudo guardar el logo. Revisa que el archivo pese menos de 2 MB e inténtalo de nuevo.',
+                'logo' => 'No se pudo guardar el logo. Revisa que el archivo pese menos de 10 MB e inténtalo de nuevo.',
             ]);
         }
 
