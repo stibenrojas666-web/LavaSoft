@@ -9,10 +9,21 @@ class TurnoService
 {
     private TurnoRepository $turnoRepository;
     
-    public function __construct(TurnoRepository $turnoRepository)
+    public function __construct(TurnoRepository $turnoRepository, private EmpleadoService $empleadoService)
 {
     $this->turnoRepository = $turnoRepository;    
 }
+
+    public function prepararFormulario(?int $turnoId = null): array
+    {
+        $empleados = $this->empleadoService->listarTodo();
+        $datos = compact('empleados');
+        if ($turnoId !== null) {
+            $datos['turno'] = $this->buscarPorId($turnoId);
+        }
+
+        return $datos;
+    }
 
     public function listarTodo(){
         return $this->turnoRepository->listarTodo();

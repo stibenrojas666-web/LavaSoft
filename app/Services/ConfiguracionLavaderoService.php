@@ -39,6 +39,18 @@ class ConfiguracionLavaderoService
         return (new ConfiguracionLavadero())->forceFill($atributos);
     }
 
+    public function rutaLogoVisible(): ?string
+    {
+        $configuracion = $this->obtener();
+        $disco = Storage::disk('public');
+
+        if (! $configuracion->mostrar_logo || ! $configuracion->logo_path || ! $disco->exists($configuracion->logo_path)) {
+            return null;
+        }
+
+        return $disco->path($configuracion->logo_path);
+    }
+
     public function actualizar(array $datos, ?UploadedFile $logo = null): ConfiguracionLavadero
     {
         unset($datos['logo']);

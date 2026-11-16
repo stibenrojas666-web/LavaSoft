@@ -49,6 +49,15 @@ class CuentaService
         return $this->usuarioRepository->buscarPorId($id)->load('rolesConInactivos');
     }
 
+    public function prepararFormulario(int|string|null $id = null, ?array $rolesAnteriores = null): array
+    {
+        $usuario = $id === null ? null : $this->buscar($id);
+        $roles = $this->listarRoles();
+        $seleccionados = $rolesAnteriores ?? ($usuario ? $this->rolesSeleccionados($usuario) : []);
+
+        return compact('usuario', 'roles', 'seleccionados');
+    }
+
     public function rolesSeleccionados(Authenticatable $usuario): array
     {
         return $usuario->rolesConInactivos->pluck('name')->all();

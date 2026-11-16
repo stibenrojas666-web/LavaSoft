@@ -7,8 +7,30 @@ use Illuminate\Validation\ValidationException;
 
 class VehiculoService
 {
-    public function __construct(private VehiculoRepositoryInterface $vehiculoRepository)
+    public function __construct(
+        private VehiculoRepositoryInterface $vehiculoRepository,
+        private ClienteService $clienteService,
+        private TipoVehiculoService $tipoVehiculoService
+    ) {
+    }
+
+    public function prepararFormulario(?int $vehiculoId = null): array
     {
+        $cliente = $this->clienteService->listarTodo();
+        $tipoVehiculo = $this->tipoVehiculoService->listarTodo();
+        $datos = compact('cliente', 'tipoVehiculo');
+        if ($vehiculoId !== null) {
+            $datos['vehiculo'] = $this->findById($vehiculoId);
+        }
+
+        return $datos;
+    }
+
+    public function prepararIndiceConOpciones(array $datos): array
+    {
+        return $this->prepararListado($datos) + [
+            'tipoVehiculosOpciones' => $this->tipoVehiculoService->opcionesParaFiltro(),
+        ];
     }
 
     public function getAll()

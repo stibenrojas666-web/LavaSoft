@@ -102,6 +102,16 @@ class PermisoService
     $this->limpiarCache();
 }
 
+    public function actualizarPorId(int $id, array $datos): void
+    {
+        $this->actualizar($this->permisoRepository->buscarPorId($id), $datos);
+    }
+
+    public function eliminarPorId(int $id): void
+    {
+        $this->eliminar($this->permisoRepository->buscarPorId($id));
+    }
+
     public function eliminar(Permission $permiso): void
 {
     if ($permiso->guard_name !== config('seguridad.guard')) {

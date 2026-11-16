@@ -9,6 +9,11 @@ use Spatie\Permission\Models\Role;
 use App\Support\TextoBusqueda;
 
 class RolRepository implements RolRepositoryInterface {
+    public function buscarPorId(int $id): Role
+    {
+        return Role::query()->findOrFail($id);
+    }
+
     public function listar(): Collection
     {
         return Role::query()

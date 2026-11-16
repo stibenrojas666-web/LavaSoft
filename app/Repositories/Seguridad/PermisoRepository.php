@@ -10,6 +10,11 @@ use Spatie\Permission\Models\Permission;
 use App\Support\TextoBusqueda;
 
 class PermisoRepository implements PermisoRepositoryInterface {
+    public function buscarPorId(int $id): Permission
+    {
+        return Permission::query()->where('guard_name', config('seguridad.guard'))->findOrFail($id);
+    }
+
     public function listar(): Collection
     {
         return Permission::query()

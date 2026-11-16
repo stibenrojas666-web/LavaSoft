@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ConfiguracionLavaderoRequest;
 use App\Services\ConfiguracionLavaderoService;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
@@ -22,13 +21,10 @@ class ConfiguracionLavaderoController extends Controller
 
     public function logo(): BinaryFileResponse
     {
-        $configuracion = $this->service->obtener();
-        $ruta = $configuracion->logo_path;
-        $disco = Storage::disk('public');
+        $ruta = $this->service->rutaLogoVisible();
+        abort_unless($ruta, 404);
 
-        abort_unless($configuracion->mostrar_logo && $ruta && $disco->exists($ruta), 404);
-
-        return response()->file($disco->path($ruta), [
+        return response()->file($ruta, [
             'Cache-Control' => 'public, max-age=0, must-revalidate',
         ]);
     }

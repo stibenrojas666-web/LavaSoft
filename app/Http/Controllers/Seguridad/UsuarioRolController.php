@@ -17,10 +17,7 @@ class UsuarioRolController extends Controller
 
     public function index(): View
     {
-        return view('seguridad.usuarios.index', [
-            'usuarios' => $this->rolService->usuariosConRolesParaListado(auth()->user()),
-            'roles' => $this->rolService->listar(),
-        ]);
+        return view('seguridad.usuarios.index', $this->rolService->prepararAsignacionRoles(auth()->user()));
     }
 
     public function update(AsignacionRolesRequest $asignacionRolesRequest): RedirectResponse

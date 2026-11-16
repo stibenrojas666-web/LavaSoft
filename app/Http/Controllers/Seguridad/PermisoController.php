@@ -11,7 +11,6 @@ use App\Http\Requests\BusquedaIndexRequest;
 use Exception;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
-use Spatie\Permission\Models\Permission;
 
 class PermisoController extends Controller
 {
@@ -41,10 +40,10 @@ class PermisoController extends Controller
             ->with('success', 'Módulo listo: ' . $total . ' permisos estándar creados o actualizados.');
     }
 
-    public function update(PermisoUpdateRequest $permisoUpdateRequest, Permission $permiso): RedirectResponse
+    public function update(PermisoUpdateRequest $permisoUpdateRequest, int $permiso): RedirectResponse
     {
         try {
-            $this->permisoService->actualizar($permiso, $permisoUpdateRequest->validated());
+            $this->permisoService->actualizarPorId($permiso, $permisoUpdateRequest->validated());
         } catch (Exception $e) {
             return back()->with('error', $e->getMessage());
         }
@@ -52,10 +51,10 @@ class PermisoController extends Controller
         return redirect()->route('seguridad.permisos.index')->with('success', 'Permiso actualizado correctamente.');
     }
 
-    public function destroy(Permission $permiso): RedirectResponse
+    public function destroy(int $permiso): RedirectResponse
     {
         try {
-            $this->permisoService->eliminar($permiso);
+            $this->permisoService->eliminarPorId($permiso);
         } catch (Exception $e) {
             return back()->with('error', $e->getMessage());
         }
