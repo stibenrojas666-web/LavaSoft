@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class tipoVehiculo extends Model
+class TipoVehiculo extends Model
 {
+    use HasFactory;
+
     protected $table = 'tipo_vehiculos';
 
     protected $fillable = [
@@ -14,6 +17,6 @@ class tipoVehiculo extends Model
 
     public function vehiculos()
     {
-        return $this->hasMany(vehiculo::class, 'tipoVehiculoId');
+        return $this->hasMany(Vehiculo::class, 'tipoVehiculoId');
     }
 }

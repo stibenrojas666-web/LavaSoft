@@ -4,8 +4,9 @@ namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
-class clienteUpdateRequest extends FormRequest
+class ClienteUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,11 +26,15 @@ class clienteUpdateRequest extends FormRequest
         return [
             'nombreCliente' => 'required|string|max:100',
             'apellidoCliente' => 'required|string|max:100',
-            'telefonoCliente' => 'required|string|max:20',
-            'emailCliente' => 'required|string|max:100'
+            'telefonoCliente' => ['required', 'regex:/^[0-9]{7,15}$/'],
+            'emailCliente' => [
+                'required', 'email', 'max:150',
+                Rule::unique('clientes', 'emailCliente')->ignore($this->route('cliente')),
+            ],
         ];
 
     }
+
     public function messages(): array
     {
         return [
@@ -42,6 +47,7 @@ class clienteUpdateRequest extends FormRequest
             'telefonoCliente.required' => 'El teléfono del cliente es obligatorio.',
             'telefonoCliente.string' => 'El teléfono del cliente debe ser una cadena de texto.',
             'telefonoCliente.max' => 'El teléfono del cliente no debe exceder los 20 caracteres.',
+            'telefonoCliente.regex' => 'El teléfono debe contener solo números (entre 7 y 15 dígitos).',
             'emailCliente.required' => 'El correo electrónico del cliente es obligatorio.',
             'emailCliente.email' => 'El correo electrónico del cliente debe ser una dirección de correo válida.',
             'emailCliente.max' => 'El correo electrónico del cliente no debe exceder los 100 caracteres.',

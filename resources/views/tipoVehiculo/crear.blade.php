@@ -1,42 +1,58 @@
 @extends('layouts.app')
 
-@section('title')
-    Crear Tipo de Vehiculo
-@endsection
+@section('title', 'Crear tipo de vehículo')
+@section('page-title', 'Registrar tipo de vehículo')
 
 @section('content')
+<div class="mx-auto max-w-5xl px-4 py-6">
+    <x-module-header
+        title="Registrar tipo de vehículo"
+        description="Agrega una nueva categoría al catálogo de vehículos."
+        icon="box"
+    />
 
-<x-card>
-    <h1 class="text-3xl font-bold mb-6 text-cyan-700">
-        🚙 Registrar Nuevo Tipo de Vehículo
-    </h1>
-
-    <form action="{{ route('tipoVehiculo.store') }}" method="POST">
+    <form
+        action="{{ route('tipoVehiculo.store') }}"
+        method="POST"
+        novalidate
+        class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
+    >
         @csrf
 
-        {{-- nombre --}}
-        <div class="mb-4">
-            <label for="nombre" class="block text-gray-700 font-semibold mb-1">Nombre</label>
-            <input type="text" name="nombre" id="nombre"
-                   value="{{ old('nombre') }}"
-                   class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-400
-                          @error('nombre') border-red-500 @enderror">
+        <div class="border-b border-slate-100 px-6 py-5">
+            <div class="flex items-center gap-3">
+                <span class="grid h-10 w-10 place-items-center rounded-xl bg-cyan-50 text-lg">
+                    🚙
+                </span>
+
+                <div>
+                    <h2 class="text-sm font-bold text-slate-800">Información del tipo</h2>
+                    <p class="mt-0.5 text-xs text-slate-500">Nombre de la categoría del vehículo.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="px-6 py-6">
+            <label for="nombre" class="mb-1.5 block text-xs font-semibold text-slate-600">
+                Nombre del tipo de vehículo
+            </label>
+
+            <input
+                type="text"
+                name="nombre"
+                id="nombre"
+                value="{{ old('nombre') }}"
+                placeholder="Ej. Automóvil, motocicleta..."
+                autocomplete="off"
+                class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/10 @error('nombre') border-red-400 @enderror"
+            >
+
             @error('nombre')
-                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                <p class="mt-1.5 text-xs font-medium text-red-600">{{ $message }}</p>
             @enderror
         </div>
 
-        <div class="flex justify-end gap-2">
-            <a href="{{ route('tipoVehiculo.index') }}"
-                class="bg-gray-500 hover:bg-gray-700 text-white font-semibold px-4 py-2 rounded-lg shadow">
-                Cancelar
-            </a>
-            <button type="submit"
-                class="bg-cyan-600 hover:bg-cyan-800 text-white font-semibold px-4 py-2 rounded-lg shadow">
-                💾 Guardar
-            </button>
-        </div>
+        <x-form-actions :cancel-url="route('tipoVehiculo.index')" save-label="Guardar tipo" />
     </form>
-</x-card>
-
+</div>
 @endsection

@@ -2,28 +2,28 @@
 
 namespace App\Http\Controllers;
 
-
-use App\Models\tipoVehiculo;
-use Illuminate\Http\Request;
-use App\Services\tipoVehiculoService;
-use App\Http\Requests\tipoVehiculoStoreRequest;
-use App\Http\Requests\tipoVehiculoUpdateRequest;
+use App\Http\Requests\BusquedaIndexRequest;
+use App\Http\Requests\TipoVehiculoStoreRequest;
+use App\Http\Requests\TipoVehiculoUpdateRequest;
+use App\Services\TipoVehiculoService;
 
 class TipoVehiculoController extends Controller
 {
-    private tipoVehiculoService $tipoVehiculoService;
+    private TipoVehiculoService $tipoVehiculoService;
 
-    public function __construct(tipoVehiculoService $tipoVehiculoService)
+    public function __construct(TipoVehiculoService $tipoVehiculoService)
     {
         $this->tipoVehiculoService = $tipoVehiculoService;
     }
+
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(BusquedaIndexRequest $busquedaIndexRequest)
     {
-        $tipoVehiculos = $this->tipoVehiculoService->listarTodo();
-        return view('tipoVehiculo.index', compact('tipoVehiculos'));
+        return view('tipoVehiculo.index', $this->tipoVehiculoService->prepararListado(
+            $busquedaIndexRequest->validated()
+        ));
     }
 
     /**
@@ -37,12 +37,13 @@ class TipoVehiculoController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(tipoVehiculoStoreRequest $request)
+    public function store(TipoVehiculoStoreRequest $tipoVehiculoStoreRequest)
     {
-        $datos = $request->validated();
-        $this->tipoVehiculoService->guardar($datos);
+        $this->tipoVehiculoService->guardar($tipoVehiculoStoreRequest->validated());
+
         return redirect()->route('tipoVehiculo.index')->with('success', 'tipoVehiculo creado correctamente.');
     }
+
     /**
      * Display the specified resource.
      */
@@ -57,15 +58,17 @@ class TipoVehiculoController extends Controller
     public function edit(int $id)
     {
         $tipoVehiculo = $this->tipoVehiculoService->buscarPorId($id);
-        return view('tipoVehiculo.editar',compact('tipoVehiculo'));
+
+        return view('tipoVehiculo.editar', compact('tipoVehiculo'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(tipoVehiculoUpdateRequest $request, int $id)
+    public function update(TipoVehiculoUpdateRequest $tipoVehiculoUpdateRequest, int $id)
     {
-        $this->tipoVehiculoService->actualizar($id, $request->validated());
+        $this->tipoVehiculoService->actualizar($id, $tipoVehiculoUpdateRequest->validated());
+
         return redirect()->route('tipoVehiculo.index')->with('success', 'tipoVehiculo actualizado correctamente.');
     }
 
@@ -74,7 +77,10 @@ class TipoVehiculoController extends Controller
      */
     public function destroy(int $id)
     {
-        $this->tipoVehiculoService->eliminar($id);
+        if (! $this->tipoVehiculoService->eliminar($id)) {
+            return redirect()->route('tipoVehiculo.index')->with('error', 'No se puede eliminar el tipo porque tiene vehículos o precios de servicio relacionados.');
+        }
+
         return redirect()->route('tipoVehiculo.index')->with('success', 'tipoVehiculo eliminado Correctamente.');
     }
 }

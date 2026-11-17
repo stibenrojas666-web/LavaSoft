@@ -2,34 +2,80 @@
 
 namespace App\Repositories;
 
-use App\Models\pago;
+use App\Models\Agenda;
+use App\Models\AgendaServicios;
+use App\Models\Pago;
+use App\Repositories\Contracts\PagoRepositoryInterface;
+use App\Support\TextoBusqueda;
 
-class PagoRepository
+class PagoRepository implements PagoRepositoryInterface
 {
-    public function getAll()
+    public function historialPagos(string $texto = '', array $filtros = [])
     {
-        return pago::with('agenda.cliente')->get();
+        $consulta = TextoBusqueda::aplicar(Pago::query()
+            ->select(['id', 'agendaId', 'Monto', 'MetodoPago', 'FechaPago', 'RequerirFactura'])
+            ->with([
+                'agenda:id,clienteId,empleadoId,fecha,hora,estado',
+                'agenda.cliente:id,nombreCliente,apellidoCliente,telefonoCliente',
+                'agenda.empleado:id,nombre,apellido',
+                'agenda.agendaServicios:id,agendaId,vehiculoId,servicioId,Precio',
+                'agenda.agendaServicios.vehiculo:id,tipoVehiculoId,placa',
+                'agenda.agendaServicios.vehiculo.tipoVehiculo:id,nombre',
+                'agenda.agendaServicios.servicio:id,nombre',
+            ]), $texto, fn ($coincidencias, $termino) => $coincidencias
+            ->where('MetodoPago', 'like', $termino)
+            ->orWhere('Monto', 'like', $termino)
+            ->orWhereHas('agenda', fn ($agenda) => $agenda->where('id', 'like', $termino)
+                ->orWhere('fecha', 'like', $termino)
+                ->orWhere('hora', 'like', $termino)
+                ->orWhereHas('cliente', fn ($cliente) => $cliente->where('nombreCliente', 'like', $termino)
+                    ->orWhere('apellidoCliente', 'like', $termino)
+                    ->orWhere('telefonoCliente', 'like', $termino))
+                ->orWhereHas('agendaServicios.vehiculo', fn ($vehiculo) => $vehiculo->where('placa', 'like', $termino))));
+
+        return $consulta
+            ->when(($filtros['metodo'] ?? '') !== '', fn ($query) => $query->where('MetodoPago', $filtros['metodo']))
+            ->when(($filtros['desde'] ?? '') !== '', fn ($query) => $query->whereDate('FechaPago', '>=', $filtros['desde']))
+            ->when(($filtros['hasta'] ?? '') !== '', fn ($query) => $query->whereDate('FechaPago', '<=', $filtros['hasta']))
+            ->orderByDesc('FechaPago')
+            ->paginate(10)
+            ->withQueryString();
     }
 
-    public function keep(array $datos)
+    public function agendaParaFactura(int $agendaId): Agenda
     {
-        return pago::create($datos);
+        return Agenda::with([
+            'cliente',
+            'empleado',
+            'pago',
+            'agendaServicios.vehiculo.tipoVehiculo',
+            'agendaServicios.servicio',
+        ])->findOrFail($agendaId);
     }
 
-    public function findById(int $id)
+    public function bloquearAgendaConfirmadaSinPago(int $agendaId): ?Agenda
     {
-        return pago::findOrFail($id);
+        $agenda = Agenda::whereKey($agendaId)->lockForUpdate()->first();
+
+        if (! $agenda || $agenda->estado !== 'confirmada' || Pago::where('agendaId', $agendaId)->exists()) {
+            return null;
+        }
+
+        return $agenda;
     }
 
-    public function update(int $id, array $datos)
+    public function totalServiciosDeAgenda(int $agendaId): float
     {
-        $pago = pago::findOrFail($id);
-        $pago->update($datos);
-        return $pago;
+        return (float) AgendaServicios::where('agendaId', $agendaId)->sum('Precio');
     }
 
-    public function delete(int $id)
+    public function crear(array $datos): Pago
     {
-        return pago::destroy($id);
+        return Pago::create($datos);
+    }
+
+    public function marcarTerminada(int $agendaId): void
+    {
+        Agenda::whereKey($agendaId)->update(['estado' => 'terminada']);
     }
 }

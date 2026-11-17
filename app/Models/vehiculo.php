@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class vehiculo extends Model
+class Vehiculo extends Model
 {
+    use HasFactory;
+
     protected $table = 'vehiculos';
 
     protected $fillable = [
@@ -14,21 +17,27 @@ class vehiculo extends Model
         'placa',
         'modelo',
         'color',
-        'estado'
+        'estado',
     ];
 
     public function cliente()
     {
-        return $this->belongsTo(clientes::class, 'clienteID');
+        return $this->belongsTo(Cliente::class, 'clienteID');
     }
 
     public function tipoVehiculo()
     {
-        return $this->belongsTo(tipoVehiculo::class, 'tipoVehiculoId');
+        return $this->belongsTo(TipoVehiculo::class, 'tipoVehiculoId');
     }
 
     public function agendas()
     {
-        return $this->hasMany(agenda::class);
+        return $this->belongsToMany(Agenda::class, 'agenda_servicios', 'vehiculoId', 'agendaId')
+            ->distinct();
+    }
+
+    public function agendaServicios()
+    {
+        return $this->hasMany(AgendaServicios::class, 'vehiculoId');
     }
 }

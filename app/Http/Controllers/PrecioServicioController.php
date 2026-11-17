@@ -2,29 +2,23 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\precioServicio;
-use App\Models\servicio;
-use App\Models\tipoVehiculo;
-use Illuminate\Http\Request;
-use App\Services\precioServicioService;
-use App\Http\Requests\precioServicioStoreRequest;
-use App\Http\Requests\precioServicioUpdateRequest;
+use App\Http\Requests\BusquedaIndexRequest;
+use App\Http\Requests\PrecioServicioStoreRequest;
+use App\Http\Requests\PrecioServicioUpdateRequest;
+use App\Services\PrecioServicioService;
 
-class PrecioServicioController extends Controller 
+class PrecioServicioController extends Controller
 {
-    private precioServicioService $precioServicioService;
+    public function __construct(private PrecioServicioService $precioServicioService) {}
 
-    public function __construct(precioServicioService $precioServicioService)
-    {
-        $this->precioServicioService = $precioServicioService;
-    }
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(BusquedaIndexRequest $busquedaIndexRequest)
     {
-        $precioServicio = $this->precioServicioService->listarTodo();
-        return view('precioServicio.index', compact('precioServicio'));
+        return view('precioServicio.index', $this->precioServicioService->prepararIndiceConOpciones(
+            $busquedaIndexRequest->validated()
+        ));
     }
 
     /**
@@ -32,19 +26,20 @@ class PrecioServicioController extends Controller
      */
     public function create()
     {
-        $servicios = servicio::all();
-        $tipoVehiculos = tipoVehiculo::all();
-        return view('precioServicio.crear', compact('servicios', 'tipoVehiculos'));
+        return view('precioServicio.crear', $this->precioServicioService->prepararFormulario(
+            null,
+            (int) old('duracionMinutos', 30)
+        ));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(precioServicioStoreRequest $request)
+    public function store(PrecioServicioStoreRequest $precioServicioStoreRequest)
     {
-        $datos = $request->validated();
-        $this->precioServicioService->guardar($datos);
-        return redirect()->route('precioServicio.index')->with('success','precio del servicio creado correctamente.');
+        $this->precioServicioService->guardar($precioServicioStoreRequest->validated());
+
+        return redirect()->route('precioServicio.index')->with('success', 'precio del servicio creado correctamente.');
     }
 
     /**
@@ -60,19 +55,20 @@ class PrecioServicioController extends Controller
      */
     public function edit(int $id)
     {
-        $precioServicio = $this->precioServicioService->buscarPorId($id);
-        $servicios = servicio::all();
-        $tipoVehiculos = tipoVehiculo::all();
-        return view('precioServicio.editar', compact('precioServicio', 'servicios', 'tipoVehiculos'));
+        return view('precioServicio.editar', $this->precioServicioService->prepararFormulario(
+            $id,
+            old('duracionMinutos') === null ? null : (int) old('duracionMinutos')
+        ));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(precioServicioUpdateRequest $request, int $id)
+    public function update(PrecioServicioUpdateRequest $precioServicioUpdateRequest, int $id)
     {
-        $this->precioServicioService->actualizar($id, $request->validated());
-        return redirect()->route('precioServicio.index')->with('success','precio del servicio actualizado correctamente.');
+        $this->precioServicioService->actualizar($id, $precioServicioUpdateRequest->validated());
+
+        return redirect()->route('precioServicio.index')->with('success', 'precio del servicio actualizado correctamente.');
     }
 
     /**
@@ -81,6 +77,7 @@ class PrecioServicioController extends Controller
     public function destroy(int $id)
     {
         $this->precioServicioService->eliminar($id);
-        return redirect()->route('precioServicio.index')->with('success','precio del servicio eliminado correctamente.');
+
+        return redirect()->route('precioServicio.index')->with('success', 'precio del servicio eliminado correctamente.');
     }
 }

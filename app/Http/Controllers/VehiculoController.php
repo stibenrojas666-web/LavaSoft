@@ -2,97 +2,87 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\VehiculoIndexRequest;
 use App\Http\Requests\VehiculoStoreRequest;
 use App\Http\Requests\VehiculoUpdateRequest;
 use App\Services\VehiculoService;
-use App\Services\clienteService;
-use App\Services\tipoVehiculoService;
+use Illuminate\Http\Request;
 
-/**use App\Services\*/
 class VehiculoController extends Controller
 {
-private VehiculoService $VehiculoService;
-private clienteService $clienteService;
-private tipoVehiculoService $tipoVehiculoService;
+    public function __construct(private VehiculoService $vehiculoService) {}
 
-    public function __construct(VehiculoService $VehiculoService, clienteService $clienteService,tipoVehiculoService $tipoVehiculoService)
+    public function index(VehiculoIndexRequest $request)
     {
-        $this->VehiculoService = $VehiculoService;
-        $this->clienteService = $clienteService;
-        $this->tipoVehiculoService = $tipoVehiculoService;
+        return view('vehiculos.index', $this->vehiculoService->prepararIndiceConOpciones($request->validated()));
     }
 
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function cambiarEstado(Request $request, int $id)
     {
-        $vehiculo = $this->VehiculoService->getAll();
+        $activo = $this->vehiculoService->cambiarEstado($id);
 
-        return view('Vehiculos.index', compact('vehiculo'));
+        return redirect()->to(route('vehiculos.index', $request->query()).'#vehiculo-'.$id)->with(
+            'success',
+            $activo ? 'Vehículo activado correctamente.' : 'Vehículo desactivado correctamente.'
+        );
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function create(Request $request)
     {
-        $cliente = $this->clienteService->listarTodo();
-        $tipoVehiculo = $this->tipoVehiculoService->listarTodo();
+        $datos = $this->vehiculoService->prepararFormulario();
+        $datos['clienteSeleccionadoId'] = $request->query('clienteId');
 
-        return view('vehiculos.crear', compact('cliente','tipoVehiculo'));
+        return view('vehiculos.crear', $datos);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(VehiculoStoreRequest $vehiculoStoreRequest)
+    public function store(VehiculoStoreRequest $request)
     {
-        $datos = $vehiculoStoreRequest->validated();
-        $this->VehiculoService->keep($datos);
-        return redirect()->route('vehiculos.index')->with('success','Vehículo creado correctamente.');
-    }
+        $vehiculo = $this->vehiculoService->keep($request->validated());
 
-    /**
-     * Display the specified resource.
-     */
-    public function show()
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(int $id)
-    {
-        $vehiculo = $this->VehiculoService->findById($id);
-        $cliente = $this->clienteService->listarTodo();
-        $tipoVehiculo = $this->tipoVehiculoService->listarTodo();
-        return view('Vehiculos.editar',compact('vehiculo','cliente','tipoVehiculo'));
-
+        if ($request->boolean('continuarAgenda') && strtolower((string) $vehiculo->estado) === 'activo') {
+            return redirect()->route('agenda.create', [
+                'clienteId' => $vehiculo->clienteID,
+                'vehiculoId' => $vehiculo->id,
+            ])->with('success', 'Vehículo creado correctamente. Ahora completa los datos de la cita.');
         }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(int $id,VehiculoUpdateRequest $vehiculoUpdateRequest)
-    {
-        $datos = $vehiculoUpdateRequest->validated();
-        $this->VehiculoService->update($id,$datos);
-        return redirect()->route('vehiculos.index')->with('success', 'Vehículo actualizado correctamente.');      
+        return redirect()->route('vehiculos.index')->with('success', 'Vehículo creado correctamente.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
+    public function show(int $id)
+    {
+        return view('vehiculos.historial', $this->vehiculoService->historial($id));
+    }
+
+    public function edit(int $id, Request $request)
+    {
+        $datos = $this->vehiculoService->prepararFormulario($id);
+        $datos['continuarAgenda'] = $request->boolean('continuarAgenda')
+            && strtolower((string) $datos['vehiculo']->estado) === 'activo';
+
+        return view('vehiculos.editar', $datos);
+    }
+
+    public function update(int $id, VehiculoUpdateRequest $request)
+    {
+        $vehiculo = $this->vehiculoService->update($id, $request->validated());
+
+        if ($request->boolean('continuarAgenda') && strtolower((string) $vehiculo->estado) === 'activo') {
+            return redirect()->route('agenda.create', [
+                'clienteId' => $vehiculo->clienteID,
+                'vehiculoId' => $vehiculo->id,
+            ])->with('success', 'Vehículo actualizado. Continúa completando la cita.');
+        }
+
+        return redirect()->route('vehiculos.index')->with('success', 'Vehículo actualizado correctamente.');
+    }
+
     public function destroy(int $id)
     {
-        $this->VehiculoService->delete($id);
+        if (! $this->vehiculoService->delete($id)) {
+            return redirect()->route('vehiculos.index')->with('error', 'No se puede eliminar el vehículo porque tiene citas relacionadas.');
+        }
 
-        return redirect()
-            ->route('vehiculos.index')
-            ->with('success', 'Vehículo eliminado correctamente.');
+        return redirect()->route('vehiculos.index')->with('success', 'Vehículo eliminado correctamente.');
     }
 }
-

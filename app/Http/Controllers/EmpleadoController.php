@@ -2,25 +2,26 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\empleado;
+use App\Http\Requests\BusquedaIndexRequest;
+use App\Http\Requests\EmpleadoStoreRequest;
+use App\Http\Requests\EmpleadoUpdateRequest;
+use App\Services\EmpleadoService;
 use Illuminate\Http\Request;
-use App\Services\empleadoService;
-use App\Http\Requests\empleadoStoreRequest;
-use App\Http\Requests\empleadoUpdateRequest;
 
 class EmpleadoController extends Controller
 {
-    private empleadoService $empleadoService;
+    private EmpleadoService $empleadoService;
 
-    public function __construct(empleadoService $empleadoService)
+    public function __construct(EmpleadoService $empleadoService)
     {
         $this->empleadoService = $empleadoService;
     }
 
-    public function index()
+    public function index(BusquedaIndexRequest $busquedaIndexRequest)
     {
-        $empleados = $this->empleadoService->listarTodo();
-        return view('empleados.index', compact('empleados'));
+        return view('empleados.index', $this->empleadoService->prepararListado(
+            $busquedaIndexRequest->validated()
+        ));
     }
 
     /**
@@ -34,15 +35,13 @@ class EmpleadoController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(empleadoStoreRequest $request)
+    public function store(EmpleadoStoreRequest $empleadoStoreRequest)
     {
-        $datos = $request->validated();
-        $this->empleadoService->guardar($datos);
+        $this->empleadoService->guardar($empleadoStoreRequest->validated());
+
         return redirect()->route('empleados.index')->with('success', 'Empleado creado correctamente.');
 
     }
-
-    
 
     /**
      * Display the specified resource.
@@ -58,24 +57,39 @@ class EmpleadoController extends Controller
     public function edit(int $id)
     {
         $empleado = $this->empleadoService->buscarPorId($id);
+
         return view('empleados.editar', compact('empleado'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(empleadoUpdateRequest $request, int $id)
-{
-    $this->empleadoService->actualizar($id, $request->validated());
-    return redirect()->route('empleados.index')->with('success', 'Empleado actualizado correctamente.');
-}
+    public function update(EmpleadoUpdateRequest $empleadoUpdateRequest, int $id)
+    {
+        $this->empleadoService->actualizar($id, $empleadoUpdateRequest->validated());
+
+        return redirect()->route('empleados.index')->with('success', 'Empleado actualizado correctamente.');
+    }
+
+    public function cambiarEstado(Request $request, int $id)
+    {
+        $activo = $this->empleadoService->cambiarEstado($id);
+
+        return redirect()->to(route('empleados.index', $request->query()).'#empleado-'.$id)->with(
+            'success',
+            $activo ? 'Empleado activado correctamente.' : 'Empleado desactivado correctamente.'
+        );
+    }
 
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(int $id)
     {
-        $this->empleadoService->eliminar($id);
+        if (! $this->empleadoService->eliminar($id)) {
+            return redirect()->route('empleados.index')->with('error', 'No se puede eliminar el empleado porque tiene citas o turnos relacionados.');
+        }
+
         return redirect()->route('empleados.index')->with('success', 'Empleado eliminado correctamente.');
     }
 }

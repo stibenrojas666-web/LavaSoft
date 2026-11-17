@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class agenda extends Model
+class Agenda extends Model
 {
     protected $table = 'agendas';
 
@@ -18,29 +18,34 @@ class agenda extends Model
         'tipoDeAtencion',
     ];
 
+    public function getReferenciaAttribute(): string
+    {
+        return str_pad((string) $this->getKey(), 7, '0', STR_PAD_LEFT);
+    }
+
     public function empleado()
     {
-        return $this->belongsTo(empleado::class, 'empleadoId');
+        return $this->belongsTo(Empleado::class, 'empleadoId');
     }
 
     public function cliente()
     {
-        return $this->belongsTo(clientes::class, 'clienteId');
-    }
-
-    public function vehiculo()
-    {
-        return $this->belongsTo(vehiculo::class, 'vehiculoId');
+        return $this->belongsTo(Cliente::class, 'clienteId');
     }
 
     public function pago()
     {
-        return $this->hasOne(pago::class, 'agendaId');
+        return $this->hasOne(Pago::class, 'agendaId');
     }
 
     public function agendaServicios()
     {
-        return $this->hasMany(agendaServicios::class, 'agendaId');
+        return $this->hasMany(AgendaServicios::class, 'agendaId')->with(['vehiculo.tipoVehiculo', 'servicio']);
     }
 
+    public function vehiculos()
+    {
+        return $this->belongsToMany(Vehiculo::class, 'agenda_servicios', 'agendaId', 'vehiculoId')
+            ->distinct();
+    }
 }

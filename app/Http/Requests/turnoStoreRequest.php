@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class turnoStoreRequest extends FormRequest
+class TurnoStoreRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,7 +25,9 @@ class turnoStoreRequest extends FormRequest
         return [
             'empleado_id' => 'required|exists:empleados,id',
             'dia' => 'required|string|in:lunes,martes,miercoles,jueves,viernes,sabado,domingo',
-            'jornada' => 'required|string|in:mañana,tarde,noche',
+            'jornada' => 'nullable|string|in:mañana,tarde,noche',
+            'horaInicio' => 'required|date_format:H:i',
+            'horaFin' => 'required|date_format:H:i|after:horaInicio',
         ];
     }
 
@@ -35,9 +37,16 @@ class turnoStoreRequest extends FormRequest
             'empleado_id.required' => 'Debes seleccionar un empleado.',
             'empleado_id.exists' => 'El empleado seleccionado no es válido.',
             'dia.required' => 'Debes seleccionar el día.',
+            'dia.string' => 'El día debe ser texto.',
             'dia.in' => 'El día seleccionado no es válido.',
             'jornada.required' => 'Debes seleccionar la jornada.',
+            'jornada.string' => 'La jornada debe ser texto.',
             'jornada.in' => 'La jornada seleccionada no es válida.',
+            'horaInicio.required' => 'Debes ingresar la hora de inicio.',
+            'horaInicio.date_format' => 'La hora de inicio debe tener el formato HH:MM.',
+            'horaFin.required' => 'Debes ingresar la hora de fin.',
+            'horaFin.date_format' => 'La hora de fin debe tener el formato HH:MM.',
+            'horaFin.after' => 'La hora de fin debe ser posterior a la hora de inicio.',
         ];
     }
 }

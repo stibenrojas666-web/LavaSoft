@@ -2,29 +2,23 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\turno;
-use App\Models\empleado;
-use Illuminate\Http\Request;
-use App\Services\turnoService;
-use App\Http\Requests\turnoStoreRequest;
-use App\Http\Requests\turnoUpdateRequest;
-
+use App\Http\Requests\BusquedaIndexRequest;
+use App\Http\Requests\TurnoStoreRequest;
+use App\Http\Requests\TurnoUpdateRequest;
+use App\Services\TurnoService;
 
 class TurnoController extends Controller
 {
+    public function __construct(private TurnoService $turnoService) {}
 
-private turnoService $turnoService;
-public function __construct(turnoService $turnoService)
-{
-    $this->turnoService = $turnoService;
-}
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(BusquedaIndexRequest $busquedaIndexRequest)
     {
-        $turnos = $this->turnoService->listarTodo();
-        return view('turno.index', compact('turnos'));
+        return view('turno.index', $this->turnoService->prepararListado(
+            $busquedaIndexRequest->validated()
+        ));
     }
 
     /**
@@ -32,18 +26,17 @@ public function __construct(turnoService $turnoService)
      */
     public function create()
     {
-        $empleados = empleado::all();
-        return view('turno.crear', compact('empleados'));
+        return view('turno.crear', $this->turnoService->prepararFormulario());
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(turnoStoreRequest $request)
+    public function store(TurnoStoreRequest $turnoStoreRequest)
     {
-        $datos = $request->validated();
-        $this->turnoService->guardar($datos);
-        return redirect()->route('turnos.index')->with('success','Turno creado correctamente.');
+        $this->turnoService->guardar($turnoStoreRequest->validated());
+
+        return redirect()->route('turnos.index')->with('success', 'Turno creado correctamente.');
     }
 
     /**
@@ -59,17 +52,16 @@ public function __construct(turnoService $turnoService)
      */
     public function edit(int $id)
     {
-        $turno = $this->turnoService->buscarPorId($id);
-        $empleados = empleado::all();
-        return view('turno.editar', compact('turno', 'empleados'));
+        return view('turno.editar', $this->turnoService->prepararFormulario($id));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(turnoUpdateRequest $request, int $id)
+    public function update(TurnoUpdateRequest $turnoUpdateRequest, int $id)
     {
-        $this->turnoService->actualizar($id, $request->validated());
+        $this->turnoService->actualizar($id, $turnoUpdateRequest->validated());
+
         return redirect()->route('turnos.index')->with('success', 'Turno actualizado correctamente.');
     }
 
@@ -79,6 +71,7 @@ public function __construct(turnoService $turnoService)
     public function destroy(int $id)
     {
         $this->turnoService->eliminar($id);
+
         return redirect()->route('turnos.index')->with('success', 'Turno eliminado correctamente.');
     }
 }

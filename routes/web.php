@@ -2,30 +2,75 @@
 
 use App\Http\Controllers\AgendaController;
 use App\Http\Controllers\AgendaServiciosController;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ClientesController;
+use App\Http\Controllers\ConfiguracionLavaderoController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmpleadoController;
-use App\Http\Controllers\ClientesController;
-use App\Http\Controllers\ServicioController;
-use App\Http\Controllers\VehiculoController;
-use App\Http\Controllers\TipoVehiculoController;
-use App\Http\Controllers\PrecioServicioController;
 use App\Http\Controllers\PagoController;
-
+use App\Http\Controllers\PrecioServicioController;
+use App\Http\Controllers\ReporteController;
+use App\Http\Controllers\ServicioController;
+use App\Http\Controllers\TipoVehiculoController;
 use App\Http\Controllers\TurnoController;
+use App\Http\Controllers\VehiculoController;
+use App\Http\Middleware\NoCacheHeaders;
+use Illuminate\Support\Facades\Route;
 
-Route::get('/', [DashboardController::class, 'index'])
-        ->name('dashboard.index');
+Route::get('factura/{agendaId}', [PagoController::class, 'facturaPublica'])
+    ->whereNumber('agendaId')
+    ->name('factura.publica')
+    ->middleware(['signed', NoCacheHeaders::class]);
 
-Route::resource('empleados',EmpleadoController::class);
-Route::resource('clientes',ClientesController::class);
-Route::resource('servicios',ServicioController::class);
-Route::resource('vehiculos',VehiculoController::class);
-Route::resource('servicios', ServicioController::class);
-Route::resource('tipoVehiculo', TipoVehiculoController::class);
-Route::resource('agenda',AgendaController::class);
-Route::resource('precioServicio',PrecioServicioController::class);
-Route::resource('agendaServicio',AgendaServiciosController::class);
-Route::resource('pagos',PagoController::class);
-Route::resource('turnos',TurnoController::class);
+Route::get('lavadero/logo', [ConfiguracionLavaderoController::class, 'logo'])
+    ->name('lavadero.logo');
+Route::middleware(['auth', NoCacheHeaders::class])->group(function () {
 
+    Route::get('/dashboard', [DashboardController::class, 'index'])
+        ->name('dashboard.index')->middleware('modulo:dashboard');
+
+    Route::resource('empleados', EmpleadoController::class)->middleware('modulo:empleados');
+    Route::resource('clientes', ClientesController::class)->middleware('modulo:clientes');
+    Route::patch('clientes/{id}/reactivar', [ClientesController::class, 'reactivar'])
+        ->whereNumber('id')->name('clientes.reactivar')->middleware('modulo:clientes');
+    Route::patch('vehiculos/{id}/estado', [VehiculoController::class, 'cambiarEstado'])
+        ->whereNumber('id')->name('vehiculos.estado')->middleware('modulo:vehiculos');
+    Route::resource('vehiculos', VehiculoController::class)->middleware('modulo:vehiculos');
+    Route::patch('empleados/{id}/estado', [EmpleadoController::class, 'cambiarEstado'])
+        ->whereNumber('id')->name('empleados.estado')->middleware('modulo:empleados');
+    Route::patch('servicios/{id}/estado', [ServicioController::class, 'cambiarEstado'])
+        ->whereNumber('id')->name('servicios.estado')->middleware('modulo:servicios');
+    Route::resource('servicios', ServicioController::class)->middleware('modulo:servicios');
+    Route::resource('tipoVehiculo', TipoVehiculoController::class)->middleware('modulo:tipoVehiculo');
+    Route::get('agenda/empleados-disponibles', [AgendaController::class, 'empleadosDisponibles'])
+        ->name('agenda.empleadosDisponibles')->middleware('modulo:agenda');
+    Route::patch('agenda/{agenda}/estado', [AgendaController::class, 'cambiarEstado'])
+        ->whereNumber('agenda')->name('agenda.estado')->middleware('modulo:agenda');
+    Route::resource('agenda', AgendaController::class)->middleware('modulo:agenda');
+    Route::get('agenda/{agendaId}/factura', [PagoController::class, 'factura'])
+        ->whereNumber('agendaId')->name('agenda.factura')->middleware('modulo:agenda');
+    Route::post('agenda/{agendaId}/pago', [PagoController::class, 'registrarPago'])
+        ->whereNumber('agendaId')->name('agenda.pago.registrar')->middleware('modulo:agenda');
+    Route::post('agenda/{agendaId}/factura/correo', [PagoController::class, 'enviarCorreo'])
+        ->whereNumber('agendaId')->name('agenda.factura.correo')->middleware('modulo:agenda');
+    Route::get('pagos/historial', [PagoController::class, 'historial'])
+        ->name('pagos.historial')->middleware('modulo:pagos');
+    Route::resource('precioServicio', PrecioServicioController::class)->middleware('modulo:precioServicio');
+    Route::resource('turnos', TurnoController::class)->middleware('modulo:turnos');
+    Route::get('agendaServicio', [AgendaServiciosController::class, 'index'])
+        ->name('agendaServicio.index')->middleware('modulo:agendaServicio');
+    Route::get('agendaServicio/{id}', [AgendaServiciosController::class, 'show'])
+        ->whereNumber('id')->name('agendaServicio.show')->middleware('modulo:agendaServicio');
+
+    Route::middleware('can:'.config('seguridad.permiso_admin'))
+        ->prefix('configuracion')
+        ->name('configuracion.')
+        ->group(function () {
+            Route::get('/lavadero', [ConfiguracionLavaderoController::class, 'edit'])->name('edit');
+            Route::put('/lavadero', [ConfiguracionLavaderoController::class, 'update'])->name('update');
+        });
+
+    Route::middleware('can:ver dashboard')->prefix('reportes')->name('reportes.')->group(function () {
+        Route::get('/diario', [ReporteController::class, 'diario'])->name('diario');
+        Route::get('/periodo', [ReporteController::class, 'periodo'])->name('periodo');
+    });
+});

@@ -2,19 +2,36 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class servicio extends Model
+class Servicio extends Model
 {
+    use HasFactory;
+
     protected $table = 'servicios';
+
     protected $fillable = [
         'nombre',
         'descripcion',
+        'duracionMinutos',
         'estado',
     ];
 
-    public function pagos()
+    public function agendaServicios()
     {
-        return $this->hasMany(pago::class, 'servicioId');
+        return $this->hasMany(AgendaServicios::class, 'servicioId');
+    }
+
+    public function agendas()
+    {
+        return $this->belongsToMany(Agenda::class, 'agenda_servicios', 'servicioId', 'agendaId')
+            ->withPivot('Precio')
+            ->withTimestamps();
+    }
+
+    public function precios()
+    {
+        return $this->hasMany(PrecioServicio::class, 'servicio_id');
     }
 }

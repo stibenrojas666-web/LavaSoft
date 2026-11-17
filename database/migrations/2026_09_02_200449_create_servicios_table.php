@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('servicios', function (Blueprint $table) {
             $table->id();
-            $table-> string('nombre', 80);
-            $table-> string('descripcion', 250)->nullable();
-            $table-> boolean('estado');
+            $table->string('nombre', 80);
+            $table->string('descripcion', 250)->nullable();
+            $table->boolean('estado');
             $table->timestamps();
         });
     }

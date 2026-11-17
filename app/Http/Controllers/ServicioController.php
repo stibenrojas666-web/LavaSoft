@@ -2,27 +2,29 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\servicio;
+use App\Http\Requests\BusquedaIndexRequest;
+use App\Http\Requests\ServicioStoreRequest;
+use App\Http\Requests\ServicioUpdateRequest;
+use App\Services\ServicioService;
 use Illuminate\Http\Request;
-use App\Services\servicioService;
-use App\Http\Requests\servicioStoreRequest;
-use App\Http\Requests\servicioUpdateRequest;
 
 class ServicioController extends Controller
 {
-    private servicioService $servicioService;
+    private ServicioService $servicioService;
 
-    public function __construct(servicioService $servicioService)
+    public function __construct(ServicioService $servicioService)
     {
         $this->servicioService = $servicioService;
     }
+
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(BusquedaIndexRequest $busquedaIndexRequest)
     {
-        $servicios = $this->servicioService->listarTodo();
-        return view('servicios.index', compact('servicios'));
+        return view('servicios.index', $this->servicioService->prepararListado(
+            $busquedaIndexRequest->validated()
+        ));
     }
 
     /**
@@ -36,11 +38,21 @@ class ServicioController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(servicioStoreRequest $request)
+    public function store(ServicioStoreRequest $servicioStoreRequest)
     {
-        $datos = $request->validated();
-        $this->servicioService->guardar($datos);
+        $this->servicioService->guardar($servicioStoreRequest->validated());
+
         return redirect()->route('servicios.index')->with('success', 'Servicio creado correctamente.');
+    }
+
+    public function cambiarEstado(Request $request, int $id)
+    {
+        $activo = $this->servicioService->cambiarEstado($id);
+
+        return redirect()->to(route('servicios.index', $request->query()).'#servicio-'.$id)->with(
+            'success',
+            $activo ? 'Servicio activado correctamente.' : 'Servicio desactivado correctamente.'
+        );
     }
 
     /**
@@ -57,15 +69,17 @@ class ServicioController extends Controller
     public function edit(int $id)
     {
         $servicio = $this->servicioService->buscarPorId($id);
+
         return view('servicios.editar', compact('servicio'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(servicioUpdateRequest $request, int $id)
+    public function update(ServicioUpdateRequest $servicioUpdateRequest, int $id)
     {
-        $this->servicioService->actualizar($id, $request->validated());
+        $this->servicioService->actualizar($id, $servicioUpdateRequest->validated());
+
         return redirect()->route('servicios.index')->with('success', 'Servicio actualizado correctamente.');
     }
 
@@ -74,7 +88,10 @@ class ServicioController extends Controller
      */
     public function destroy(int $id)
     {
-        $this->servicioService->eliminar($id);
+        if (! $this->servicioService->eliminar($id)) {
+            return redirect()->route('servicios.index')->with('error', 'No se puede eliminar el servicio porque tiene citas o precios relacionados.');
+        }
+
         return redirect()->route('servicios.index')->with('success', 'Servicio eliminado correctamente');
     }
 }
