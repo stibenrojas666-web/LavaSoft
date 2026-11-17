@@ -1,6 +1,6 @@
 LavaSoft
 
-Sistema de gestión para lavaderos de vehículos. Permite llevar el control de clientes, vehículos, servicios, agenda, empleados y pagos desde un solo lugar, en lugar de usar cuadernos o Excel.
+software para la gestión administrativa de lavaderos. Permite llevar el control de clientes, vehículos, servicios, agenda, empleados y pagos desde un solo lugar, en lugar de usar cuadernos o Excel.
 
 Es un proyecto de formación del SENA (CATA, Málaga, Santander), desarrollado con metodología Scrum. Está hecho con Laravel y pensado para correr de forma local, sin depender de internet ni de APIs externas.
 
