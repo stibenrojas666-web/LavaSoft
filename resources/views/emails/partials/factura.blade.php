@@ -58,7 +58,7 @@
                             Factura de servicio
                         </p>
                         <p style="margin:0;font-size:20px;font-weight:bold;color:#102f40;">
-                            Cita #{{ $agenda->id }}
+                            Cita #{{ $agenda->referencia }}
                         </p>
                     </td>
 

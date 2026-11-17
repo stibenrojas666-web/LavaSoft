@@ -16,13 +16,13 @@ class AutorizarModulo
         $usuario = $request->user();
 
         if ($usuario === null) {
-            throw new AuthenticationException();
+            throw new AuthenticationException;
         }
 
-        $permiso = $this->accion($request->route()) . ' ' . mb_strtolower($modulo);
+        $permiso = $this->accion($request->route()).' '.mb_strtolower($modulo);
 
         if (! $usuario->can($permiso)) {
-            throw new AuthorizationException('No tienes el permiso "' . $permiso . '".');
+            throw new AuthorizationException('No tienes el permiso "'.$permiso.'".');
         }
 
         return $next($request);

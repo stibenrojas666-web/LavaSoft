@@ -2,16 +2,37 @@
 
 namespace App\Repositories;
 
-use App\Repositories\Contracts\VehiculoRepositoryInterface;
-use App\Models\Vehiculo;
 use App\Models\AgendaServicios;
+use App\Models\Vehiculo;
+use App\Repositories\Contracts\VehiculoRepositoryInterface;
 use App\Support\TextoBusqueda;
+use Illuminate\Support\Facades\DB;
 
-class VehiculoRespository implements VehiculoRepositoryInterface {
-    public function getAll(){
+class VehiculoRepository implements VehiculoRepositoryInterface
+{
+    public function getAll()
+    {
         return Vehiculo::query()
             ->select(['id', 'clienteID', 'tipoVehiculoId', 'placa', 'modelo', 'color', 'estado'])
             ->with(['cliente:id,nombreCliente,apellidoCliente', 'tipoVehiculo:id,nombre'])
+            ->get();
+    }
+
+    public function listarParaAgenda(array $incluirIds = [])
+    {
+        $incluirIds = array_values(array_unique(array_filter(array_map('intval', $incluirIds))));
+
+        return Vehiculo::query()
+            ->select(['id', 'clienteID', 'tipoVehiculoId', 'placa', 'modelo', 'color', 'estado'])
+            ->with(['cliente:id,nombreCliente,apellidoCliente', 'tipoVehiculo:id,nombre'])
+            ->where(function ($query) use ($incluirIds) {
+                $query->where('estado', 'Activo');
+
+                if ($incluirIds) {
+                    $query->orWhereIn('id', $incluirIds);
+                }
+            })
+            ->orderBy('placa')
             ->get();
     }
 
@@ -51,11 +72,13 @@ class VehiculoRespository implements VehiculoRepositoryInterface {
         return strtolower((string) $vehiculo->estado) === 'activo';
     }
 
-    public function keep(array $datos){
-    return Vehiculo::create($datos);
+    public function keep(array $datos)
+    {
+        return Vehiculo::create($datos);
     }
 
-    public function finById(int $id){
+    public function finById(int $id)
+    {
         return Vehiculo::with(['cliente', 'tipoVehiculo'])->findOrFail($id);
     }
 
@@ -69,27 +92,30 @@ class VehiculoRespository implements VehiculoRepositoryInterface {
             ->get();
     }
 
-    public function update (int $id, array $datos){
-        $vehiculo= Vehiculo::findOrFail($id);
+    public function update(int $id, array $datos)
+    {
+        $vehiculo = Vehiculo::findOrFail($id);
         $vehiculo->update($datos);
-        return $vehiculo; 
+
+        return $vehiculo;
     }
 
-    public function delete (int $id){
+    public function delete(int $id)
+    {
         return Vehiculo::destroy($id);
     }
 
     public function tieneDependencias(int $id): bool
-{
-    $tieneServicios = \App\Models\AgendaServicios::where(
-        'vehiculoId',
-        $id
-    )->exists();
+    {
+        $tieneServicios = AgendaServicios::where(
+            'vehiculoId',
+            $id
+        )->exists();
 
-    $tieneAgendasAntiguas = \Illuminate\Support\Facades\DB::table('agendas')
-        ->where('vehiculoId', $id)
-        ->exists();
+        $tieneAgendasAntiguas = DB::table('agendas')
+            ->where('vehiculoId', $id)
+            ->exists();
 
-    return $tieneServicios || $tieneAgendasAntiguas;
-}
+        return $tieneServicios || $tieneAgendasAntiguas;
+    }
 }

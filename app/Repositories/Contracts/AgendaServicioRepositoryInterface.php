@@ -4,6 +4,7 @@ namespace App\Repositories\Contracts;
 
 /**
  * Contrato de acceso a datos para AgendaServicioRepository.
+ *
  * @method mixed getAll(...$arguments)
  * @method mixed buscar(...$arguments)
  * @method mixed keep(...$arguments)
@@ -13,6 +14,4 @@ namespace App\Repositories\Contracts;
  * @method mixed agendaTienePago(...$arguments)
  * @method mixed buscarAgenda(...$arguments)
  */
-interface AgendaServicioRepositoryInterface
-{
-}
+interface AgendaServicioRepositoryInterface {}

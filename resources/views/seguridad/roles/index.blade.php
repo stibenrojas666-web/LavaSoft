@@ -13,7 +13,7 @@
 
         <div class="overflow-hidden rounded-xl border border-slate-200">
             <div class="overflow-x-auto">
-                <table class="lavasoft-table min-w-[850px] text-sm">
+                <table data-datatable data-server-paginated="true" class="lavasoft-table min-w-full text-sm">
                     <thead class="bg-slate-50 text-left text-slate-500">
                         <tr>
                             <th class="px-4 py-4">Rol</th>
@@ -25,7 +25,7 @@
                     </thead>
                     <tbody class="divide-y divide-slate-100">
                         @forelse($roles as $rol)
-                            <tr class="transition hover:bg-slate-50/70">
+                            <tr id="rol-{{ $rol->id }}" class="scroll-mt-24 transition hover:bg-slate-50/70">
                                 <td class="px-4 py-4">
                                     <span class="font-bold text-slate-800">{{ $rol->name }}</span>
                                     @if($rol->protegidoParaSistema)
@@ -46,7 +46,7 @@
                                         <a href="{{ route('seguridad.roles.edit', $rol) }}" class="rounded-lg bg-cyan-50 px-3 py-2 text-xs font-bold text-cyan-800 hover:bg-cyan-100">Editar</a>
 
                                         @unless($rol->noDesactivable)
-                                            <form action="{{ route('seguridad.roles.estado', $rol) }}" method="POST"
+                                            <form data-preserve-scroll action="{{ route('seguridad.roles.estado', array_merge(['rol' => $rol->id], request()->query())) }}" method="POST"
                                                 @if($rol->activo && $rol->users_count > 0)
                                                     onsubmit="return confirm('Este rol tiene {{ $rol->users_count }} usuario(s). Al desactivarlo perderán sus permisos. ¿Continuar?');"
                                                 @endif

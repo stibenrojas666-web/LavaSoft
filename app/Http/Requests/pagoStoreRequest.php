@@ -15,7 +15,7 @@ class PagoStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'MetodoPago'      => ['required', Rule::in(['Efectivo', 'Tarjeta', 'Transferencia'])],
+            'MetodoPago' => ['required', Rule::in(['Efectivo', 'Tarjeta', 'Transferencia'])],
             'RequerirFactura' => ['sometimes', 'boolean'],
         ];
     }
@@ -23,9 +23,9 @@ class PagoStoreRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'MetodoPago.required'      => 'El método de pago es obligatorio',
-            'MetodoPago.in'            => 'El método de pago seleccionado no es válido',
-            'RequerirFactura.boolean'  => 'El valor de factura no es válido',
+            'MetodoPago.required' => 'El método de pago es obligatorio',
+            'MetodoPago.in' => 'El método de pago seleccionado no es válido',
+            'RequerirFactura.boolean' => 'El valor de factura no es válido',
         ];
     }
 }

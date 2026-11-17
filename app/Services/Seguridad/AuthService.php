@@ -3,15 +3,13 @@
 namespace App\Services\Seguridad;
 
 use App\Repositories\Seguridad\Contracts\UsuarioRepositoryInterface as UsuarioRepository;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Contracts\Auth\Authenticatable;
 
 class AuthService
 {
-    public function __construct(private UsuarioRepository $usuarioRepository)
-    {
-    }
+    public function __construct(private UsuarioRepository $usuarioRepository) {}
 
     public function autenticar(array $credenciales, bool $recordar = false): bool
     {

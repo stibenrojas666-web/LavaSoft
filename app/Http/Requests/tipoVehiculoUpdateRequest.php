@@ -24,7 +24,7 @@ class TipoVehiculoUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-         'nombre' => ['required', 'string', 'max:30', Rule::unique('tipo_vehiculos', 'nombre')->ignore($this->route('tipoVehiculo'))],
+            'nombre' => ['required', 'string', 'max:30', Rule::unique('tipo_vehiculos', 'nombre')->ignore($this->route('tipoVehiculo'))],
         ];
     }
 
@@ -37,5 +37,4 @@ class TipoVehiculoUpdateRequest extends FormRequest
             'nombre.max' => 'El nombre no puede superar los 30 caracteres.',
         ];
     }
-
 }

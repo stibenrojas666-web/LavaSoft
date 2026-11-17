@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Repositories\AgendaRepository;
 use App\Repositories\AgendaServicioRepository;
+use App\Repositories\ClienteRepository;
 use App\Repositories\ConfiguracionLavaderoRepository;
 use App\Repositories\Contracts\AgendaRepositoryInterface;
 use App\Repositories\Contracts\AgendaServicioRepositoryInterface;
@@ -19,23 +20,22 @@ use App\Repositories\Contracts\TipoVehiculoRepositoryInterface;
 use App\Repositories\Contracts\TurnoRepositoryInterface;
 use App\Repositories\Contracts\VehiculoRepositoryInterface;
 use App\Repositories\DashboardRepository;
+use App\Repositories\EmpleadoRepository;
 use App\Repositories\PagoRepository;
+use App\Repositories\PrecioServicioRepository;
 use App\Repositories\ReporteRepository;
 use App\Repositories\Seguridad\Contracts\PermisoRepositoryInterface;
 use App\Repositories\Seguridad\Contracts\RolRepositoryInterface;
-use App\Repositories\Seguridad\Contracts\UsuarioRepositoryInterface;
 use App\Repositories\Seguridad\Contracts\TokenRecuperacionRepositoryInterface;
+use App\Repositories\Seguridad\Contracts\UsuarioRepositoryInterface;
 use App\Repositories\Seguridad\PermisoRepository;
 use App\Repositories\Seguridad\RolRepository;
-use App\Repositories\Seguridad\UsuarioRepository;
 use App\Repositories\Seguridad\TokenRecuperacionRepository;
-use App\Repositories\VehiculoRespository;
-use App\Repositories\ClienteRepository;
-use App\Repositories\EmpleadoRepository;
-use App\Repositories\PrecioServicioRepository;
+use App\Repositories\Seguridad\UsuarioRepository;
 use App\Repositories\ServicioRepository;
 use App\Repositories\TipoVehiculoRepository;
 use App\Repositories\TurnoRepository;
+use App\Repositories\VehiculoRepository;
 use Illuminate\Support\ServiceProvider;
 
 class RepositoryServiceProvider extends ServiceProvider
@@ -58,6 +58,6 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(TurnoRepositoryInterface::class, TurnoRepository::class);
         $this->app->bind(UsuarioRepositoryInterface::class, UsuarioRepository::class);
         $this->app->bind(TokenRecuperacionRepositoryInterface::class, TokenRecuperacionRepository::class);
-        $this->app->bind(VehiculoRepositoryInterface::class, VehiculoRespository::class);
+        $this->app->bind(VehiculoRepositoryInterface::class, VehiculoRepository::class);
     }
 }

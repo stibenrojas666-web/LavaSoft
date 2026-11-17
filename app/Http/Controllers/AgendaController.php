@@ -1,127 +1,145 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Http\Requests\AgendaStoreRequest;
 use App\Http\Requests\AgendaUpdateRequest;
 use App\Http\Requests\BusquedaIndexRequest;
+use App\Http\Requests\CambiarEstadoAgendaRequest;
 use App\Http\Requests\EmpleadosDisponiblesRequest;
 use App\Services\AgendaService;
-use App\Services\ClienteService;
 use App\Services\EmpleadoService;
-use App\Services\VehiculoService;
-use App\Services\ServicioService;
+use App\Services\NotificacionCitaService;
+use Illuminate\Http\Request;
 
 class AgendaController extends Controller
 {
-    private AgendaService $agendaService;
-    private ClienteService $clienteService;
-    private EmpleadoService $empleadoService;
-    private VehiculoService $vehiculoService;
-    private ServicioService $servicioService;
-
     public function __construct(
-        AgendaService $agendaService,
-        ClienteService $clienteService,
-        EmpleadoService $empleadoService,
-        VehiculoService $vehiculoService,
-        ServicioService $servicioService
-    ) {
-        $this->agendaService = $agendaService;
-        $this->clienteService = $clienteService;
-        $this->empleadoService = $empleadoService;
-        $this->vehiculoService = $vehiculoService;
-        $this->servicioService = $servicioService;
+        private AgendaService $agendaService,
+        private EmpleadoService $empleadoService,
+        private NotificacionCitaService $notificacionCitaService
+    ) {}
+
+    public function index(BusquedaIndexRequest $request)
+    {
+        return view('Agenda.index', $this->agendaService->prepararIndice($request->validated()));
     }
 
-    /**
-     * Display a listing of the resource.
-     */
-    public function index(BusquedaIndexRequest $busquedaAgendaRequest)
+    public function create(Request $request)
     {
-        return view('Agenda.index', $this->agendaService->prepararIndice($busquedaAgendaRequest->validated()));
-    }
+        $datos = $this->agendaService->prepararFormulario(null, old('vehiculos'));
+        $clienteId = $request->query('clienteId');
+        $vehiculoId = (int) $request->query('vehiculoId', 0);
+        $vehiculoSeleccionado = $datos['vehiculo']->firstWhere('id', $vehiculoId);
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        $cliente = $this->clienteService->listarTodo();
-        $empleado = collect();
-        $vehiculo = $this->vehiculoService->listarParaAgenda();
-        $serviciosPrecios = $this->servicioService->catalogoActivosConPrecios();
+        $datos['clienteSeleccionadoId'] = $clienteId;
 
-        $bloquesIniciales = $this->agendaService->bloquesIniciales(null, old('vehiculos'), $serviciosPrecios);
+        if ($vehiculoSeleccionado && (int) $vehiculoSeleccionado->clienteID === (int) $clienteId) {
+            if (old('vehiculos') === null) {
+                $datos['bloquesIniciales'] = $this->agendaService->bloquesIniciales(
+                    null,
+                    [[
+                        'vehiculoId' => $vehiculoSeleccionado->id,
+                        'servicios' => [['servicioId' => '', 'precioAcordado' => '']],
+                    ]],
+                    $datos['serviciosPrecios']
+                );
+            }
 
-        return view('Agenda.crear', compact('cliente', 'empleado', 'vehiculo', 'serviciosPrecios', 'bloquesIniciales'));
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(AgendaStoreRequest $agendaStoreRequest)
-    {
-        $this->agendaService->keep($agendaStoreRequest->validated());
-
-        return redirect()->route('agenda.index')->with('success', 'Cita agendada correctamente.');
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show()
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(int $id)
-    {
-        $agenda = $this->agendaService->findById($id);
-        if (! $this->agendaService->puedeEditar($agenda)) {
-            return redirect()->route('agenda.index')
-            ->with('error', 'Una cita terminada ya no se puede editar.');}
-        $cliente = $this->clienteService->listarTodo();
-        $empleado = $agenda->empleado ? collect([$agenda->empleado]) : collect();
-        $propios = $this->agendaService->vehiculosDeAgenda($agenda);
-        $vehiculo = $this->vehiculoService->listarParaAgenda($propios);
-        $serviciosPrecios = $this->servicioService->catalogoActivosConPrecios();
-
-        $bloquesIniciales = $this->agendaService->bloquesIniciales($agenda, old('vehiculos'), $serviciosPrecios);
-
-        return view('Agenda.editar', compact('agenda', 'cliente', 'empleado', 'vehiculo', 'serviciosPrecios', 'bloquesIniciales'));
-    }
-
-    /** Retorna empleados con turno en ese día/hora y sin otra cita activa. */
-    /** Retorna empleados con turno completo y sin cruces de citas. */
-public function empleadosDisponibles(EmpleadosDisponiblesRequest $empleadosDisponiblesRequest)
-{
-    return response()->json($this->empleadoService->disponiblesParaAgenda(
-        $empleadosDisponiblesRequest->validated()
-    ));
-}
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(int $id, AgendaUpdateRequest $agendaUpdateRequest)
-    {
-        $this->agendaService->update($id, $agendaUpdateRequest->validated());
-
-        return redirect()->route('agenda.index')->with('success', 'Cita actualizada correctamente.');
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(int $id)
-    {
-        if (!$this->agendaService->delete($id)) {
-            return redirect()->route('agenda.index')->with('error', 'No se puede eliminar la cita porque ya tiene un pago registrado.');
+            $datos['urlVolverVehiculo'] = route('vehiculos.edit', $vehiculoSeleccionado->id).'?continuarAgenda=1';
         }
 
-        return redirect()->route('agenda.index')->with('success', 'Cita eliminada correctamente.');
+        return view('Agenda.crear', $datos);
+    }
+
+    public function store(AgendaStoreRequest $request)
+    {
+        $datos = $request->validated();
+        $agenda = $this->agendaService->keep($datos);
+        $correoEnviado = $agenda->estado === 'cancelada'
+            ? true
+            : $this->notificacionCitaService->enviarSolicitud($agenda);
+        $retorno = $this->agendaService->parametrosRetornoTrasGuardar(
+            array_merge($request->query(), $request->all()),
+            $datos
+        );
+
+        $respuesta = redirect()->route('agenda.index', $retorno)->with('success', 'Cita agendada correctamente.');
+        if ($agenda->estado === 'cancelada') {
+            return $respuesta;
+        }
+
+        return $correoEnviado
+            ? $respuesta->with('info', 'Enviamos al cliente un aviso con los detalles de su cita.')
+            : $respuesta->with('warning', 'La cita se guardó, pero no se pudo enviar el aviso. Revisa que el cliente tenga un correo registrado.');
+    }
+
+    public function show()
+    {
+        // La ruta se conserva por compatibilidad con los recursos registrados.
+    }
+
+    public function edit(int $id)
+    {
+        $datos = $this->agendaService->prepararFormulario($id, old('vehiculos'));
+        if (! $this->agendaService->puedeEditar($datos['agenda'])) {
+            return redirect()->route('agenda.index')->with('error', 'Una cita terminada ya no se puede editar.');
+        }
+
+        return view('Agenda.editar', $datos);
+    }
+
+    public function cambiarEstado(CambiarEstadoAgendaRequest $request, int $id)
+    {
+        $estado = (string) $request->validated('estado');
+        $this->agendaService->cambiarEstadoRapido($id, $estado);
+        $agenda = $this->agendaService->findById($id);
+        $correoEnviado = $this->notificacionCitaService->enviarEstado($agenda, $estado);
+
+        return redirect()->to(route('agenda.index', $request->query()).'#agenda-'.$id)
+            ->with($correoEnviado ? 'success' : 'warning', $correoEnviado ? 'Estado actualizado y notificación enviada al cliente.' : 'Estado actualizado, pero no se pudo notificar al cliente.');
+    }
+
+    public function empleadosDisponibles(EmpleadosDisponiblesRequest $request)
+    {
+        return response()->json($this->empleadoService->disponiblesParaAgenda($request->validated()));
+    }
+
+    public function update(int $id, AgendaUpdateRequest $request)
+    {
+        $datos = $request->validated();
+        $estadoAnterior = $this->agendaService->findById($id)->estado;
+        $this->agendaService->update($id, $datos);
+        $correoEstadoEnviado = true;
+        if (($datos['estado'] ?? $estadoAnterior) !== $estadoAnterior) {
+            $correoEstadoEnviado = $this->notificacionCitaService->enviarEstado(
+                $this->agendaService->findById($id),
+                $datos['estado']
+            );
+        }
+        $retorno = $this->agendaService->parametrosRetornoTrasGuardar(
+            array_merge($request->query(), $request->all()),
+            $datos
+        );
+
+        $respuesta = redirect()->route('agenda.index', $retorno);
+
+        return $correoEstadoEnviado
+            ? $respuesta->with('success', 'Cita actualizada correctamente.')
+            : $respuesta->with('warning', 'La cita se actualizó, pero no se pudo notificar al cliente por correo.');
+    }
+
+    public function destroy(Request $request, int $id)
+    {
+        $retorno = $this->agendaService->parametrosRetorno(
+            array_merge($request->query(), $request->all())
+        );
+
+        if (! $this->agendaService->delete($id)) {
+            return redirect()->route('agenda.index', $retorno)
+                ->with('error', 'No se puede eliminar la cita porque ya tiene un pago registrado.');
+        }
+
+        return redirect()->route('agenda.index', $retorno)->with('success', 'Cita eliminada correctamente.');
     }
 }

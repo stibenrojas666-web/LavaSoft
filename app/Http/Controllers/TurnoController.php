@@ -2,18 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\TurnoService;
+use App\Http\Requests\BusquedaIndexRequest;
 use App\Http\Requests\TurnoStoreRequest;
 use App\Http\Requests\TurnoUpdateRequest;
-use App\Http\Requests\BusquedaIndexRequest;
-
+use App\Services\TurnoService;
 
 class TurnoController extends Controller
 {
+    public function __construct(private TurnoService $turnoService) {}
 
-public function __construct(private TurnoService $turnoService)
-{
-}
     /**
      * Display a listing of the resource.
      */
@@ -38,7 +35,8 @@ public function __construct(private TurnoService $turnoService)
     public function store(TurnoStoreRequest $turnoStoreRequest)
     {
         $this->turnoService->guardar($turnoStoreRequest->validated());
-        return redirect()->route('turnos.index')->with('success','Turno creado correctamente.');
+
+        return redirect()->route('turnos.index')->with('success', 'Turno creado correctamente.');
     }
 
     /**
@@ -63,6 +61,7 @@ public function __construct(private TurnoService $turnoService)
     public function update(TurnoUpdateRequest $turnoUpdateRequest, int $id)
     {
         $this->turnoService->actualizar($id, $turnoUpdateRequest->validated());
+
         return redirect()->route('turnos.index')->with('success', 'Turno actualizado correctamente.');
     }
 
@@ -72,6 +71,7 @@ public function __construct(private TurnoService $turnoService)
     public function destroy(int $id)
     {
         $this->turnoService->eliminar($id);
+
         return redirect()->route('turnos.index')->with('success', 'Turno eliminado correctamente.');
     }
 }

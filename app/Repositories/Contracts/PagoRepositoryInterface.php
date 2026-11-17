@@ -4,6 +4,7 @@ namespace App\Repositories\Contracts;
 
 /**
  * Contrato de acceso a datos para PagoRepository.
+ *
  * @method mixed historialPagos(...$arguments)
  * @method mixed agendaParaFactura(...$arguments)
  * @method mixed bloquearAgendaConfirmadaSinPago(...$arguments)
@@ -12,6 +13,4 @@ namespace App\Repositories\Contracts;
  * @method mixed marcarTerminada(...$arguments)
  * @method mixed empleadoPorId(...$arguments)
  */
-interface PagoRepositoryInterface
-{
-}
+interface PagoRepositoryInterface {}

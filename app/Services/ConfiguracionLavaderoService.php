@@ -14,18 +14,20 @@ use Throwable;
 
 class ConfiguracionLavaderoService
 {
-    public function __construct(private ConfiguracionLavaderoRepository $repository)
-    {
-    }
+    public function __construct(private ConfiguracionLavaderoRepository $repository) {}
 
     public function obtener(): ConfiguracionLavadero
     {
-        if (!Schema::hasTable('configuracion_lavadero')) {
+        if (! Schema::hasTable('configuracion_lavadero')) {
             return new ConfiguracionLavadero([
                 'nombre' => config('lavadero.nombre', 'LavaSoft'),
                 'nit' => config('lavadero.nit'),
                 'direccion' => config('lavadero.direccion'),
                 'telefono' => config('lavadero.telefono'),
+                'apertura_regular' => config('lavadero.apertura_regular', '07:00'),
+                'cierre_regular' => config('lavadero.cierre_regular', '18:00'),
+                'apertura_domingo_festivo' => config('lavadero.apertura_domingo_festivo', '08:00'),
+                'cierre_domingo_festivo' => config('lavadero.cierre_domingo_festivo', '13:00'),
                 'mostrar_logo' => true,
             ]);
         }
@@ -36,7 +38,7 @@ class ConfiguracionLavaderoService
             fn () => $this->repository->obtener()->getAttributes()
         );
 
-        return (new ConfiguracionLavadero())->forceFill($atributos);
+        return (new ConfiguracionLavadero)->forceFill($atributos);
     }
 
     public function rutaLogoVisible(): ?string

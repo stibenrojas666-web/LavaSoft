@@ -11,8 +11,7 @@ class VehiculoService
         private VehiculoRepositoryInterface $vehiculoRepository,
         private ClienteService $clienteService,
         private TipoVehiculoService $tipoVehiculoService
-    ) {
-    }
+    ) {}
 
     public function prepararFormulario(?int $vehiculoId = null): array
     {
@@ -40,12 +39,7 @@ class VehiculoService
 
     public function listarParaAgenda(array $incluirIds = [])
     {
-        $idsIncluidos = array_map('intval', $incluirIds);
-
-        return $this->getAll()->filter(fn ($vehiculo) =>
-            strtolower((string) $vehiculo->estado) === 'activo'
-            || in_array((int) $vehiculo->id, $idsIncluidos, true)
-        )->values();
+        return $this->vehiculoRepository->listarParaAgenda($incluirIds);
     }
 
     public function buscar(string $texto, array $filtros = [])

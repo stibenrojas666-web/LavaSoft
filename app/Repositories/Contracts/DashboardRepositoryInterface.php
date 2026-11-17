@@ -4,6 +4,7 @@ namespace App\Repositories\Contracts;
 
 /**
  * Contrato de acceso a datos para DashboardRepository.
+ *
  * @method mixed serviciosHoy(...$arguments)
  * @method mixed cajaHoy(...$arguments)
  * @method mixed lavadoresActivos(...$arguments)
@@ -15,6 +16,4 @@ namespace App\Repositories\Contracts;
  * @method mixed topServicios(...$arguments)
  * @method mixed ultimasCitas(...$arguments)
  */
-interface DashboardRepositoryInterface
-{
-}
+interface DashboardRepositoryInterface {}

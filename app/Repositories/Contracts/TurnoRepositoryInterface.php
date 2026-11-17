@@ -4,6 +4,7 @@ namespace App\Repositories\Contracts;
 
 /**
  * Contrato de acceso a datos para TurnoRepository.
+ *
  * @method mixed tieneCruce(...$arguments)
  * @method mixed listarTodo(...$arguments)
  * @method mixed buscar(...$arguments)
@@ -12,6 +13,4 @@ namespace App\Repositories\Contracts;
  * @method mixed buscarPorId(...$arguments)
  * @method mixed actualizar(...$arguments)
  */
-interface TurnoRepositoryInterface
-{
-}
+interface TurnoRepositoryInterface {}

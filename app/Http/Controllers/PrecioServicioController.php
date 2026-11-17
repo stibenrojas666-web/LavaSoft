@@ -2,16 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\PrecioServicioService;
+use App\Http\Requests\BusquedaIndexRequest;
 use App\Http\Requests\PrecioServicioStoreRequest;
 use App\Http\Requests\PrecioServicioUpdateRequest;
-use App\Http\Requests\BusquedaIndexRequest;
+use App\Services\PrecioServicioService;
 
-class PrecioServicioController extends Controller 
+class PrecioServicioController extends Controller
 {
-    public function __construct(private PrecioServicioService $precioServicioService)
-    {
-    }
+    public function __construct(private PrecioServicioService $precioServicioService) {}
+
     /**
      * Display a listing of the resource.
      */
@@ -39,7 +38,8 @@ class PrecioServicioController extends Controller
     public function store(PrecioServicioStoreRequest $precioServicioStoreRequest)
     {
         $this->precioServicioService->guardar($precioServicioStoreRequest->validated());
-        return redirect()->route('precioServicio.index')->with('success','precio del servicio creado correctamente.');
+
+        return redirect()->route('precioServicio.index')->with('success', 'precio del servicio creado correctamente.');
     }
 
     /**
@@ -67,7 +67,8 @@ class PrecioServicioController extends Controller
     public function update(PrecioServicioUpdateRequest $precioServicioUpdateRequest, int $id)
     {
         $this->precioServicioService->actualizar($id, $precioServicioUpdateRequest->validated());
-        return redirect()->route('precioServicio.index')->with('success','precio del servicio actualizado correctamente.');
+
+        return redirect()->route('precioServicio.index')->with('success', 'precio del servicio actualizado correctamente.');
     }
 
     /**
@@ -76,6 +77,7 @@ class PrecioServicioController extends Controller
     public function destroy(int $id)
     {
         $this->precioServicioService->eliminar($id);
-        return redirect()->route('precioServicio.index')->with('success','precio del servicio eliminado correctamente.');
+
+        return redirect()->route('precioServicio.index')->with('success', 'precio del servicio eliminado correctamente.');
     }
 }

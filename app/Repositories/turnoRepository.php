@@ -2,12 +2,12 @@
 
 namespace App\Repositories;
 
-use App\Repositories\Contracts\TurnoRepositoryInterface;
-
 use App\Models\Turno;
+use App\Repositories\Contracts\TurnoRepositoryInterface;
 use App\Support\TextoBusqueda;
 
-class TurnoRepository implements TurnoRepositoryInterface {
+class TurnoRepository implements TurnoRepositoryInterface
+{
     public function tieneCruce(int $empleadoId, string $dia, string $horaInicio, string $horaFin, ?int $turnoId = null): bool
     {
         return Turno::where('empleado_id', $empleadoId)
@@ -68,6 +68,7 @@ class TurnoRepository implements TurnoRepositoryInterface {
     {
         $turno = Turno::findOrFail($id);
         $turno->update($datos);
+
         return $turno;
     }
 }

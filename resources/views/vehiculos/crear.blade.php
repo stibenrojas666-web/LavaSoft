@@ -19,6 +19,9 @@
         class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
     >
         @csrf
+        @if($clienteSeleccionadoId)
+            <input type="hidden" name="continuarAgenda" value="1">
+        @endif
 
         <div class="border-b border-slate-100 px-6 py-5">
             <div class="flex items-center gap-3">
@@ -49,7 +52,7 @@
                         <option value="">Seleccione un cliente</option>
 
                         @foreach($cliente as $c)
-                            <option value="{{ $c->id }}" {{ old('clienteID') == $c->id ? 'selected' : '' }}>
+                            <option value="{{ $c->id }}" {{ old('clienteID', $clienteSeleccionadoId) == $c->id ? 'selected' : '' }}>
                                 {{ $c->nombreCliente }} {{ $c->apellidoCliente }}
                             </option>
                         @endforeach
@@ -153,7 +156,7 @@
                         class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-700 outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/10 @error('estado') border-red-400 @enderror"
                     >
                         <option value="">Seleccione un estado</option>
-                        <option value="Activo" {{ old('estado') == 'Activo' ? 'selected' : '' }}>Activo</option>
+                        <option value="Activo" {{ old('estado', $clienteSeleccionadoId ? 'Activo' : '') == 'Activo' ? 'selected' : '' }}>Activo</option>
                         <option value="Inactivo" {{ old('estado') == 'Inactivo' ? 'selected' : '' }}>Inactivo</option>
                     </select>
 
@@ -164,16 +167,7 @@
             </div>
         </div>
 
-        <div class="flex flex-col-reverse justify-end gap-3 border-t border-slate-100 bg-slate-50/70 px-6 py-4 sm:flex-row">
-            <a href="{{ route('vehiculos.index') }}" class="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-100">Cancelar</a>
-
-            <button
-                type="submit"
-                class="inline-flex items-center justify-center gap-2 rounded-xl bg-cyan-700 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-cyan-800 focus:outline-none focus:ring-4 focus:ring-cyan-500/20"
-            >
-                Guardar vehículo
-            </button>
-        </div>
+        <x-form-actions :cancel-url="$clienteSeleccionadoId ? route('clientes.show', $clienteSeleccionadoId) : route('vehiculos.index')" save-label="Guardar vehículo" />
     </form>
 </div>
 @endsection

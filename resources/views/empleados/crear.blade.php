@@ -174,13 +174,7 @@
             </div>
         </div>
 
-        <div class="empleado-actions">
-            <a href="{{ route('empleados.index') }}" class="empleado-btn empleado-btn-cancel">Cancelar</a>
-            <button type="submit" class="empleado-btn empleado-btn-save">
-                @include('layouts.partials.icons', ['icon' => 'save'])
-                Guardar empleado
-            </button>
-        </div>
+        <x-form-actions :cancel-url="route('empleados.index')" save-label="Guardar empleado" class="empleado-actions" />
     </form>
 </div>
 @endsection

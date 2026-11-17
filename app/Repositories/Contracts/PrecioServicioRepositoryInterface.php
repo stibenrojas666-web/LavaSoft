@@ -4,6 +4,7 @@ namespace App\Repositories\Contracts;
 
 /**
  * Contrato de acceso a datos para PrecioServicioRepository.
+ *
  * @method mixed listarTodo(...$arguments)
  * @method mixed buscar(...$arguments)
  * @method mixed guardar(...$arguments)
@@ -13,6 +14,4 @@ namespace App\Repositories\Contracts;
  * @method mixed buscarConfiguracion(...$arguments)
  * @method mixed actualizar(...$arguments)
  */
-interface PrecioServicioRepositoryInterface
-{
-}
+interface PrecioServicioRepositoryInterface {}

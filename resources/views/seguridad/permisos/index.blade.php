@@ -84,7 +84,7 @@
             </div>
 
             <div class="overflow-x-auto">
-                <table class="lavasoft-table min-w-[700px] text-sm">
+                <table data-datatable data-server-paginated="true" class="lavasoft-table min-w-full text-sm">
                     <thead class="bg-white text-left text-slate-500">
                         <tr>
                             <th class="px-4 py-3">Permiso</th>

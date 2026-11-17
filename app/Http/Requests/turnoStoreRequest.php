@@ -28,7 +28,7 @@ class TurnoStoreRequest extends FormRequest
             'jornada' => 'nullable|string|in:mañana,tarde,noche',
             'horaInicio' => 'required|date_format:H:i',
             'horaFin' => 'required|date_format:H:i|after:horaInicio',
-            ];
+        ];
     }
 
     public function messages(): array
@@ -47,6 +47,6 @@ class TurnoStoreRequest extends FormRequest
             'horaFin.required' => 'Debes ingresar la hora de fin.',
             'horaFin.date_format' => 'La hora de fin debe tener el formato HH:MM.',
             'horaFin.after' => 'La hora de fin debe ser posterior a la hora de inicio.',
-            ];
+        ];
     }
 }

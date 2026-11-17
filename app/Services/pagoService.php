@@ -3,24 +3,22 @@
 namespace App\Services;
 
 use App\Mail\FacturaCitaMail;
+use App\Models\Agenda;
 use App\Models\Pago;
 use App\Repositories\Contracts\EmpleadoRepositoryInterface as EmpleadoRepository;
 use App\Repositories\Contracts\PagoRepositoryInterface as PagoRepository;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Throwable;
-
 
 class PagoService
 {
     public function __construct(
         private PagoRepository $pagoRepository,
         private EmpleadoRepository $empleadoRepository
-    )
-    {
-    }
+    ) {}
 
     public function obtenerFactura(int $agendaId): array
     {
@@ -36,12 +34,11 @@ class PagoService
         $datosFactura = $this->obtenerFactura($agendaId);
 
         if (! $datosFactura['agenda']->pago) {
-            throw (new ModelNotFoundException())->setModel(\App\Models\Agenda::class, $agendaId);
+            throw (new ModelNotFoundException)->setModel(Agenda::class, $agendaId);
         }
 
         return $datosFactura;
     }
-
 
     public function detallePorVehiculo(object $agenda): array
     {
@@ -98,57 +95,57 @@ class PagoService
     }
 
     public function registrarPago(int $agendaId, array $datos): Pago
-{
-    return DB::transaction(function () use ($agendaId, $datos) {
-        $agenda = $this->pagoRepository
-            ->bloquearAgendaConfirmadaSinPago($agendaId);
+    {
+        return DB::transaction(function () use ($agendaId, $datos) {
+            $agenda = $this->pagoRepository
+                ->bloquearAgendaConfirmadaSinPago($agendaId);
 
-        if (!$agenda) {
-            throw ValidationException::withMessages([
-                'pago' => 'Solo se puede pagar una cita confirmada que todavía no tenga un pago.',
+            if (! $agenda) {
+                throw ValidationException::withMessages([
+                    'pago' => 'Solo se puede pagar una cita confirmada que todavía no tenga un pago.',
+                ]);
+            }
+
+            $total = $this->calcularTotal($agendaId);
+
+            if ($total <= 0 || $total > 99999999.99) {
+                throw ValidationException::withMessages([
+                    'pago' => 'La cita debe tener un total válido mayor que cero para registrar el pago.',
+                ]);
+            }
+
+            $empleadoAsignado = $agenda->empleadoId
+                ? $this->empleadoRepository->buscarParaPago((int) $agenda->empleadoId)
+                : null;
+
+            $porcentaje = (float) (
+                $empleadoAsignado?->porcentajeComision ?? 0
+            );
+
+            $comision = round($total * ($porcentaje / 100), 2);
+
+            $pago = $this->pagoRepository->crear([
+                'agendaId' => $agendaId,
+                'empleadoId' => $empleadoAsignado?->id,
+                'Monto' => $total,
+                'MetodoPago' => $datos['MetodoPago'],
+                'FechaPago' => now(),
+                'RequerirFactura' => (bool) ($datos['RequerirFactura'] ?? false),
+                'porcentajeComision' => $porcentaje,
+                'valorComision' => $comision,
             ]);
-        }
 
-        $total = $this->calcularTotal($agendaId);
+            $this->pagoRepository->marcarTerminada($agendaId);
 
-        if ($total <= 0 || $total > 99999999.99) {
-            throw ValidationException::withMessages([
-                'pago' => 'La cita debe tener un total válido mayor que cero para registrar el pago.',
-            ]);
-        }
-
-        $empleadoAsignado = $agenda->empleadoId
-            ? $this->empleadoRepository->buscarParaPago((int) $agenda->empleadoId)
-            : null;
-
-        $porcentaje = (float) (
-            $empleadoAsignado?->porcentajeComision ?? 0
-        );
-
-        $comision = round($total * ($porcentaje / 100), 2);
-
-        $pago = $this->pagoRepository->crear([
-            'agendaId' => $agendaId,
-            'empleadoId' => $empleadoAsignado?->id,
-            'Monto' => $total,
-            'MetodoPago' => $datos['MetodoPago'],
-            'FechaPago' => now(),
-            'RequerirFactura' => (bool) ($datos['RequerirFactura'] ?? false),
-            'porcentajeComision' => $porcentaje,
-            'valorComision' => $comision,
-        ]);
-
-        $this->pagoRepository->marcarTerminada($agendaId);
-
-        return $pago;
-    });
-}
+            return $pago;
+        });
+    }
 
     public function enviarFacturaPorCorreo(int $agendaId): void
     {
         $agenda = $this->pagoRepository->agendaParaFactura($agendaId);
 
-        if (!$agenda->pago) {
+        if (! $agenda->pago) {
             throw ValidationException::withMessages([
                 'correo' => 'Registra el pago antes de enviar la factura por correo.',
             ]);

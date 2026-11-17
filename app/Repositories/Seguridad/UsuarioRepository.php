@@ -2,14 +2,14 @@
 
 namespace App\Repositories\Seguridad;
 
-use App\Repositories\Seguridad\Contracts\UsuarioRepositoryInterface;
-
 use App\Models\User;
+use App\Repositories\Seguridad\Contracts\UsuarioRepositoryInterface;
+use App\Support\TextoBusqueda;
 use Illuminate\Database\Eloquent\Collection;
 use Spatie\Permission\Models\Role;
-use App\Support\TextoBusqueda;
 
-class UsuarioRepository implements UsuarioRepositoryInterface {
+class UsuarioRepository implements UsuarioRepositoryInterface
+{
     private function modelo(): string
     {
         return config('auth.providers.users.model');
@@ -25,7 +25,7 @@ class UsuarioRepository implements UsuarioRepositoryInterface {
         return $this->modelo()::findOrFail($id);
     }
 
-    public function crear(array $datos): User 
+    public function crear(array $datos): User
     {
         return $this->modelo()::create($datos);
     }
@@ -43,7 +43,7 @@ class UsuarioRepository implements UsuarioRepositoryInterface {
     public function contarConRol(string $rol): int
     {
         return $this->modelo()::whereHas('rolesConInactivos', function ($consulta) use ($rol) {
-            $consulta->where(config('permission.table_names.roles') . '.name', $rol);
+            $consulta->where(config('permission.table_names.roles').'.name', $rol);
         })->count();
     }
 
@@ -69,27 +69,27 @@ class UsuarioRepository implements UsuarioRepositoryInterface {
     }
 
     public function sincronizarRoles(User $usuario, array $nombresDeRoles): void
-{
-    $rolesActualesInactivos = $usuario->rolesConInactivos()
-        ->where('activo', false)
-        ->whereIn('name', $nombresDeRoles)
-        ->pluck('id')
-        ->all();
+    {
+        $rolesActualesInactivos = $usuario->rolesConInactivos()
+            ->where('activo', false)
+            ->whereIn('name', $nombresDeRoles)
+            ->pluck('id')
+            ->all();
 
-    $rolesActivos = Role::whereIn('name', $nombresDeRoles)
-        ->where('guard_name', config('seguridad.guard'))
-        ->where('activo', true)
-        ->pluck('id')
-        ->all();
+        $rolesActivos = Role::whereIn('name', $nombresDeRoles)
+            ->where('guard_name', config('seguridad.guard'))
+            ->where('activo', true)
+            ->pluck('id')
+            ->all();
 
-    $ids = array_unique(array_merge(
-        $rolesActivos,
-        $rolesActualesInactivos
-    ));
+        $ids = array_unique(array_merge(
+            $rolesActivos,
+            $rolesActualesInactivos
+        ));
 
-    $usuario->rolesConInactivos()->sync($ids);
+        $usuario->rolesConInactivos()->sync($ids);
 
-    $usuario->unsetRelation('roles');
-    $usuario->unsetRelation('rolesConInactivos');
-}
+        $usuario->unsetRelation('roles');
+        $usuario->unsetRelation('rolesConInactivos');
+    }
 }

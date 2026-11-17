@@ -328,8 +328,6 @@
 .dark .custom-scrollbar::-webkit-scrollbar-thumb {
   background-color: #344054;
 }
-
-
 .sidebar:hover {
   width: 290px;
 }
@@ -993,4 +991,50 @@ body :is(a, button)[title^="Eliminar"]:disabled {
   cursor: not-allowed !important;
   background: transparent !important;
   color: #cbd5e1 !important;
+}
+
+/* Tablas DataTables: conservar el ancho disponible y revelar columnas ocultas en móvil. */
+.dt-container {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.dt-layout-row {
+  flex-wrap: wrap;
+  gap: .5rem 1rem;
+}
+
+table.dataTable.dtr-inline.collapsed > tbody > tr > td.dtr-control::before,
+table.dataTable.dtr-inline.collapsed > tbody > tr > th.dtr-control::before {
+  background-color: #087b98;
+  box-shadow: none;
+}
+
+table.dataTable > tbody > tr.child > td.child {
+  background: #f8fbfd;
+  padding: .65rem .8rem;
+}
+
+table.dataTable > tbody > tr.child ul.dtr-details {
+  display: grid;
+  width: 100%;
+  gap: .4rem;
+}
+
+table.dataTable > tbody > tr.child ul.dtr-details > li {
+  display: grid;
+  grid-template-columns: minmax(6rem, 35%) minmax(0, 1fr);
+  gap: .5rem;
+  border: 0;
+  padding: .2rem 0;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 640px) {
+  table[data-datatable] th,
+  table[data-datatable] td {
+    padding-inline: .65rem !important;
+    font-size: .75rem;
+  }
 }

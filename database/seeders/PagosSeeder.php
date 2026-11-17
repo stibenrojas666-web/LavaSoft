@@ -25,13 +25,18 @@ class PagosSeeder extends Seeder
                 return;
             }
 
-            Pago::firstOrCreate([
+            $empleado = $cita->empleado;
+            $porcentaje = (float) ($empleado?->porcentajeComision ?? 0);
+            Pago::updateOrCreate([
                 'agendaId' => $cita->id,
             ], [
+                'empleadoId' => $empleado?->id,
                 'Monto' => $monto,
                 'MetodoPago' => 'Efectivo',
                 'FechaPago' => now(),
                 'RequerirFactura' => false,
+                'porcentajeComision' => $porcentaje,
+                'valorComision' => round($monto * $porcentaje / 100, 2),
             ]);
 
             $cita->update(['estado' => 'terminada']);

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Factura de servicio #{{ $agenda->id }}</title>
+    <title>Factura de servicio #{{ $agenda->referencia }}</title>
     @vite(['resources/css/app.css'])
     <style>
         @page {
@@ -38,7 +38,7 @@
         <div class="no-imprimir mb-5 flex items-center justify-between gap-3">
             <div>
                 <p class="text-sm font-bold text-slate-800">Comprobante de servicio</p>
-                <p class="text-xs text-slate-500">Factura de la cita #{{ $agenda->id }}</p>
+                <p class="text-xs text-slate-500">Factura de la cita #{{ $agenda->referencia }}</p>
             </div>
 
             <button

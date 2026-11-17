@@ -2,6 +2,7 @@
 
 namespace App\Support;
 
+use App\Services\ConfiguracionLavaderoService;
 use Carbon\Carbon;
 
 class HorarioLavadero
@@ -20,29 +21,30 @@ class HorarioLavadero
                 true
             );
 
+        $configuracion = app(ConfiguracionLavaderoService::class)->obtener();
         $inicio = $esDomingoOFestivo
-            ? config('lavadero.apertura_domingo_festivo', '08:00')
-            : config('lavadero.apertura_regular', '07:00');
+            ? ($configuracion->apertura_domingo_festivo ?: config('lavadero.apertura_domingo_festivo', '08:00'))
+            : ($configuracion->apertura_regular ?: config('lavadero.apertura_regular', '07:00'));
 
         $fin = $esDomingoOFestivo
-            ? config('lavadero.cierre_domingo_festivo', '13:00')
-            : config('lavadero.cierre_regular', '18:00');
+            ? ($configuracion->cierre_domingo_festivo ?: config('lavadero.cierre_domingo_festivo', '13:00'))
+            : ($configuracion->cierre_regular ?: config('lavadero.cierre_regular', '18:00'));
 
         $horaInicio = Carbon::createFromFormat(
             'Y-m-d H:i',
-            $dia->toDateString() . ' ' . substr($hora, 0, 5)
+            $dia->toDateString().' '.substr($hora, 0, 5)
         );
 
         $horaFin = $horaInicio->copy()->addMinutes($duracionMinutos);
 
         $apertura = Carbon::createFromFormat(
             'Y-m-d H:i',
-            $dia->toDateString() . ' ' . $inicio
+            $dia->toDateString().' '.substr($inicio, 0, 5)
         );
 
         $cierre = Carbon::createFromFormat(
             'Y-m-d H:i',
-            $dia->toDateString() . ' ' . $fin
+            $dia->toDateString().' '.substr($fin, 0, 5)
         );
 
         return $horaInicio->greaterThanOrEqualTo($apertura)

@@ -33,11 +33,11 @@
 
     <div class="relative min-w-0 flex-1">
 
-        <p class="truncate text-xs font-bold text-slate-500 sm:text-sm">
+        <p class="break-words text-xs font-bold leading-tight text-slate-500 sm:text-sm">
             {{ $label }}
         </p>
 
-        <p class="mt-1 truncate text-2xl font-extrabold tracking-tight text-[#17394d] sm:text-3xl">
+        <p class="mt-1 text-xl font-extrabold tracking-tight text-[#17394d] sm:text-2xl xl:text-3xl [overflow-wrap:anywhere]">
             {{ $value }}
         </p>
 

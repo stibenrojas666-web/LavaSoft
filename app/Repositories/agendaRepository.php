@@ -2,14 +2,19 @@
 
 namespace App\Repositories;
 
-use App\Repositories\Contracts\AgendaRepositoryInterface;
-
 use App\Models\Agenda;
 use App\Models\AgendaServicios;
+use App\Models\Empleado;
 use App\Models\Pago;
+use App\Models\Servicio;
+use App\Models\Turno;
+use App\Models\Vehiculo;
+use App\Repositories\Contracts\AgendaRepositoryInterface;
 use App\Support\TextoBusqueda;
+use Carbon\Carbon;
 
-class AgendaRepository implements AgendaRepositoryInterface {
+class AgendaRepository implements AgendaRepositoryInterface
+{
     public function getAll()
     {
         return Agenda::query()
@@ -103,6 +108,7 @@ class AgendaRepository implements AgendaRepositoryInterface {
     public function keep(array $datos)
     {
         $datos['vehiculoId'] = null;
+
         return Agenda::create($datos);
     }
 
@@ -128,37 +134,38 @@ class AgendaRepository implements AgendaRepositoryInterface {
 
     public function vehiculoPerteneceACliente(int $vehiculoId, int $clienteId): bool
     {
-        return \App\Models\Vehiculo::whereKey($vehiculoId)
+        return Vehiculo::whereKey($vehiculoId)
             ->where('clienteID', $clienteId)
             ->exists();
     }
 
     public function vehiculoActivo(int $id): bool
     {
-        return \App\Models\Vehiculo::whereKey($id)->where('estado', 'Activo')->exists();
+        return Vehiculo::whereKey($id)->where('estado', 'Activo')->exists();
     }
 
     public function servicioActivo(int $id): bool
     {
-        return \App\Models\Servicio::whereKey($id)->where('estado', true)->exists();
+        return Servicio::whereKey($id)->where('estado', true)->exists();
     }
 
     public function empleadoActivo(int $empleadoId): bool
     {
-        return \App\Models\Empleado::whereKey($empleadoId)->where('estado', true)->exists();
+        return Empleado::whereKey($empleadoId)->where('estado', true)->exists();
     }
 
     public function empleadoTieneTurno(
-    int $empleadoId,string $dia,string $hora,int $duracionMinutos): bool {
-    $horaFin = \Carbon\Carbon::createFromFormat('H:i:s', $hora)
-        ->addMinutes($duracionMinutos)
-        ->format('H:i:s');
+        int $empleadoId, string $dia, string $hora, int $duracionMinutos): bool
+    {
+        $horaFin = Carbon::createFromFormat('H:i:s', $hora)
+            ->addMinutes($duracionMinutos)
+            ->format('H:i:s');
 
-    return \App\Models\Turno::where('empleado_id', $empleadoId)
-        ->where('dia', $dia)
-        ->where('horaInicio', '<=', $hora)
-        ->where('horaFin', '>=', $horaFin)
-        ->exists();
+        return Turno::where('empleado_id', $empleadoId)
+            ->where('dia', $dia)
+            ->where('horaInicio', '<=', $hora)
+            ->where('horaFin', '>=', $horaFin)
+            ->exists();
     }
 
     public function empleadoOcupado(int $empleadoId, string $fecha, string $hora, ?int $agendaId = null): bool
@@ -176,6 +183,7 @@ class AgendaRepository implements AgendaRepositoryInterface {
         $agenda = Agenda::findOrFail($id);
         $datos['vehiculoId'] = null;
         $agenda->update($datos);
+
         return $agenda;
     }
 
@@ -211,6 +219,6 @@ class AgendaRepository implements AgendaRepositoryInterface {
 
     public function duracionesServicios(array $ids)
     {
-        return \App\Models\Servicio::whereIn('id', $ids)->pluck('duracionMinutos', 'id');
+        return Servicio::whereIn('id', $ids)->pluck('duracionMinutos', 'id');
     }
 }

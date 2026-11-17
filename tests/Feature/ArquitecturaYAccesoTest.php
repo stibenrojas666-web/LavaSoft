@@ -35,8 +35,8 @@ class ArquitecturaYAccesoTest extends TestCase
 
     public function test_el_modelo_agenda_declara_sus_campos_asignables(): void
     {
-        $this->assertContains('clienteId', (new Agenda())->getFillable());
-        $this->assertContains('fecha', (new Agenda())->getFillable());
+        $this->assertContains('clienteId', (new Agenda)->getFillable());
+        $this->assertContains('fecha', (new Agenda)->getFillable());
     }
 
     public function test_el_seeder_crea_el_administrador_configurado(): void

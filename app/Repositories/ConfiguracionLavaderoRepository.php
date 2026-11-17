@@ -2,11 +2,11 @@
 
 namespace App\Repositories;
 
+use App\Models\ConfiguracionLavadero;
 use App\Repositories\Contracts\ConfiguracionLavaderoRepositoryInterface;
 
-use App\Models\ConfiguracionLavadero;
-
-class ConfiguracionLavaderoRepository implements ConfiguracionLavaderoRepositoryInterface {
+class ConfiguracionLavaderoRepository implements ConfiguracionLavaderoRepositoryInterface
+{
     public function obtener(): ConfiguracionLavadero
     {
         return ConfiguracionLavadero::query()->first()

@@ -2,14 +2,14 @@
 
 namespace App\Repositories;
 
-use App\Repositories\Contracts\PagoRepositoryInterface;
-
 use App\Models\Agenda;
 use App\Models\AgendaServicios;
 use App\Models\Pago;
+use App\Repositories\Contracts\PagoRepositoryInterface;
 use App\Support\TextoBusqueda;
 
-class PagoRepository implements PagoRepositoryInterface {
+class PagoRepository implements PagoRepositoryInterface
+{
     public function historialPagos(string $texto = '', array $filtros = [])
     {
         $consulta = TextoBusqueda::aplicar(Pago::query()
@@ -42,7 +42,7 @@ class PagoRepository implements PagoRepositoryInterface {
             ->withQueryString();
     }
 
-    public function agendaParaFactura(int $agendaId): agenda
+    public function agendaParaFactura(int $agendaId): Agenda
     {
         return Agenda::with([
             'cliente',
@@ -53,11 +53,11 @@ class PagoRepository implements PagoRepositoryInterface {
         ])->findOrFail($agendaId);
     }
 
-    public function bloquearAgendaConfirmadaSinPago(int $agendaId): ?agenda
+    public function bloquearAgendaConfirmadaSinPago(int $agendaId): ?Agenda
     {
         $agenda = Agenda::whereKey($agendaId)->lockForUpdate()->first();
 
-        if (!$agenda || $agenda->estado !== 'confirmada' || Pago::where('agendaId', $agendaId)->exists()) {
+        if (! $agenda || $agenda->estado !== 'confirmada' || Pago::where('agendaId', $agendaId)->exists()) {
             return null;
         }
 
@@ -69,7 +69,7 @@ class PagoRepository implements PagoRepositoryInterface {
         return (float) AgendaServicios::where('agendaId', $agendaId)->sum('Precio');
     }
 
-    public function crear(array $datos): pago
+    public function crear(array $datos): Pago
     {
         return Pago::create($datos);
     }

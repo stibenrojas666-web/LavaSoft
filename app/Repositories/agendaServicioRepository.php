@@ -2,17 +2,18 @@
 
 namespace App\Repositories;
 
-use App\Repositories\Contracts\AgendaServicioRepositoryInterface;
-
+use App\Models\Agenda;
 use App\Models\AgendaServicios;
 use App\Models\Pago;
+use App\Repositories\Contracts\AgendaServicioRepositoryInterface;
 use App\Support\TextoBusqueda;
 
-class AgendaServicioRepository implements AgendaServicioRepositoryInterface {
+class AgendaServicioRepository implements AgendaServicioRepositoryInterface
+{
     public function getAll()
     {
         return AgendaServicios::query()
-            ->select(['id', 'agendaId', 'vehiculoId', 'servicioId', 'Precio','duracionMinutos'])
+            ->select(['id', 'agendaId', 'vehiculoId', 'servicioId', 'Precio', 'duracionMinutos'])
             ->with([
                 'agenda:id,clienteId,empleadoId,fecha,hora,estado',
                 'agenda.cliente:id,nombreCliente,apellidoCliente',
@@ -26,7 +27,7 @@ class AgendaServicioRepository implements AgendaServicioRepositoryInterface {
     public function buscar(string $texto, array $filtros = [])
     {
         return TextoBusqueda::aplicar(AgendaServicios::query()
-            ->select(['id', 'agendaId', 'vehiculoId', 'servicioId', 'Precio','duracionMinutos'])
+            ->select(['id', 'agendaId', 'vehiculoId', 'servicioId', 'Precio', 'duracionMinutos'])
             ->with([
                 'agenda:id,clienteId,empleadoId,fecha,hora,estado',
                 'agenda.cliente:id,nombreCliente,apellidoCliente',
@@ -34,13 +35,13 @@ class AgendaServicioRepository implements AgendaServicioRepositoryInterface {
                 'vehiculo.tipoVehiculo:id,nombre',
                 'servicio:id,nombre',
             ]), $texto, fn ($consulta, $termino) => $consulta
-                ->where('Precio', 'like', $termino)
-                ->orWhereHas('agenda', fn ($agenda) => $agenda->where('id', 'like', $termino)
-                    ->orWhere('fecha', 'like', $termino)
-                    ->orWhereHas('cliente', fn ($cliente) => $cliente->where('nombreCliente', 'like', $termino)
-                        ->orWhere('apellidoCliente', 'like', $termino)))
-                ->orWhereHas('vehiculo', fn ($vehiculo) => $vehiculo->where('placa', 'like', $termino))
-                ->orWhereHas('servicio', fn ($servicio) => $servicio->where('nombre', 'like', $termino)))
+            ->where('Precio', 'like', $termino)
+            ->orWhereHas('agenda', fn ($agenda) => $agenda->where('id', 'like', $termino)
+                ->orWhere('fecha', 'like', $termino)
+                ->orWhereHas('cliente', fn ($cliente) => $cliente->where('nombreCliente', 'like', $termino)
+                    ->orWhere('apellidoCliente', 'like', $termino)))
+            ->orWhereHas('vehiculo', fn ($vehiculo) => $vehiculo->where('placa', 'like', $termino))
+            ->orWhereHas('servicio', fn ($servicio) => $servicio->where('nombre', 'like', $termino)))
             ->when(($filtros['estado'] ?? '') !== '', fn ($query) => $query->whereHas('agenda', fn ($agenda) => $agenda->where('estado', $filtros['estado'])))
             ->when(($filtros['desde'] ?? '') !== '', fn ($query) => $query->whereHas('agenda', fn ($agenda) => $agenda->whereDate('fecha', '>=', $filtros['desde'])))
             ->when(($filtros['hasta'] ?? '') !== '', fn ($query) => $query->whereHas('agenda', fn ($agenda) => $agenda->whereDate('fecha', '<=', $filtros['hasta'])))
@@ -70,6 +71,7 @@ class AgendaServicioRepository implements AgendaServicioRepositoryInterface {
     {
         $agendaServicio = AgendaServicios::findOrFail($id);
         $agendaServicio->update($datos);
+
         return $agendaServicio;
     }
 
@@ -85,6 +87,6 @@ class AgendaServicioRepository implements AgendaServicioRepositoryInterface {
 
     public function buscarAgenda(int $agendaId)
     {
-        return \App\Models\Agenda::with('cliente')->findOrFail($agendaId);
+        return Agenda::with('cliente')->findOrFail($agendaId);
     }
 }

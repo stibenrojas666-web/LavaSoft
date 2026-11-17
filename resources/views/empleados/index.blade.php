@@ -12,8 +12,6 @@
     .empleado-card:hover{transform:translateY(-3px);border-color:#a5dbe5;box-shadow:0 12px 25px rgb(11 42 58 / 9%)}
     .empleado-info-label{color:#8193a2;font-size:12px}
     .empleado-info-value{overflow-wrap:anywhere;color:#17394d;font-size:13px;font-weight:600}
-    .empleado-btn-nuevo{display:inline-flex;min-height:40px;align-items:center;justify-content:center;gap:8px;padding:0 16px;border-radius:10px;background:linear-gradient(110deg,#087b98,#06364c);color:#fff;font-size:12px;font-weight:700;transition:.2s}
-    .empleado-btn-nuevo:hover{filter:brightness(1.1);transform:translateY(-1px)}
     .empleado-empty{padding:40px 20px;border:1px dashed #cbdce6;border-radius:16px;background:#f8fbfd;text-align:center}
     .empleado-status{display:inline-flex;align-items:center;gap:7px;border-radius:30px;padding:6px 10px;font-size:11px;font-weight:700}
     .empleado-status.activo{background:#ecfdf5;color:#047857}
@@ -27,16 +25,7 @@
         variant="list"
         title="Equipo de trabajo"
         description="Consulta y administra la información de los empleados del lavadero."
-    >
-        <x-slot:actions>
-            <a href="{{ route('empleados.create') }}" class="empleado-btn-nuevo">
-                <span class="h-4 w-4">
-                    @include('layouts.partials.icons', ['icon' => 'plus'])
-                </span>
-                Nuevo empleado
-            </a>
-        </x-slot:actions>
-    </x-module-header>
+    />
 
     <div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div class="empleado-stat flex items-center gap-4">
@@ -109,7 +98,7 @@
 
         <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             @forelse($empleados as $empleado)
-                <article class="empleado-card">
+                <article id="empleado-{{ $empleado->id }}" class="empleado-card scroll-mt-24">
 
                     <div class="flex items-start gap-4">
                         <span class="empleado-icon">
@@ -162,7 +151,7 @@
 
                     <div class="mt-auto flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-4">
 
-                        <form action="{{ route('empleados.estado', $empleado->id) }}" method="POST">
+                        <form data-preserve-scroll action="{{ route('empleados.estado', array_merge(['id' => $empleado->id], request()->query())) }}" method="POST">
                             @csrf
                             @method('PATCH')
 
@@ -251,5 +240,6 @@
             </div>
         @endif
     </div>
+    <x-floating-action :href="route('empleados.create')" label="Nuevo empleado" icon="plus" />
 </div>
 @endsection

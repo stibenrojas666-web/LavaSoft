@@ -2,17 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\PagoStoreRequest;
 use App\Http\Requests\BusquedaIndexRequest;
+use App\Http\Requests\PagoStoreRequest;
 use App\Services\PagoService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
 class PagoController extends Controller
 {
-    public function __construct(private PagoService $pagoService)
-    {
-    }
+    public function __construct(private PagoService $pagoService) {}
 
     public function historial(BusquedaIndexRequest $busquedaIndexRequest): View
     {
@@ -42,7 +40,7 @@ class PagoController extends Controller
             ->with('success', 'Factura enviada al correo registrado del cliente.');
     }
 
-        public function facturaPublica(int $agendaId): View
+    public function facturaPublica(int $agendaId): View
     {
         return view('pagos.factura-publica', $this->pagoService->obtenerFacturaPublica($agendaId));
     }

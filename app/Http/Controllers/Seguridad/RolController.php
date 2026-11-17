@@ -1,23 +1,22 @@
 <?php
 
-
 namespace App\Http\Controllers\Seguridad;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\BusquedaIndexRequest;
 use App\Http\Requests\RolStoreRequest;
 use App\Http\Requests\RolUpdateRequest;
 use App\Services\Seguridad\RolService;
-use App\Http\Requests\BusquedaIndexRequest;
 use Exception;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class RolController extends Controller
 {
     public function __construct(
         private RolService $rolService,
-    ) {
-    }
+    ) {}
 
     public function index(BusquedaIndexRequest $busquedaIndexRequest): View
     {
@@ -60,15 +59,17 @@ class RolController extends Controller
         return redirect()->route('seguridad.roles.index')->with('success', 'Rol actualizado correctamente.');
     }
 
-    public function estado(int $rol): RedirectResponse
+    public function estado(Request $request, int $rol): RedirectResponse
     {
         try {
             $resultado = $this->rolService->cambiarEstadoPorId($rol);
         } catch (Exception $e) {
-            return back()->with('error', $e->getMessage());
+            return redirect()->to(route('seguridad.roles.index', $request->query()).'#rol-'.$rol)
+                ->with('error', $e->getMessage());
         }
 
-        return back()->with('success', 'El rol "' . $resultado['nombre'] . '" quedó ' . ($resultado['activo'] ? 'activo' : 'inactivo') . '.');
+        return redirect()->to(route('seguridad.roles.index', $request->query()).'#rol-'.$rol)
+            ->with('success', 'El rol "'.$resultado['nombre'].'" quedó '.($resultado['activo'] ? 'activo' : 'inactivo').'.');
     }
 
     public function destroy(int $rol): RedirectResponse

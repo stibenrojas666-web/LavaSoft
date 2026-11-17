@@ -2,11 +2,12 @@
 
 namespace Database\Factories;
 
+use App\Models\TipoVehiculo;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class TipoVehiculoFactory extends Factory
 {
-    protected $model = \App\Models\TipoVehiculo::class;
+    protected $model = TipoVehiculo::class;
 
     public function definition(): array
     {

@@ -4,6 +4,7 @@ namespace App\Repositories\Contracts;
 
 /**
  * Contrato de acceso a datos para EmpleadoRepository.
+ *
  * @method mixed listarTodo(...$arguments)
  * @method mixed buscar(...$arguments)
  * @method mixed candidatosConTurno(...$arguments)
@@ -14,6 +15,4 @@ namespace App\Repositories\Contracts;
  * @method mixed buscarParaPago(...$arguments)
  * @method mixed actualizar(...$arguments)
  */
-interface EmpleadoRepositoryInterface
-{
-}
+interface EmpleadoRepositoryInterface {}

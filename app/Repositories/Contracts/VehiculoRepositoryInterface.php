@@ -3,7 +3,8 @@
 namespace App\Repositories\Contracts;
 
 /**
- * Contrato de acceso a datos para VehiculoRespository.
+ * Contrato de acceso a datos para vehículos.
+ *
  * @method mixed getAll(...$arguments)
  * @method mixed buscar(...$arguments)
  * @method mixed cambiarEstado(...$arguments)
@@ -16,4 +17,5 @@ namespace App\Repositories\Contracts;
  */
 interface VehiculoRepositoryInterface
 {
+    public function listarParaAgenda(array $incluirIds = []);
 }

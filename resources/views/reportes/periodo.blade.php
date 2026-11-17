@@ -98,7 +98,7 @@
             title="Resumen del período"
             subtitle="{{ \Illuminate\Support\Carbon::parse($desde)->format('d/m/Y') }} al {{ \Illuminate\Support\Carbon::parse($hasta)->format('d/m/Y') }}"
         >
-            <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+            <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                 <x-stat-card
                     label="Citas atendidas"
                     :value="number_format($citasAtendidas)"
@@ -124,12 +124,13 @@
                 />
 
                 <x-stat-card
-                    label="Recaudado después de comisiones"
+                    label="Disponible antes de gastos"
                     :value="'$' . number_format((float) $ingresoDespuesComisiones, 0, ',', '.')"
                     icon="wallet"
                     color="emerald"
                 />
             </div>
+            <p class="mt-4 text-xs text-slate-500">Es el recaudo menos las comisiones registradas. No descuenta arriendo, insumos ni otros gastos del lavadero.</p>
         </x-card>
     </div>
 
@@ -139,7 +140,7 @@
             title="Comisiones por empleado"
             subtitle="Comisiones calculadas según cada pago registrado"
         >
-            <x-table :headers="['Empleado', 'Pagos', 'Comisión']">
+            <x-table :headers="['Empleado', 'Pagos', 'Recaudado', 'Comisión efectiva', 'Comisión']">
                 @forelse($comisionesPorEmpleado as $fila)
                     <tr>
                         <td>
@@ -154,18 +155,36 @@
                             {{ number_format((int) $fila->cantidadPagos) }}
                         </td>
 
+                        <td class="whitespace-nowrap text-right">
+                            ${{ number_format((float) $fila->totalPagado, 0, ',', '.') }}
+                        </td>
+
+                        <td class="whitespace-nowrap text-right">
+                            {{ number_format((float) $fila->porcentajeEfectivo, 2, ',', '.') }}%
+                        </td>
+
                         <td class="whitespace-nowrap text-right font-semibold">
                             ${{ number_format((float) $fila->totalComision, 0, ',', '.') }}
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="3" class="py-8 text-center text-slate-500">
+                        <td colspan="5" class="py-8 text-center text-slate-500">
                             No hay comisiones registradas en este período.
                         </td>
                     </tr>
                 @endforelse
             </x-table>
+        </x-card>
+    </div>
+
+    <div class="reporte-card">
+        <x-card title="Rendimiento por empleado" subtitle="Valor de los servicios terminados asignados a cada empleado">
+            @if($empleados->isNotEmpty())
+                <div class="h-80"><canvas id="grafico-empleados-periodo" role="img" aria-label="Rendimiento por empleado en el período"></canvas></div>
+            @else
+                <p class="py-10 text-center text-sm text-slate-500">No hay citas terminadas con empleados asignados en este período.</p>
+            @endif
         </x-card>
     </div>
 
@@ -351,6 +370,26 @@
                                 }
                             }
                         }
+                    }
+                });
+            });
+        </script>
+    @endif
+    @if($empleados->isNotEmpty())
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const canvas = document.getElementById('grafico-empleados-periodo');
+                if (!canvas || typeof Chart === 'undefined') return;
+                new Chart(canvas, {
+                    type: 'bar',
+                    data: { labels: @json($empleadosLabels), datasets: [{
+                        label: 'Valor generado', data: @json($empleadosValues),
+                        backgroundColor: '#0e7490', hoverBackgroundColor: '#0891b2', borderRadius: 8, maxBarThickness: 40
+                    }] },
+                    options: {
+                        indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+                        plugins: { legend: { display: false }, tooltip: { callbacks: { label: item => '$' + Number(item.parsed.x).toLocaleString('es-CO') } } },
+                        scales: { x: { beginAtZero: true, ticks: { callback: value => '$' + Number(value).toLocaleString('es-CO') } } }
                     }
                 });
             });

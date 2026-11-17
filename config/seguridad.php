@@ -2,23 +2,23 @@
 
 return [
     'guard' => 'web',
-    
+
     'rol_admin' => 'administrador',
 
     'rol_recepcionista' => 'recepcionista',
 
-        'modulos_recepcionista' => [
-            'dashboard',
-            'empleados',
-            'clientes',
-            'vehiculos',
-            'servicios',
-            'tipoVehiculo',
-            'agenda',
-            'agendaServicio',
-            'precioServicio',
-            'turnos',
-            'pagos',
+    'modulos_recepcionista' => [
+        'dashboard',
+        'empleados',
+        'clientes',
+        'vehiculos',
+        'servicios',
+        'tipoVehiculo',
+        'agenda',
+        'agendaServicio',
+        'precioServicio',
+        'turnos',
+        'pagos',
     ],
 
     'acciones_recepcionista' => ['ver', 'crear', 'editar'],

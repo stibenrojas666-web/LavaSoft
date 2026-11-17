@@ -2,21 +2,19 @@
 
 use App\Http\Controllers\AgendaController;
 use App\Http\Controllers\AgendaServiciosController;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ClientesController;
+use App\Http\Controllers\ConfiguracionLavaderoController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmpleadoController;
-use App\Http\Controllers\ClientesController;
-use App\Http\Controllers\ServicioController;
-use App\Http\Controllers\VehiculoController;
-use App\Http\Controllers\TipoVehiculoController;
-use App\Http\Controllers\PrecioServicioController;
-use App\Http\Controllers\TurnoController;
 use App\Http\Controllers\PagoController;
-use App\Http\Controllers\ConfiguracionLavaderoController;
+use App\Http\Controllers\PrecioServicioController;
 use App\Http\Controllers\ReporteController;
+use App\Http\Controllers\ServicioController;
+use App\Http\Controllers\TipoVehiculoController;
+use App\Http\Controllers\TurnoController;
+use App\Http\Controllers\VehiculoController;
 use App\Http\Middleware\NoCacheHeaders;
-
-
+use Illuminate\Support\Facades\Route;
 
 Route::get('factura/{agendaId}', [PagoController::class, 'facturaPublica'])
     ->whereNumber('agendaId')
@@ -25,14 +23,15 @@ Route::get('factura/{agendaId}', [PagoController::class, 'facturaPublica'])
 
 Route::get('lavadero/logo', [ConfiguracionLavaderoController::class, 'logo'])
     ->name('lavadero.logo');
-
 Route::middleware(['auth', NoCacheHeaders::class])->group(function () {
 
     Route::get('/dashboard', [DashboardController::class, 'index'])
-            ->name('dashboard.index')->middleware('modulo:dashboard');
-            
+        ->name('dashboard.index')->middleware('modulo:dashboard');
+
     Route::resource('empleados', EmpleadoController::class)->middleware('modulo:empleados');
     Route::resource('clientes', ClientesController::class)->middleware('modulo:clientes');
+    Route::patch('clientes/{id}/reactivar', [ClientesController::class, 'reactivar'])
+        ->whereNumber('id')->name('clientes.reactivar')->middleware('modulo:clientes');
     Route::patch('vehiculos/{id}/estado', [VehiculoController::class, 'cambiarEstado'])
         ->whereNumber('id')->name('vehiculos.estado')->middleware('modulo:vehiculos');
     Route::resource('vehiculos', VehiculoController::class)->middleware('modulo:vehiculos');
@@ -44,6 +43,8 @@ Route::middleware(['auth', NoCacheHeaders::class])->group(function () {
     Route::resource('tipoVehiculo', TipoVehiculoController::class)->middleware('modulo:tipoVehiculo');
     Route::get('agenda/empleados-disponibles', [AgendaController::class, 'empleadosDisponibles'])
         ->name('agenda.empleadosDisponibles')->middleware('modulo:agenda');
+    Route::patch('agenda/{agenda}/estado', [AgendaController::class, 'cambiarEstado'])
+        ->whereNumber('agenda')->name('agenda.estado')->middleware('modulo:agenda');
     Route::resource('agenda', AgendaController::class)->middleware('modulo:agenda');
     Route::get('agenda/{agendaId}/factura', [PagoController::class, 'factura'])
         ->whereNumber('agendaId')->name('agenda.factura')->middleware('modulo:agenda');
@@ -60,7 +61,7 @@ Route::middleware(['auth', NoCacheHeaders::class])->group(function () {
     Route::get('agendaServicio/{id}', [AgendaServiciosController::class, 'show'])
         ->whereNumber('id')->name('agendaServicio.show')->middleware('modulo:agendaServicio');
 
-    Route::middleware('can:' . config('seguridad.permiso_admin'))
+    Route::middleware('can:'.config('seguridad.permiso_admin'))
         ->prefix('configuracion')
         ->name('configuracion.')
         ->group(function () {

@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Agenda;
 use App\Models\AgendaServicios;
 use App\Models\Cliente;
+use App\Models\Empleado;
 use App\Models\PrecioServicio;
 use App\Models\Servicio;
 use App\Models\Vehiculo;
@@ -20,20 +21,21 @@ class AgendaDemoSeeder extends Seeder
         $carro = Vehiculo::where('placa', 'DEMO001')->firstOrFail();
         $moto = Vehiculo::where('placa', 'DEMO002')->firstOrFail();
         $carroPendiente = Vehiculo::where('placa', 'DEMO004')->firstOrFail();
+        $empleado = Empleado::where('identificacion', 'DEMO-EMP-001')->firstOrFail();
 
-        DB::transaction(function () use ($cliente, $carro, $moto, $carroPendiente) {
+        DB::transaction(function () use ($cliente, $carro, $moto, $carroPendiente, $empleado) {
             $citaConDosVehiculos = Agenda::firstOrCreate([
                 'clienteId' => $cliente->id,
                 'fecha' => Carbon::today()->toDateString(),
                 'hora' => '08:00:00',
             ], [
                 'vehiculoId' => null,
-                'empleadoId' => null,
+                'empleadoId' => $empleado->id,
                 'estado' => 'pendiente',
                 'tipoDeAtencion' => 'Por orden de llegada',
             ]);
 
-            $citaConDosVehiculos->update(['vehiculoId' => null]);
+            $citaConDosVehiculos->update(['vehiculoId' => null, 'empleadoId' => $empleado->id]);
             $this->agregarLinea($citaConDosVehiculos, $carro, 'Lavada general con todo incluido', 85000);
             $this->agregarLinea($citaConDosVehiculos, $moto, 'Lavada', 12000);
 

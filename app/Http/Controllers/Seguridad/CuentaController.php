@@ -3,19 +3,18 @@
 namespace App\Http\Controllers\Seguridad;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\BusquedaIndexRequest;
 use App\Http\Requests\CuentaStoreRequest;
 use App\Http\Requests\CuentaUpdateRequest;
 use App\Services\Seguridad\CuentaService;
-use App\Http\Requests\BusquedaIndexRequest;
 use Exception;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class CuentaController extends Controller
 {
-    public function __construct(private CuentaService $cuentaService)
-    {
-    }
+    public function __construct(private CuentaService $cuentaService) {}
 
     public function index(BusquedaIndexRequest $busquedaIndexRequest): View
     {
@@ -64,7 +63,7 @@ class CuentaController extends Controller
         return redirect()->route('seguridad.cuentas.index')->with('success', 'Usuario actualizado correctamente.');
     }
 
-    public function destroy(\Illuminate\Http\Request $eliminarCuentaRequest, string $cuenta): RedirectResponse
+    public function destroy(Request $eliminarCuentaRequest, string $cuenta): RedirectResponse
     {
         try {
             $this->cuentaService->eliminar($this->cuentaService->buscar($cuenta), $eliminarCuentaRequest->user());

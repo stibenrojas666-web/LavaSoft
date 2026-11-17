@@ -114,7 +114,7 @@
             </div>
 
             <div class="overflow-x-auto">
-                <table class="lavasoft-table min-w-[1100px] text-left text-sm">
+                <table data-datatable data-server-paginated="true" class="lavasoft-table min-w-[1000px] text-left text-sm">
                     <thead>
                         <tr>
                             <th>ID</th>
@@ -132,9 +132,9 @@
 
                     <tbody>
                         @forelse ($agenda as $a)
-                            <tr class="transition hover:bg-cyan-50/40">
+                            <tr id="agenda-{{ $a->id }}" class="scroll-mt-24 transition hover:bg-cyan-50/40">
                                 <td class="whitespace-nowrap font-semibold text-slate-400">
-                                    #{{ $a->id }}
+                                    #{{ $a->referencia }}
                                 </td>
 
                                 <td>
@@ -179,14 +179,45 @@
                                 </td>
 
                                 <td>
-                                    <span class="inline-flex whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-bold
-                                        @if($a->estado === 'confirmada') bg-emerald-50 text-emerald-700
-                                        @elseif($a->estado === 'cancelada') bg-rose-50 text-rose-700
-                                        @elseif($a->estado === 'terminada') bg-sky-50 text-sky-700
-                                        @else bg-amber-50 text-amber-700
-                                        @endif">
-                                        {{ ucfirst($a->estado) }}
-                                    </span>
+                                    <div class="flex flex-col items-start gap-2">
+                                        <span class="inline-flex rounded-full px-3 py-1.5 text-xs font-bold {{ $a->estado === 'confirmada' ? 'bg-emerald-50 text-emerald-700' : ($a->estado === 'cancelada' ? 'bg-rose-50 text-rose-700' : ($a->estado === 'terminada' ? 'bg-sky-50 text-sky-700' : 'bg-amber-50 text-amber-700')) }}">{{ ucfirst($a->estado) }}</span>
+                                        @can('editar agenda')
+                                            @if($a->estado !== 'terminada')
+                                                <div class="flex items-center gap-1" aria-label="Acciones de estado">
+                                                    @if($a->estado !== 'pendiente')
+                                                        <form data-preserve-scroll action="{{ route('agenda.estado', array_merge(request()->query(), ['agenda' => $a->id])) }}" method="POST">
+                                                            @csrf
+                                                            @method('PATCH')
+                                                            <input type="hidden" name="estado" value="pendiente">
+                                                            <button type="submit" class="grid h-8 w-8 place-items-center rounded-lg border border-amber-100 bg-amber-50 text-amber-700 transition hover:border-amber-300 hover:bg-amber-100" title="Marcar pendiente" aria-label="Marcar cita como pendiente">
+                                                                <span class="h-4 w-4">@include('layouts.partials.icons', ['icon' => 'history'])</span>
+                                                            </button>
+                                                        </form>
+                                                    @endif
+                                                    @if($a->estado !== 'confirmada')
+                                                        <form data-preserve-scroll action="{{ route('agenda.estado', array_merge(request()->query(), ['agenda' => $a->id])) }}" method="POST">
+                                                            @csrf
+                                                            @method('PATCH')
+                                                            <input type="hidden" name="estado" value="confirmada">
+                                                            <button type="submit" class="grid h-8 w-8 place-items-center rounded-lg border border-emerald-100 bg-emerald-50 text-emerald-700 transition hover:border-emerald-300 hover:bg-emerald-100" title="Confirmar cita" aria-label="Confirmar cita">
+                                                                <span class="h-4 w-4">@include('layouts.partials.icons', ['icon' => 'check-circle'])</span>
+                                                            </button>
+                                                        </form>
+                                                    @endif
+                                                    @if($a->estado !== 'cancelada')
+                                                        <form data-preserve-scroll action="{{ route('agenda.estado', array_merge(request()->query(), ['agenda' => $a->id])) }}" method="POST" onsubmit="return confirm('¿Cancelar esta cita?')">
+                                                            @csrf
+                                                            @method('PATCH')
+                                                            <input type="hidden" name="estado" value="cancelada">
+                                                            <button type="submit" class="grid h-8 w-8 place-items-center rounded-lg border border-rose-100 bg-rose-50 text-rose-700 transition hover:border-rose-300 hover:bg-rose-100" title="Cancelar cita" aria-label="Cancelar cita">
+                                                                <span class="h-4 w-4">@include('layouts.partials.icons', ['icon' => 'x'])</span>
+                                                            </button>
+                                                        </form>
+                                                    @endif
+                                                </div>
+                                            @endif
+                                        @endcan
+                                    </div>
                                 </td>
 
                                 <td>
@@ -299,7 +330,7 @@
                 </a>
             </div>
 
-            <div class="grid grid-cols-7 border-b border-slate-200 bg-slate-50 text-center text-[10px] font-extrabold uppercase tracking-wider text-slate-500 sm:text-xs">
+            <div class="grid grid-cols-7 border-b border-slate-200 bg-slate-50 text-center text-[9px] font-extrabold uppercase tracking-wide text-slate-500 sm:text-xs">
                 @foreach(['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'] as $dia)
                     <div class="px-1 py-3">{{ $dia }}</div>
                 @endforeach
@@ -307,11 +338,11 @@
 
             <div class="grid grid-cols-7">
                 @for($diaCalendario = $inicioCalendario->copy(); $diaCalendario->lte($finCalendario); $diaCalendario->addDay())
-                    <div class="min-h-24 border-b border-r border-slate-100 p-1 sm:min-h-28 sm:p-2 {{ $diaCalendario->month !== $primerDia->month ? 'bg-slate-50/70' : 'bg-white' }}">
+                    <div class="min-h-20 border-b border-r border-slate-100 p-1 sm:min-h-24 sm:p-1.5 {{ $diaCalendario->month !== $primerDia->month ? 'bg-slate-50/70' : 'bg-white' }}">
                         <div class="flex items-center justify-between">
                             <a
                                 href="{{ route('agenda.index', array_merge(request()->query(), ['vista' => 'lista', 'mes' => $diaCalendario->format('Y-m'), 'desde' => $diaCalendario->format('Y-m-d'), 'hasta' => $diaCalendario->format('Y-m-d')])) }}"
-                                class="inline-grid h-8 w-8 place-items-center rounded-full text-xs font-bold transition
+                                class="inline-grid h-7 w-7 place-items-center rounded-full text-[11px] font-bold transition sm:h-8 sm:w-8 sm:text-xs
                                     {{ $diaCalendario->format('Y-m-d') === $fechaCalendario ? 'bg-cyan-700 text-white shadow-md' : ($diaCalendario->month === $primerDia->month ? 'text-slate-700 hover:bg-cyan-50' : 'text-slate-400 hover:bg-slate-100') }}"
                             >
                                 {{ $diaCalendario->day }}
@@ -322,30 +353,31 @@
                                     href="{{ route('agenda.create', ['fecha' => $diaCalendario->format('Y-m-d'), 'vista' => 'calendario', 'mes' => $diaCalendario->format('Y-m')]) }}"
                                     title="Agendar para {{ $diaCalendario->format('d/m/Y') }}"
                                     aria-label="Agendar cita para {{ $diaCalendario->format('d/m/Y') }}"
-                                    class="grid h-7 w-7 place-items-center rounded-lg text-lg font-semibold leading-none text-cyan-700 transition hover:bg-cyan-50 hover:text-cyan-900"
+                                    class="grid h-6 w-6 place-items-center rounded-lg text-base font-semibold leading-none text-cyan-700 transition hover:bg-cyan-50 hover:text-cyan-900"
                                 >
                                     +
                                 </a>
                             @endif
                         </div>
 
+                        @php($citasDelDia = $citasPorDia->get($diaCalendario->format('Y-m-d'), collect()))
                         <div class="mt-1 space-y-1">
-                            @foreach($citasPorDia->get($diaCalendario->format('Y-m-d'), collect())->take(3) as $citaCalendario)
-                                <a
-                                    href="{{ route('agenda.factura', ['agendaId' => $citaCalendario->id, 'vista' => 'calendario', 'mes' => $primerDia->format('Y-m'), 'fecha' => \Carbon\Carbon::parse($citaCalendario->fecha)->toDateString()]) }}"
-                                    title="{{ substr($citaCalendario->hora, 0, 5) }} · {{ $citaCalendario->cliente->nombreCliente ?? 'Cliente' }}"
-                                    class="block truncate rounded-lg px-1.5 py-1.5 text-[9px] font-semibold leading-tight shadow-sm transition hover:-translate-y-0.5 hover:shadow-md sm:text-[10px]
-                                        {{ $citaCalendario->estado === 'confirmada' ? 'bg-emerald-50 text-emerald-800' : ($citaCalendario->estado === 'cancelada' ? 'bg-rose-50 text-rose-700' : ($citaCalendario->estado === 'terminada' ? 'bg-sky-50 text-sky-800' : 'bg-amber-50 text-amber-800')) }}"
-                                >
-                                    <span class="font-extrabold">{{ substr($citaCalendario->hora, 0, 5) }}</span>
-                                    {{ $citaCalendario->cliente->nombreCliente ?? 'Cliente' }}
-                                </a>
+                            @foreach($citasDelDia->take(2) as $citaCalendario)
+                                @include('Agenda.partials.evento-calendario')
                             @endforeach
 
-                            @if($citasPorDia->get($diaCalendario->format('Y-m-d'), collect())->count() > 3)
-                                <span class="block px-1 text-[9px] font-semibold text-slate-500 sm:text-[10px]">
-                                    +{{ $citasPorDia->get($diaCalendario->format('Y-m-d'), collect())->count() - 3 }} más
-                                </span>
+                            @if($citasDelDia->count() > 2)
+                                <details class="group">
+                                    <summary class="block cursor-pointer list-none px-1 text-[9px] font-bold text-cyan-700 hover:text-cyan-900 [&::-webkit-details-marker]:hidden sm:text-[10px]">
+                                        <span class="group-open:hidden">+{{ $citasDelDia->count() - 2 }} más</span>
+                                        <span class="hidden group-open:inline">Mostrar menos</span>
+                                    </summary>
+                                    <div class="mt-1 space-y-1">
+                                        @foreach($citasDelDia->skip(2) as $citaCalendario)
+                                            @include('Agenda.partials.evento-calendario')
+                                        @endforeach
+                                    </div>
+                                </details>
                             @endif
                         </div>
                     </div>

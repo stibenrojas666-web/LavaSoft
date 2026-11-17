@@ -53,16 +53,7 @@
             @enderror
         </div>
 
-        <div class="flex flex-col-reverse justify-end gap-3 border-t border-slate-100 bg-slate-50/70 px-6 py-4 sm:flex-row">
-            <a href="{{ route('tipoVehiculo.index') }}" class="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-100">Cancelar</a>
-
-            <button
-                type="submit"
-                class="inline-flex items-center justify-center rounded-xl bg-cyan-700 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-cyan-800 focus:outline-none focus:ring-4 focus:ring-cyan-500/20"
-            >
-                Guardar cambios
-            </button>
-        </div>
+        <x-form-actions :cancel-url="route('tipoVehiculo.index')" save-label="Guardar cambios" />
     </form>
 </div>
 @endsection

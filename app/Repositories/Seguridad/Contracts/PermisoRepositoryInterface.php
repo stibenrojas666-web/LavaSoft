@@ -4,6 +4,7 @@ namespace App\Repositories\Seguridad\Contracts;
 
 /**
  * Contrato de acceso a datos para PermisoRepository.
+ *
  * @method mixed listar(...$arguments)
  * @method mixed buscar(...$arguments)
  * @method mixed listarModulos(...$arguments)
@@ -13,6 +14,4 @@ namespace App\Repositories\Seguridad\Contracts;
  * @method mixed eliminar(...$arguments)
  * @method mixed tieneRolesAsignados(...$arguments)
  */
-interface PermisoRepositoryInterface
-{
-}
+interface PermisoRepositoryInterface {}

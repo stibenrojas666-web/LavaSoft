@@ -27,7 +27,7 @@ class ServicioStoreRequest extends FormRequest
             'descripcion' => 'nullable|string|max:250',
             'duracionMinutos' => ['required', 'integer', 'min:5', 'max:480'],
             'estado' => 'boolean',
-            
+
         ];
     }
 

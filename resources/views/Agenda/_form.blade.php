@@ -9,6 +9,10 @@
         icon="calendar"
     />
 
+    @if(!empty($urlVolverVehiculo))
+        <a href="{{ $urlVolverVehiculo }}" class="mb-4 inline-flex items-center gap-2 text-sm font-semibold text-cyan-800 hover:underline">← Volver a editar el vehículo</a>
+    @endif
+
     <form action="{{ $esEdicion ? route('agenda.update', $agenda->id) : route('agenda.store') }}"
           method="POST"
           novalidate
@@ -53,7 +57,7 @@
 
                         @foreach($cliente as $c)
                             <option value="{{ $c->id }}"
-                                @selected((string) old('clienteId', $agenda->clienteId ?? '') === (string) $c->id)>
+                                @selected((string) old('clienteId', $agenda->clienteId ?? ($clienteSeleccionadoId ?? '')) === (string) $c->id)>
                                 {{ $c->nombreCliente }} {{ $c->apellidoCliente }}
                             </option>
                         @endforeach
@@ -364,19 +368,7 @@
             </div>
         </div>
 
-        {{-- Botones --}}
-        <div class="flex flex-col-reverse justify-end gap-2 border-t border-slate-100 bg-slate-50 px-6 py-4 sm:flex-row">
-
-            <a href="{{ route('agenda.index') }}"
-               class="rounded-lg border border-slate-300 bg-white px-4 py-2 text-center text-sm font-semibold text-slate-600 transition hover:bg-slate-100">
-                Cancelar
-            </a>
-
-            <button type="submit"
-                    class="rounded-lg bg-cyan-600 px-5 py-2 text-sm font-semibold text-white transition hover:bg-cyan-700">
-                {{ $esEdicion ? 'Guardar cambios' : 'Guardar cita' }}
-            </button>
-        </div>
+        <x-form-actions :cancel-url="route('agenda.index')" :save-label="$esEdicion ? 'Guardar cambios' : 'Guardar cita'" />
 
     </form>
 </div>

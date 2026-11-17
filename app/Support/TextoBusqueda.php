@@ -20,7 +20,7 @@ class TextoBusqueda
         ), fn (string $termino) => $termino !== ''));
 
         foreach ($terminos as $termino) {
-            $comodin = '%' . $termino . '%';
+            $comodin = '%'.$termino.'%';
             $consulta->where(fn (Builder $grupo) => $camposCoincidentes($grupo, $comodin));
         }
 

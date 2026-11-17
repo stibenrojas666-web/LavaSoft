@@ -28,7 +28,7 @@ class TurnoUpdateRequest extends FormRequest
             'jornada' => 'nullable|string|in:mañana,tarde,noche',
             'horaInicio' => 'required|date_format:H:i',
             'horaFin' => 'required|date_format:H:i|after:horaInicio',
-            ];
+        ];
     }
 
     public function messages(): array

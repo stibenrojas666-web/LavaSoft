@@ -6,13 +6,7 @@
 @section('content')
 <div class="mx-auto w-full max-w-5xl space-y-6">
 
-    <div>
-        <div>
-            <h1 class="text-2xl font-extrabold tracking-tight text-slate-800">Editar precio de servicio</h1>
-            <p class="mt-1 text-sm text-slate-500">Actualiza la tarifa, modalidad y duración configuradas.</p>
-        </div>
-
-    </div>
+    <x-module-header title="Editar precio de servicio" description="Actualiza la tarifa, modalidad y duración configuradas." icon="tag" />
 
     @if($errors->any())
         <div class="rounded-xl border border-red-200 bg-red-50 p-4">
@@ -116,13 +110,7 @@
             </div>
         </div>
 
-        <div class="flex flex-col-reverse gap-3 border-t border-slate-100 bg-slate-50 px-5 py-4 sm:flex-row sm:justify-end sm:px-7">
-            <a href="{{ route('precioServicio.index') }}" class="rounded-xl border border-slate-200 bg-white px-5 py-3 text-center text-sm font-semibold text-slate-600 transition hover:bg-slate-100">Cancelar</a>
-            <button type="submit"
-                    class="rounded-xl bg-cyan-700 px-6 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-cyan-800">
-                Guardar cambios
-            </button>
-        </div>
+        <x-form-actions :cancel-url="route('precioServicio.index')" save-label="Guardar cambios" />
     </form>
 </div>
 

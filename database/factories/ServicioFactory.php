@@ -2,11 +2,12 @@
 
 namespace Database\Factories;
 
+use App\Models\Servicio;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class ServicioFactory extends Factory
 {
-    protected $model = \App\Models\Servicio::class;
+    protected $model = Servicio::class;
 
     public function definition(): array
     {

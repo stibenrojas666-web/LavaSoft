@@ -20,6 +20,7 @@ class BusquedaIndexRequest extends FormRequest
 
         return [
             'buscar' => ['nullable', 'string', 'max:100'],
+            'archivados' => ['nullable', 'boolean'],
             'estado' => ['nullable', 'in:activo,inactivo,pendiente,confirmada,terminada,cancelada'],
             'dia' => ['nullable', 'in:lunes,martes,miercoles,jueves,viernes,sabado,domingo'],
             'jornada' => ['nullable', 'in:mañana,tarde,noche'],

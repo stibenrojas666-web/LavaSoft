@@ -3,7 +3,7 @@
 
 <div class="lavasoft-table-shell overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
 
-    <table {{ $attributes->merge(['class' => 'lavasoft-table min-w-full']) }}>
+    <table data-datatable data-server-paginated="true" {{ $attributes->merge(['class' => 'lavasoft-table min-w-full']) }}>
 
         <thead>
             <tr class="bg-slate-50">

@@ -2,14 +2,14 @@
 
 namespace App\Repositories;
 
-use App\Repositories\Contracts\TipoVehiculoRepositoryInterface;
-
-use App\Models\TipoVehiculo;
 use App\Models\PrecioServicio;
+use App\Models\TipoVehiculo;
 use App\Models\Vehiculo;
+use App\Repositories\Contracts\TipoVehiculoRepositoryInterface;
 use App\Support\TextoBusqueda;
 
-class TipoVehiculoRepository implements TipoVehiculoRepositoryInterface {
+class TipoVehiculoRepository implements TipoVehiculoRepositoryInterface
+{
     public function listarTodo()
     {
         return TipoVehiculo::query()->select(['id', 'nombre'])->orderBy('nombre')->get();
@@ -48,6 +48,7 @@ class TipoVehiculoRepository implements TipoVehiculoRepositoryInterface {
     {
         $tipovehiculo = TipoVehiculo::findOrFail($id);
         $tipovehiculo->update($datos);
+
         return $tipovehiculo;
     }
 }

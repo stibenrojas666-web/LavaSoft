@@ -160,6 +160,10 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="h-full w-full"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3h12l4 4v14H3V3h2zM7 3v6h10V3M7 21v-8h10v8"/></svg>
         @break
 
+    @case('arrow-right')
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="h-full w-full"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14m-6-6 6 6-6 6"/></svg>
+        @break
+
     @case('shield-check')
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="h-full w-full"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m8.5 12 2.3 2.3 4.7-4.7"/></svg>
         @break

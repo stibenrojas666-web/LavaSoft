@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Factura de cita #' . $agenda->id)
+@section('title', 'Factura de cita #' . $agenda->referencia)
 @section('page-title', 'Factura de servicio')
 
 @section('content')

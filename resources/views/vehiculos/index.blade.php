@@ -63,7 +63,7 @@
                     $activo = strtolower((string) $v->estado) === 'activo';
                 @endphp
 
-                <article class="flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-cyan-200 hover:shadow-md">
+                <article id="vehiculo-{{ $v->id }}" class="flex h-full scroll-mt-24 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-cyan-200 hover:shadow-md">
 
                     <div class="flex items-start gap-4 p-5">
                         <span class="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-cyan-50 p-3 text-cyan-800">
@@ -124,7 +124,7 @@
                     </dl>
 
                     <div class="flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 bg-slate-50/70 px-5 py-4">
-                        <form action="{{ route('vehiculos.estado', $v->id) }}" method="POST">
+                        <form data-preserve-scroll action="{{ route('vehiculos.estado', array_merge(['id' => $v->id], request()->query())) }}" method="POST">
                             @csrf
                             @method('PATCH')
 

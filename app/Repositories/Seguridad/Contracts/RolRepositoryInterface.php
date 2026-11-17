@@ -4,6 +4,7 @@ namespace App\Repositories\Seguridad\Contracts;
 
 /**
  * Contrato de acceso a datos para RolRepository.
+ *
  * @method mixed listar(...$arguments)
  * @method mixed buscar(...$arguments)
  * @method mixed listarNombres(...$arguments)
@@ -16,6 +17,4 @@ namespace App\Repositories\Seguridad\Contracts;
  * @method mixed nombresActivos(...$arguments)
  * @method mixed permisosSeleccionados(...$arguments)
  */
-interface RolRepositoryInterface
-{
-}
+interface RolRepositoryInterface {}

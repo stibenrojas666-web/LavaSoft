@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
-
-use App\Services\TipoVehiculoService;
+use App\Http\Requests\BusquedaIndexRequest;
 use App\Http\Requests\TipoVehiculoStoreRequest;
 use App\Http\Requests\TipoVehiculoUpdateRequest;
-use App\Http\Requests\BusquedaIndexRequest;
+use App\Services\TipoVehiculoService;
 
 class TipoVehiculoController extends Controller
 {
@@ -16,6 +15,7 @@ class TipoVehiculoController extends Controller
     {
         $this->tipoVehiculoService = $tipoVehiculoService;
     }
+
     /**
      * Display a listing of the resource.
      */
@@ -40,8 +40,10 @@ class TipoVehiculoController extends Controller
     public function store(TipoVehiculoStoreRequest $tipoVehiculoStoreRequest)
     {
         $this->tipoVehiculoService->guardar($tipoVehiculoStoreRequest->validated());
+
         return redirect()->route('tipoVehiculo.index')->with('success', 'tipoVehiculo creado correctamente.');
     }
+
     /**
      * Display the specified resource.
      */
@@ -56,7 +58,8 @@ class TipoVehiculoController extends Controller
     public function edit(int $id)
     {
         $tipoVehiculo = $this->tipoVehiculoService->buscarPorId($id);
-        return view('tipoVehiculo.editar',compact('tipoVehiculo'));
+
+        return view('tipoVehiculo.editar', compact('tipoVehiculo'));
     }
 
     /**
@@ -65,6 +68,7 @@ class TipoVehiculoController extends Controller
     public function update(TipoVehiculoUpdateRequest $tipoVehiculoUpdateRequest, int $id)
     {
         $this->tipoVehiculoService->actualizar($id, $tipoVehiculoUpdateRequest->validated());
+
         return redirect()->route('tipoVehiculo.index')->with('success', 'tipoVehiculo actualizado correctamente.');
     }
 
@@ -73,9 +77,10 @@ class TipoVehiculoController extends Controller
      */
     public function destroy(int $id)
     {
-        if (!$this->tipoVehiculoService->eliminar($id)) {
+        if (! $this->tipoVehiculoService->eliminar($id)) {
             return redirect()->route('tipoVehiculo.index')->with('error', 'No se puede eliminar el tipo porque tiene vehículos o precios de servicio relacionados.');
         }
+
         return redirect()->route('tipoVehiculo.index')->with('success', 'tipoVehiculo eliminado Correctamente.');
     }
 }
