@@ -2,9 +2,10 @@
 
 namespace App\Services\Seguridad;
 
-use App\Repositories\Seguridad\UsuarioRepository;
+use App\Repositories\Seguridad\Contracts\UsuarioRepositoryInterface as UsuarioRepository;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Contracts\Auth\Authenticatable;
 
 class AuthService
 {
@@ -12,11 +13,11 @@ class AuthService
     {
     }
 
-    public function autenticar(string $email, string $password, bool $recordar = false): bool
+    public function autenticar(array $credenciales, bool $recordar = false): bool
     {
-        $usuario = $this->usuarioRepository->buscarPorEmail($email);
+        $usuario = $this->usuarioRepository->buscarPorEmail($credenciales['email']);
 
-        if ($usuario === null || ! Hash::check($password, $usuario->getAuthPassword())) {
+        if ($usuario === null || ! Hash::check($credenciales['password'], $usuario->getAuthPassword())) {
             return false;
         }
 
@@ -28,5 +29,23 @@ class AuthService
     public function cerrarSesion(): void
     {
         Auth::guard(config('seguridad.guard'))->logout();
+    }
+
+    public function destinoInicial(Authenticatable $usuario): ?string
+    {
+        foreach ([
+            'ver dashboard' => 'dashboard.index',
+            'ver agenda' => 'agenda.index',
+            'ver pagos' => 'pagos.historial',
+            'ver clientes' => 'clientes.index',
+            'ver vehiculos' => 'vehiculos.index',
+            'ver servicios' => 'servicios.index',
+        ] as $permiso => $ruta) {
+            if ($usuario->can($permiso)) {
+                return route($ruta);
+            }
+        }
+
+        return null;
     }
 }

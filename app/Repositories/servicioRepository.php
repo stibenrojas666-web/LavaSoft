@@ -2,16 +2,17 @@
 
 namespace App\Repositories;
 
-use App\Models\servicio;
-use App\Models\agendaServicios;
-use App\Models\precioServicio;
+use App\Repositories\Contracts\ServicioRepositoryInterface;
+
+use App\Models\Servicio;
+use App\Models\AgendaServicios;
+use App\Models\PrecioServicio;
 use App\Support\TextoBusqueda;
 
-class servicioRepository
-{
+class ServicioRepository implements ServicioRepositoryInterface {
     public function listarTodo()
     {
-        return servicio::query()
+        return Servicio::query()
             ->select(['id', 'nombre', 'descripcion', 'estado'])
             ->orderBy('nombre')
             ->get();
@@ -19,7 +20,7 @@ class servicioRepository
 
     public function buscar(string $texto, array $filtros = [])
     {
-        return TextoBusqueda::aplicar(servicio::query()->select(['id', 'nombre', 'descripcion', 'estado']), $texto, fn ($consulta, $termino) => $consulta
+        return TextoBusqueda::aplicar(Servicio::query()->select(['id', 'nombre', 'descripcion', 'estado']), $texto, fn ($consulta, $termino) => $consulta
                 ->where('nombre', 'like', $termino)
                 ->orWhere('descripcion', 'like', $termino))
             ->when(($filtros['estado'] ?? '') !== '', fn ($query) => $query->where('estado', $filtros['estado'] === 'activo'))
@@ -30,9 +31,9 @@ class servicioRepository
 
     public function listarActivosConPrecios()
     {
-        return servicio::query()
+        return Servicio::query()
             ->select(['id', 'nombre', 'estado'])
-            ->with('precios:id,servicio_id,tipo_vehiculo_id,modalidad,precio')
+            ->with('precios:id,servicio_id,tipo_vehiculo_id,modalidad,precio,duracionMinutos')
             ->where('estado', true)
             ->orderBy('nombre')
             ->get();
@@ -40,12 +41,12 @@ class servicioRepository
 
     public function guardar(array $datos)
     {
-        return servicio::create($datos);
+        return Servicio::create($datos);
     }
 
     public function cambiarEstado(int $id): bool
     {
-        $servicio = servicio::findOrFail($id);
+        $servicio = Servicio::findOrFail($id);
         $servicio->estado = ! (bool) $servicio->estado;
         $servicio->save();
 
@@ -54,23 +55,23 @@ class servicioRepository
 
     public function eliminar(int $id)
     {
-        return servicio::destroy($id);
+        return Servicio::destroy($id);
     }
 
     public function tieneDependencias(int $id): bool
     {
-        return agendaServicios::where('servicioId', $id)->exists()
-            || precioServicio::where('servicio_id', $id)->exists();
+        return AgendaServicios::where('servicioId', $id)->exists()
+            || PrecioServicio::where('servicio_id', $id)->exists();
     }
 
     public function buscarPorId(int $id)
     {
-        return servicio::findOrFail($id);
+        return Servicio::findOrFail($id);
     }
 
     public function actualizar(int $id, array $datos)
     {
-        $servicio = servicio::findOrFail($id);
+        $servicio = Servicio::findOrFail($id);
         $servicio->update($datos);
         return $servicio;
     }

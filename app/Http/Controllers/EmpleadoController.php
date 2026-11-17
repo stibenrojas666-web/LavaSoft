@@ -2,27 +2,25 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\empleadoService;
-use App\Http\Requests\empleadoStoreRequest;
-use App\Http\Requests\empleadoUpdateRequest;
+use App\Services\EmpleadoService;
+use App\Http\Requests\EmpleadoStoreRequest;
+use App\Http\Requests\EmpleadoUpdateRequest;
 use App\Http\Requests\BusquedaIndexRequest;
 
 class EmpleadoController extends Controller
 {
-    private empleadoService $empleadoService;
+    private EmpleadoService $empleadoService;
 
-    public function __construct(empleadoService $empleadoService)
+    public function __construct(EmpleadoService $empleadoService)
     {
         $this->empleadoService = $empleadoService;
     }
 
-    public function index(BusquedaIndexRequest $request)
+    public function index(BusquedaIndexRequest $busquedaIndexRequest)
     {
-        $datos = $request->validated();
-        $buscar = trim((string) ($datos['buscar'] ?? ''));
-        $filtros = array_intersect_key($datos, array_flip(['estado']));
-        $empleados = $this->empleadoService->buscar($buscar, $filtros);
-        return view('empleados.index', compact('empleados', 'buscar', 'filtros'));
+        return view('empleados.index', $this->empleadoService->prepararListado(
+            $busquedaIndexRequest->validated()
+        ));
     }
 
     /**
@@ -36,10 +34,9 @@ class EmpleadoController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(empleadoStoreRequest $request)
+    public function store(EmpleadoStoreRequest $empleadoStoreRequest)
     {
-        $datos = $request->validated();
-        $this->empleadoService->guardar($datos);
+        $this->empleadoService->guardar($empleadoStoreRequest->validated());
         return redirect()->route('empleados.index')->with('success', 'Empleado creado correctamente.');
 
     }
@@ -66,9 +63,9 @@ class EmpleadoController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(empleadoUpdateRequest $request, int $id)
+    public function update(EmpleadoUpdateRequest $empleadoUpdateRequest, int $id)
 {
-    $this->empleadoService->actualizar($id, $request->validated());
+    $this->empleadoService->actualizar($id, $empleadoUpdateRequest->validated());
     return redirect()->route('empleados.index')->with('success', 'Empleado actualizado correctamente.');
 }
 

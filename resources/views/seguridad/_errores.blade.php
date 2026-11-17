@@ -1,6 +1,7 @@
 @if ($errors->any())
-    <div class="rounded-md bg-red-50 border border-red-200 text-red-800 px-4 py-3 text-sm mb-4">
-        <ul class="list-disc pl-5">
+    <div class="mb-5 rounded-xl border border-rose-200 bg-rose-50 px-4 py-4 text-sm text-rose-800" role="alert">
+        <p class="mb-2 font-bold">Revisa la información ingresada:</p>
+        <ul class="list-inside list-disc space-y-1">
             @foreach ($errors->all() as $mensaje)
                 <li>{{ $mensaje }}</li>
             @endforeach

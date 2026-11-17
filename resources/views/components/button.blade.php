@@ -1,24 +1,38 @@
-@props(['variant' => 'primary', 'href' => null, 'type' => 'button'])
+
+@props([
+    'variant' => 'primary',
+    'href' => null,
+    'type' => 'button',
+])
 
 @php
-    $base = 'inline-flex min-h-[44px] items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition focus:outline-none focus:ring-4 disabled:opacity-50 disabled:cursor-not-allowed';
+    $base = 'inline-flex min-h-[42px] items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold transition-all duration-200 focus:outline-none focus:ring-4 disabled:pointer-events-none disabled:opacity-50';
+
     $variants = [
-        'primary'   => 'bg-primary-600 text-white shadow-sm hover:bg-primary-700 hover:-translate-y-px focus:ring-primary-200',
-        'cyan'      => 'bg-cyan-700 text-white shadow-sm hover:bg-cyan-800 hover:-translate-y-px focus:ring-cyan-200',
-        'neutral'   => 'bg-slate-600 text-white hover:bg-slate-700 focus:ring-slate-200',
-        'secondary' => 'bg-white text-slate-700 border border-slate-200 hover:border-cyan-300 hover:bg-cyan-50 focus:ring-primary-100',
-        'danger'    => 'bg-red-700 text-white hover:bg-red-800 focus:ring-red-200',
-        'ghost'     => 'text-slate-600 hover:bg-slate-100 focus:ring-primary-100',
+        'primary' => 'bg-[#0b3045] text-white shadow-sm hover:bg-[#12465f] hover:-translate-y-0.5 focus:ring-cyan-100',
+        'cyan' => 'bg-cyan-600 text-white shadow-sm hover:bg-cyan-700 hover:-translate-y-0.5 focus:ring-cyan-100',
+        'neutral' => 'bg-slate-700 text-white hover:bg-slate-800 focus:ring-slate-200',
+        'secondary' => 'border border-slate-200 bg-white text-slate-700 shadow-sm hover:border-cyan-300 hover:bg-cyan-50 hover:text-cyan-800 focus:ring-cyan-100',
+        'danger' => 'bg-rose-600 text-white shadow-sm hover:bg-rose-700 focus:ring-rose-100',
+        'success' => 'bg-emerald-600 text-white shadow-sm hover:bg-emerald-700 focus:ring-emerald-100',
+        'ghost' => 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 focus:ring-slate-100',
     ];
+
     $classes = $base . ' ' . ($variants[$variant] ?? $variants['primary']);
 @endphp
 
 @if ($href)
-    <a href="{{ $href }}" {{ $attributes->merge(['class' => $classes]) }}>
+    <a
+        href="{{ $href }}"
+        {{ $attributes->merge(['class' => $classes]) }}
+    >
         {{ $slot }}
     </a>
 @else
-    <button type="{{ $type }}" {{ $attributes->merge(['class' => $classes]) }}>
+    <button
+        type="{{ $type }}"
+        {{ $attributes->merge(['class' => $classes]) }}
+    >
         {{ $slot }}
     </button>
 @endif

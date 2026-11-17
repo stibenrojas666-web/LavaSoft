@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class turnoStoreRequest extends FormRequest
+class TurnoStoreRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,7 +25,7 @@ class turnoStoreRequest extends FormRequest
         return [
             'empleado_id' => 'required|exists:empleados,id',
             'dia' => 'required|string|in:lunes,martes,miercoles,jueves,viernes,sabado,domingo',
-            'jornada' => 'required|string|in:mañana,tarde,noche',
+            'jornada' => 'nullable|string|in:mañana,tarde,noche',
             'horaInicio' => 'required|date_format:H:i',
             'horaFin' => 'required|date_format:H:i|after:horaInicio',
             ];

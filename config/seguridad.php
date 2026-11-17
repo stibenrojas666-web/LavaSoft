@@ -2,8 +2,26 @@
 
 return [
     'guard' => 'web',
-
+    
     'rol_admin' => 'administrador',
+
+    'rol_recepcionista' => 'recepcionista',
+
+        'modulos_recepcionista' => [
+            'dashboard',
+            'empleados',
+            'clientes',
+            'vehiculos',
+            'servicios',
+            'tipoVehiculo',
+            'agenda',
+            'agendaServicio',
+            'precioServicio',
+            'turnos',
+            'pagos',
+    ],
+
+    'acciones_recepcionista' => ['ver', 'crear', 'editar'],
 
     'permiso_admin' => 'gestionar seguridad',
 
@@ -12,6 +30,11 @@ return [
     'roles_no_desactivables' => ['administrador'],
 
     'acciones' => ['ver', 'crear', 'editar', 'eliminar'],
+
+    // Este módulo conserva únicamente permisos de consulta.
+    'acciones_por_modulo' => [
+        'agendaservicio' => ['ver'],
+    ],
 
     'metodos_a_acciones' => [
         'index' => 'ver',
@@ -22,6 +45,11 @@ return [
         'update' => 'editar',
         'destroy' => 'eliminar',
         'empleadosDisponibles' => 'ver',
+        'cambiarEstado' => 'editar',
+        'factura' => 'ver',
+        'registrarPago' => 'editar',
+        'enviarCorreo' => 'editar',
+        'historial' => 'ver',
     ],
 
     'auditar_prefijos' => ['App\\'],
@@ -45,6 +73,6 @@ return [
     'admin' => [
         'name' => env('SEGURIDAD_ADMIN_NAME', 'Administrador'),
         'email' => env('SEGURIDAD_ADMIN_EMAIL', 'admin@admin.com'),
-        'password' => env('SEGURIDAD_ADMIN_PASSWORD', '12345678'),
+        'password' => env('SEGURIDAD_ADMIN_PASSWORD'),
     ],
 ];

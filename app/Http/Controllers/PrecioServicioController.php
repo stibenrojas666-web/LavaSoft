@@ -2,36 +2,24 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\precioServicioService;
-use App\Services\servicioService;
-use App\Services\tipoVehiculoService;
-use App\Http\Requests\precioServicioStoreRequest;
-use App\Http\Requests\precioServicioUpdateRequest;
+use App\Services\PrecioServicioService;
+use App\Http\Requests\PrecioServicioStoreRequest;
+use App\Http\Requests\PrecioServicioUpdateRequest;
 use App\Http\Requests\BusquedaIndexRequest;
 
 class PrecioServicioController extends Controller 
 {
-    private precioServicioService $precioServicioService;
-    private servicioService $servicioService;
-    private tipoVehiculoService $tipoVehiculoService;
-
-    public function __construct(precioServicioService $precioServicioService, servicioService $servicioService, tipoVehiculoService $tipoVehiculoService)
+    public function __construct(private PrecioServicioService $precioServicioService)
     {
-        $this->precioServicioService = $precioServicioService;
-        $this->servicioService = $servicioService;
-        $this->tipoVehiculoService = $tipoVehiculoService;
     }
     /**
      * Display a listing of the resource.
      */
-    public function index(BusquedaIndexRequest $request)
+    public function index(BusquedaIndexRequest $busquedaIndexRequest)
     {
-        $datos = $request->validated();
-        $buscar = trim((string) ($datos['buscar'] ?? ''));
-        $filtros = array_intersect_key($datos, array_flip(['tipoVehiculoId', 'modalidad']));
-        $precioServicio = $this->precioServicioService->buscar($buscar, $filtros);
-        $tipoVehiculos = $this->tipoVehiculoService->listarTodo();
-        return view('precioServicio.index', compact('precioServicio', 'buscar', 'filtros', 'tipoVehiculos'));
+        return view('precioServicio.index', $this->precioServicioService->prepararIndiceConOpciones(
+            $busquedaIndexRequest->validated()
+        ));
     }
 
     /**
@@ -39,18 +27,18 @@ class PrecioServicioController extends Controller
      */
     public function create()
     {
-        $servicios = $this->servicioService->listarActivosConPrecios();
-        $tipoVehiculos = $this->tipoVehiculoService->listarTodo();
-        return view('precioServicio.crear', compact('servicios', 'tipoVehiculos'));
+        return view('precioServicio.crear', $this->precioServicioService->prepararFormulario(
+            null,
+            (int) old('duracionMinutos', 30)
+        ));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(precioServicioStoreRequest $request)
+    public function store(PrecioServicioStoreRequest $precioServicioStoreRequest)
     {
-        $datos = $request->validated();
-        $this->precioServicioService->guardar($datos);
+        $this->precioServicioService->guardar($precioServicioStoreRequest->validated());
         return redirect()->route('precioServicio.index')->with('success','precio del servicio creado correctamente.');
     }
 
@@ -67,18 +55,18 @@ class PrecioServicioController extends Controller
      */
     public function edit(int $id)
     {
-        $precioServicio = $this->precioServicioService->buscarPorId($id);
-        $servicios = $this->servicioService->listarActivosConPrecios();
-        $tipoVehiculos = $this->tipoVehiculoService->listarTodo();
-        return view('precioServicio.editar', compact('precioServicio', 'servicios', 'tipoVehiculos'));
+        return view('precioServicio.editar', $this->precioServicioService->prepararFormulario(
+            $id,
+            old('duracionMinutos') === null ? null : (int) old('duracionMinutos')
+        ));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(precioServicioUpdateRequest $request, int $id)
+    public function update(PrecioServicioUpdateRequest $precioServicioUpdateRequest, int $id)
     {
-        $this->precioServicioService->actualizar($id, $request->validated());
+        $this->precioServicioService->actualizar($id, $precioServicioUpdateRequest->validated());
         return redirect()->route('precioServicio.index')->with('success','precio del servicio actualizado correctamente.');
     }
 

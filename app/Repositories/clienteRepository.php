@@ -2,16 +2,17 @@
 
 namespace App\Repositories;
 
-use App\Models\clientes;
-use App\Models\agenda;
-use App\Models\vehiculo;
+use App\Repositories\Contracts\ClienteRepositoryInterface;
+
+use App\Models\Cliente;
+use App\Models\Agenda;
+use App\Models\Vehiculo;
 use App\Support\TextoBusqueda;
 
-class clienteRepository
-{
+class ClienteRepository implements ClienteRepositoryInterface {
     public function listarTodo()
     {
-        return clientes::query()
+        return Cliente::query()
             ->select(['id', 'nombreCliente', 'apellidoCliente'])
             ->orderBy('apellidoCliente')
             ->orderBy('nombreCliente')
@@ -20,7 +21,7 @@ class clienteRepository
 
     public function buscar(string $texto)
     {
-        $consulta = clientes::query()
+        $consulta = Cliente::query()
             ->select([
                 'id',
                 'nombreCliente',
@@ -47,28 +48,28 @@ class clienteRepository
 
     public function guardar(array $datos)
     {
-        return clientes::create($datos);
+        return Cliente::create($datos);
     }
 
     public function eliminar(int $id)
     {
-        return clientes::destroy($id);
+        return Cliente::destroy($id);
     }
 
     public function tieneDependencias(int $id): bool
     {
-        return vehiculo::where('clienteID', $id)->exists()
-            || agenda::where('clienteId', $id)->exists();
+        return Vehiculo::where('clienteID', $id)->exists()
+            || Agenda::where('clienteId', $id)->exists();
     }
 
     public function buscarPorId(int $id)
     {
-        return clientes::findOrFail($id);
+        return Cliente::findOrFail($id);
     }
 
     public function buscarConHistorial(int $id)
     {
-        return clientes::with([
+        return Cliente::with([
             'vehiculo.tipoVehiculo',
             'vehiculo.agendaServicios' => function ($query) {
                 $query->whereHas(
@@ -84,7 +85,7 @@ class clienteRepository
 
     public function actualizar(int $id, array $datos)
     {
-        $cliente = clientes::findOrFail($id);
+        $cliente = Cliente::findOrFail($id);
         $cliente->update($datos);
 
         return $cliente;

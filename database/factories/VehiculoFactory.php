@@ -2,19 +2,19 @@
 
 namespace Database\Factories;
 
-use App\Models\clientes;
-use App\Models\tipoVehiculo;
+use App\Models\Cliente;
+use App\Models\TipoVehiculo;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class VehiculoFactory extends Factory
 {
-    protected $model = \App\Models\vehiculo::class;
+    protected $model = \App\Models\Vehiculo::class;
 
     public function definition(): array
     {
         return [
-            'clienteID' => clientes::factory(),
-            'tipoVehiculoId' => tipoVehiculo::query()->inRandomOrder()->value('id') ?? tipoVehiculo::factory(),
+            'clienteID' => Cliente::factory(),
+            'tipoVehiculoId' => TipoVehiculo::query()->inRandomOrder()->value('id') ?? TipoVehiculo::factory(),
             'placa' => strtoupper(fake()->unique()->bothify('???####')),
             'modelo' => fake()->word(),
             'color' => fake()->safeColorName(),

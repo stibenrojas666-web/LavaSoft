@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class tipoVehiculoStoreRequest extends FormRequest
+class TipoVehiculoStoreRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,13 +23,14 @@ class tipoVehiculoStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nombre' => 'required|string|max:30',
+         'nombre' => ['required', 'string', 'max:30', 'unique:tipo_vehiculos,nombre'],
         ];
     }
 
     public function messages(): array
     {
         return [
+            'nombre.unique' => 'Ya existe un tipo de vehículo con ese nombre.',
             'nombre.required' => 'El campo Nombre es obligatorio.',
             'nombre.string' => 'El nombre debe ser texto.',
             'nombre.max' => 'El nombre no puede superar los 30 caracteres.',

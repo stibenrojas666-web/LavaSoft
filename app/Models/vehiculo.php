@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class vehiculo extends Model
+class Vehiculo extends Model
 {
     use HasFactory;
     protected $table = 'vehiculos';
@@ -21,22 +21,22 @@ class vehiculo extends Model
 
     public function cliente()
     {
-        return $this->belongsTo(clientes::class, 'clienteID');
+        return $this->belongsTo(Cliente::class, 'clienteID');
     }
 
     public function tipoVehiculo()
     {
-        return $this->belongsTo(tipoVehiculo::class, 'tipoVehiculoId');
+        return $this->belongsTo(TipoVehiculo::class, 'tipoVehiculoId');
     }
 
     public function agendas()
     {
-        return $this->belongsToMany(agenda::class, 'agenda_servicios', 'vehiculoId', 'agendaId')
+        return $this->belongsToMany(Agenda::class, 'agenda_servicios', 'vehiculoId', 'agendaId')
             ->distinct();
     }
 
     public function agendaServicios()
     {
-        return $this->hasMany(agendaServicios::class, 'vehiculoId');
+        return $this->hasMany(AgendaServicios::class, 'vehiculoId');
     }
 }

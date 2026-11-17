@@ -2,14 +2,14 @@
 
 namespace Database\Seeders;
 
-use App\Models\empleado;
+use App\Models\Empleado;
 use Illuminate\Database\Seeder;
 
 class EmpleadosSeeder extends Seeder
 {
     public function run(): void
     {
-        empleado::firstOrCreate(['identificacion' => 'DEMO-EMP-001'], [
+        Empleado::firstOrCreate(['identificacion' => 'DEMO-EMP-001'], [
             'nombre' => 'Empleado',
             'apellido' => 'Demo',
             'telefono' => '3000000001',
@@ -19,9 +19,9 @@ class EmpleadosSeeder extends Seeder
         ]);
 
         foreach (range(1, 3) as $numero) {
-            empleado::firstOrCreate(
+            Empleado::firstOrCreate(
                 ['identificacion' => "DEMO-EMP-00{$numero}"],
-                empleado::factory()->make([
+                Empleado::factory()->make([
                     'identificacion' => "DEMO-EMP-00{$numero}",
                 ])->getAttributes()
             );

@@ -17,6 +17,7 @@ class EmpleadosDisponiblesRequest extends FormRequest
             'fecha' => ['required', 'date'],
             'hora' => ['required', 'date_format:H:i'],
             'agendaId' => ['nullable', 'integer', 'exists:agendas,id'],
+            'duracionMinutos' => ['nullable', 'integer', 'min:1', 'max:1440'],
         ];
     }
 
@@ -29,6 +30,9 @@ class EmpleadosDisponiblesRequest extends FormRequest
             'hora.date_format' => 'La hora debe tener el formato HH:MM.',
             'agendaId.integer' => 'La cita seleccionada no es válida.',
             'agendaId.exists' => 'La cita seleccionada no existe.',
+            'duracionMinutos.integer' => 'La duración debe ser un número entero.',
+            'duracionMinutos.min' => 'La duración debe ser de al menos un minuto.',
+            'duracionMinutos.max' => 'La duración no puede superar las 24 horas.',
         ];
     }
 }

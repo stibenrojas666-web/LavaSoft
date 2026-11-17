@@ -3,13 +3,12 @@
 namespace App\Http\Controllers\Seguridad;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\CuentaStoreRequest;
+use App\Http\Requests\CuentaUpdateRequest;
 use App\Services\Seguridad\CuentaService;
 use App\Http\Requests\BusquedaIndexRequest;
 use Exception;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
-use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class CuentaController extends Controller
@@ -18,69 +17,45 @@ class CuentaController extends Controller
     {
     }
 
-    public function index(BusquedaIndexRequest $request): View
+    public function index(BusquedaIndexRequest $busquedaIndexRequest): View
     {
-        $datos = $request->validated();
-        $buscar = trim((string) ($datos['buscar'] ?? ''));
-        return view('seguridad.cuentas.index', [
-            'usuarios' => $this->cuentaService->buscarEnListado($buscar),
-            'buscar' => $buscar,
-        ]);
+        return view('seguridad.cuentas.index', $this->cuentaService->prepararListado(
+            $busquedaIndexRequest->validated()
+        ));
     }
 
     public function create(): View
     {
-        return view('seguridad.cuentas.form', [
-            'usuario' => null,
-            'roles' => $this->cuentaService->listarRoles(),
-            'seleccionados' => old('roles', []),
-        ]);
+        return view('seguridad.cuentas.form', $this->cuentaService->prepararFormulario(
+            null,
+            old('roles', [])
+        ));
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(CuentaStoreRequest $cuentaStoreRequest): RedirectResponse
     {
-        $datos = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255', Rule::unique(config('auth.providers.users.model'), 'email')],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'roles' => ['nullable', 'array'],
-            'roles.*' => ['string', Rule::exists(config('permission.table_names.roles'), 'name')],
-        ]);
-
-        $this->cuentaService->crear(Arr::only($datos, ['name', 'email', 'password']), $datos['roles'] ?? []);
+        $this->cuentaService->crear($cuentaStoreRequest->validated());
 
         return redirect()->route('seguridad.cuentas.index')->with('success', 'Usuario creado correctamente.');
     }
 
     public function edit(string $cuenta): View
     {
-        $usuario = $this->cuentaService->buscar($cuenta);
-
-        return view('seguridad.cuentas.form', [
-            'usuario' => $usuario,
-            'roles' => $this->cuentaService->listarRoles(),
-            'seleccionados' => old('roles', $usuario->rolesConInactivos->pluck('name')->all()),
-        ]);
+        return view('seguridad.cuentas.form', $this->cuentaService->prepararFormulario(
+            $cuenta,
+            old('roles')
+        ));
     }
 
-    public function update(Request $request, string $cuenta): RedirectResponse
+    public function update(CuentaUpdateRequest $cuentaUpdateRequest, string $cuenta): RedirectResponse
     {
         $usuario = $this->cuentaService->buscar($cuenta);
-
-        $datos = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255', Rule::unique(config('auth.providers.users.model'), 'email')->ignore($usuario->getKey())],
-            'password' => ['nullable', 'string', 'min:8', 'confirmed'],
-            'roles' => ['nullable', 'array'],
-            'roles.*' => ['string', Rule::exists(config('permission.table_names.roles'), 'name')],
-        ]);
 
         try {
             $this->cuentaService->actualizar(
                 $usuario,
-                Arr::only($datos, ['name', 'email', 'password']),
-                $datos['roles'] ?? [],
-                $request->user()
+                $cuentaUpdateRequest->validated(),
+                $cuentaUpdateRequest->user()
             );
         } catch (Exception $e) {
             return back()->withInput()->with('error', $e->getMessage());
@@ -89,10 +64,10 @@ class CuentaController extends Controller
         return redirect()->route('seguridad.cuentas.index')->with('success', 'Usuario actualizado correctamente.');
     }
 
-    public function destroy(Request $request, string $cuenta): RedirectResponse
+    public function destroy(\Illuminate\Http\Request $eliminarCuentaRequest, string $cuenta): RedirectResponse
     {
         try {
-            $this->cuentaService->eliminar($this->cuentaService->buscar($cuenta), $request->user());
+            $this->cuentaService->eliminar($this->cuentaService->buscar($cuenta), $eliminarCuentaRequest->user());
         } catch (Exception $e) {
             return back()->with('error', $e->getMessage());
         }

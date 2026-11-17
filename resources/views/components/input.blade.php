@@ -1,32 +1,58 @@
-{{--
-    Uso:
-    <x-input name="email" label="Correo electrónico" type="email" :value="old('email')" required />
---}}
-@props(['name', 'label' => null, 'type' => 'text', 'value' => null, 'hint' => null])
 
-<div>
+@props([
+    'name',
+    'label' => null,
+    'type' => 'text',
+    'value' => null,
+    'hint' => null,
+])
+
+<div class="min-w-0">
+
     @if ($label)
-        <label for="{{ $name }}" class="block text-sm font-medium text-slate-700 mb-1.5">{{ $label }}</label>
+        <label
+            for="{{ $name }}"
+            class="mb-2 block text-sm font-bold text-[#284657]"
+        >
+            {{ $label }}
+
+            @if ($attributes->has('required'))
+                <span class="text-rose-500">*</span>
+            @endif
+        </label>
     @endif
 
     <input
         id="{{ $name }}"
         name="{{ $name }}"
         type="{{ $type }}"
-        value="{{ $value }}"
+        value="{{ old($name, $value) }}"
+        @if ($errors->has($name))
+            aria-invalid="true"
+            aria-describedby="{{ $name }}-error"
+        @endif
         {{ $attributes->merge([
-            'class' => 'w-full px-3.5 py-2.5 text-sm rounded-lg border ' .
-                       ($errors->has($name) ? 'border-red-300 focus:ring-red-500' : 'border-slate-200 focus:ring-primary-500') .
-                       ' bg-white focus:outline-none focus:ring-2 focus:border-transparent transition placeholder:text-slate-400'
+            'class' =>
+                'min-h-[46px] w-full rounded-xl border bg-white px-3.5 py-3 text-sm text-slate-800 shadow-sm transition placeholder:text-slate-400 focus:border-cyan-500 focus:outline-none focus:ring-4 focus:ring-cyan-100 ' .
+                ($errors->has($name)
+                    ? 'border-rose-400'
+                    : 'border-slate-200')
         ]) }}
-        @if ($errors->has($name)) aria-invalid="true" aria-describedby="{{ $name }}-error" @endif
     >
 
     @if ($hint && !$errors->has($name))
-        <p class="mt-1.5 text-xs text-slate-400">{{ $hint }}</p>
+        <p class="mt-1.5 text-xs leading-relaxed text-slate-400">
+            {{ $hint }}
+        </p>
     @endif
 
     @error($name)
-        <p id="{{ $name }}-error" class="mt-1.5 text-xs text-red-600">{{ $message }}</p>
+        <p
+            id="{{ $name }}-error"
+            class="mt-1.5 text-xs font-medium text-rose-600"
+        >
+            {{ $message }}
+        </p>
     @enderror
+
 </div>

@@ -1,107 +1,166 @@
 @extends('layouts.app')
 
-@section('title')
-    Turno - Editar
-@endsection
+@section('title', 'Editar turno')
+@section('page-title', 'Editar turno')
 
 @section('content')
+<div class="mx-auto w-full max-w-4xl space-y-6">
 
-<x-card>
+    <div>
+        <div>
+            <h1 class="text-2xl font-extrabold tracking-tight text-slate-800">Editar turno</h1>
+            <p class="mt-1 text-sm text-slate-500">Actualiza el horario de trabajo del empleado.</p>
+        </div>
 
-    <div class="flex items-center justify-between mb-6">
-        <h1 class="text-3xl font-bold text-cyan-700">
-            ✏️ Editar Turno
-        </h1>
-        <a href="{{ route('turnos.index') }}"
-            class="text-sm text-cyan-600 hover:text-cyan-800 font-medium">
-            ← Volver al listado
-        </a>
     </div>
 
-    <form action="{{ route('turnos.update', $turno->id) }}" method="POST" novalidate>
-        @csrf
-        @method('PUT')
-
-        {{-- empleado --}}
-        <div class="mb-4">
-            <label for="empleado_id" class="block text-gray-700 font-semibold mb-1">Empleado</label>
-            <select name="empleado_id" id="empleado_id"
-                    class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-400
-                           @error('empleado_id') border-red-500 @enderror">
-                @foreach($empleados as $empleado)
-                    <option value="{{ $empleado->id }}"
-                        {{ old('empleado_id', $turno->empleado_id) == $empleado->id ? 'selected' : '' }}>
-                         {{ $empleado->nombre }} {{ $empleado->apellido }} ({{ $empleado->identificacion }}  )
-                    </option>
+    @if($errors->any())
+        <div class="rounded-xl border border-red-200 bg-red-50 p-4">
+            <p class="mb-2 text-sm font-bold text-red-800">Revisa los siguientes campos:</p>
+            <ul class="list-inside list-disc space-y-1 text-sm text-red-700">
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
                 @endforeach
-            </select>
-            @error('empleado_id')
-                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-            @enderror
+            </ul>
         </div>
+    @endif
 
-        {{-- dia --}}
-        <div class="mb-4">
-            <label for="dia" class="block text-gray-700 font-semibold mb-1">Día</label>
-            <select name="dia" id="dia"
-                    class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-400
-                           @error('dia') border-red-500 @enderror">
-                @foreach(['lunes','martes','miercoles','jueves','viernes','sabado','domingo'] as $d)
-                    <option value="{{ $d }}" {{ old('dia', $turno->dia) == $d ? 'selected' : '' }}>{{ ucfirst($d) }}</option>
-                @endforeach
-            </select>
-            @error('dia')
-                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-            @enderror
-        </div>
-
-        {{-- jornada --}}
-        <div class="mb-6">
-            <label for="jornada" class="block text-gray-700 font-semibold mb-1">Jornada</label>
-            <select name="jornada" id="jornada"
-                    class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-400
-                           @error('jornada') border-red-500 @enderror">
-                @foreach(['mañana','tarde','noche'] as $j)
-                    <option value="{{ $j }}" {{ old('jornada', $turno->jornada) == $j ? 'selected' : '' }}>{{ ucfirst($j) }}</option>
-                @endforeach
-            </select>
-            @error('jornada')
-                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-            @enderror
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-            <div>
-                <label for="horaInicio" class="block text-gray-700 font-semibold mb-1">Hora de inicio</label>
-                <input type="time" name="horaInicio" id="horaInicio"
-                    value="{{ old('horaInicio', $turno->horaInicio ? substr($turno->horaInicio, 0, 5) : '') }}"
-                    class="w-full border rounded-lg px-3 py-2 @error('horaInicio') border-red-500 @enderror">
-                @error('horaInicio')
-                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                @enderror
-            </div>
-            <div>
-                <label for="horaFin" class="block text-gray-700 font-semibold mb-1">Hora de fin</label>
-                <input type="time" name="horaFin" id="horaFin"
-                    value="{{ old('horaFin', $turno->horaFin ? substr($turno->horaFin, 0, 5) : '') }}"
-                    class="w-full border rounded-lg px-3 py-2 @error('horaFin') border-red-500 @enderror">
-                @error('horaFin')
-                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                @enderror
+    <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div class="border-b border-slate-100 px-5 py-5 sm:px-7">
+            <div class="flex items-center gap-3">
+                <div class="grid h-11 w-11 place-items-center rounded-xl bg-cyan-50 text-2xl text-cyan-800">◷</div>
+                <div>
+                    <h2 class="font-extrabold text-slate-800">Configuración del turno</h2>
+                    <p class="mt-1 text-xs text-slate-500">Modifica el empleado, el día o el horario asignado.</p>
+                </div>
             </div>
         </div>
 
-        <div class="flex justify-end gap-2">
-            <a href="{{ route('turnos.index') }}"
-                class="bg-gray-500 hover:bg-gray-700 text-white font-semibold px-4 py-2 rounded-lg shadow">
-                Cancelar
-            </a>
-            <button type="submit"
-                class="bg-cyan-600 hover:bg-cyan-800 text-white font-semibold px-4 py-2 rounded-lg shadow">
-                💾 Guardar cambios
-            </button>
-        </div>
-    </form>
-</x-card>
+        <form action="{{ route('turnos.update', $turno->id) }}" method="POST">
+            @csrf
+            @method('PUT')
 
+            <div class="grid grid-cols-1 gap-5 px-5 py-6 sm:grid-cols-2 sm:px-7">
+
+                <div class="sm:col-span-2">
+                    <label for="empleado_id" class="mb-1.5 block text-sm font-semibold text-slate-700">Empleado</label>
+                    <select
+                        name="empleado_id"
+                        id="empleado_id"
+                        required
+                        class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-3 text-sm outline-none transition focus:border-cyan-600 focus:ring-2 focus:ring-cyan-100 @error('empleado_id') border-red-500 @enderror"
+                    >
+                        @foreach($empleados as $empleado)
+                            <option value="{{ $empleado->id }}" @selected(old('empleado_id', $turno->empleado_id) == $empleado->id)>
+                                {{ $empleado->nombre }} {{ $empleado->apellido }} ({{ $empleado->identificacion }})
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('empleado_id')
+                        <p class="mt-1.5 text-xs font-medium text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label for="dia" class="mb-1.5 block text-sm font-semibold text-slate-700">Día</label>
+                    <select
+                        name="dia"
+                        id="dia"
+                        required
+                        class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-3 text-sm outline-none transition focus:border-cyan-600 focus:ring-2 focus:ring-cyan-100 @error('dia') border-red-500 @enderror"
+                    >
+                        @foreach(['lunes','martes','miercoles','jueves','viernes','sabado','domingo'] as $dia)
+                            <option value="{{ $dia }}" @selected(old('dia', $turno->dia) === $dia)>
+                                {{ ucfirst($dia) }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('dia')
+                        <p class="mt-1.5 text-xs font-medium text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label for="jornada_visual" class="mb-1.5 block text-sm font-semibold text-slate-700">Jornada</label>
+                    <select
+                        id="jornada_visual"
+                        disabled
+                        class="w-full cursor-not-allowed rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-3 text-sm text-slate-600"
+                    >
+                        <option value="">Se calcula según la hora de inicio</option>
+                        <option value="mañana">Mañana</option>
+                        <option value="tarde">Tarde</option>
+                        <option value="noche">Noche</option>
+                    </select>
+                    <p class="mt-1.5 text-xs text-slate-500">La jornada se determina automáticamente según la hora de inicio.</p>
+                </div>
+
+                <div>
+                    <label for="horaInicio" class="mb-1.5 block text-sm font-semibold text-slate-700">Hora de inicio</label>
+                    <input
+                        type="time"
+                        name="horaInicio"
+                        id="horaInicio"
+                        value="{{ old('horaInicio', $turno->horaInicio ? substr($turno->horaInicio, 0, 5) : '') }}"
+                        required
+                        class="w-full rounded-xl border border-slate-200 px-3.5 py-3 text-sm outline-none transition focus:border-cyan-600 focus:ring-2 focus:ring-cyan-100 @error('horaInicio') border-red-500 @enderror"
+                    >
+                    @error('horaInicio')
+                        <p class="mt-1.5 text-xs font-medium text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label for="horaFin" class="mb-1.5 block text-sm font-semibold text-slate-700">Hora de fin</label>
+                    <input
+                        type="time"
+                        name="horaFin"
+                        id="horaFin"
+                        value="{{ old('horaFin', $turno->horaFin ? substr($turno->horaFin, 0, 5) : '') }}"
+                        required
+                        class="w-full rounded-xl border border-slate-200 px-3.5 py-3 text-sm outline-none transition focus:border-cyan-600 focus:ring-2 focus:ring-cyan-100 @error('horaFin') border-red-500 @enderror"
+                    >
+                    @error('horaFin')
+                        <p class="mt-1.5 text-xs font-medium text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+            </div>
+
+            <div class="flex flex-col-reverse gap-3 border-t border-slate-100 bg-slate-50 px-5 py-4 sm:flex-row sm:justify-end sm:px-7">
+                <a href="{{ route('turnos.index') }}" class="rounded-xl border border-slate-200 bg-white px-5 py-3 text-center text-sm font-semibold text-slate-600 transition hover:bg-slate-100">Cancelar</a>
+                <button type="submit"
+                        class="rounded-xl bg-cyan-700 px-6 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-cyan-800">
+                    Guardar cambios
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+(() => {
+    const horaInicio = document.getElementById('horaInicio');
+    const jornada = document.getElementById('jornada_visual');
+
+    if (!horaInicio || !jornada) {
+        return;
+    }
+
+    function actualizarJornada() {
+        if (!horaInicio.value) {
+            jornada.value = '';
+            return;
+        }
+
+        const hora = Number(horaInicio.value.split(':')[0]);
+
+        jornada.value = hora < 12
+            ? 'mañana'
+            : (hora < 18 ? 'tarde' : 'noche');
+    }
+
+    horaInicio.addEventListener('input', actualizarJornada);
+    actualizarJornada();
+})();
+</script>
 @endsection

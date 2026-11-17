@@ -18,7 +18,7 @@ class ConfiguracionLavaderoRequest extends FormRequest
             'nit' => ['nullable', 'string', 'max:30'],
             'direccion' => ['nullable', 'string', 'max:255'],
             'telefono' => ['nullable', 'string', 'max:30'],
-            'logo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'logo' => ['nullable', 'mimes:jpg,jpeg,png,webp,gif,svg,bmp,ico', 'max:10240'],
             'mostrar_logo' => ['nullable', 'boolean'],
         ];
     }
@@ -32,9 +32,8 @@ class ConfiguracionLavaderoRequest extends FormRequest
             'nit.max' => 'El NIT no puede superar los 30 caracteres.',
             'direccion.max' => 'La dirección no puede superar los 255 caracteres.',
             'telefono.max' => 'El teléfono no puede superar los 30 caracteres.',
-            'logo.image' => 'El archivo debe ser una imagen.',
-            'logo.mimes' => 'El logo debe estar en formato JPG, PNG o WEBP.',
-            'logo.max' => 'El logo no puede superar los 2 MB.',
+            'logo.mimes' => 'El logo debe estar en formato JPG, PNG, WEBP, GIF, SVG, BMP o ICO.',
+            'logo.max' => 'El logo no puede superar los 10 MB.',
             'mostrar_logo.boolean' => 'La opción de mostrar el logo no es válida.',
         ];
     }

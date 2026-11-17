@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ReporteDiarioRequest;
 use App\Http\Requests\ReportePeriodoRequest;
 use App\Services\ReporteService;
-use Illuminate\Support\Carbon;
 use Illuminate\View\View;
 
 class ReporteController extends Controller
@@ -14,40 +13,20 @@ class ReporteController extends Controller
     {
     }
 
-    public function diario(ReporteDiarioRequest $request): View
+    public function diario(ReporteDiarioRequest $reporteDiarioRequest): View
     {
-        $fecha = $request->validated('fecha') ?: Carbon::today()->toDateString();
-
-        return view('reportes.diario', [
-            'fecha' => $fecha,
-            ...$this->service->diario($fecha),
-        ]);
+        return view('reportes.diario', $this->service->diario(
+            $reporteDiarioRequest->validated('fecha')
+        ));
     }
 
-    public function periodo(ReportePeriodoRequest $request): View
+    public function periodo(ReportePeriodoRequest $reportePeriodoRequest): View
     {
-        $datos = $request->validated();
-        $hoy = Carbon::today();
-        if (!isset($datos['desde']) && !isset($datos['hasta'])) {
-            $desde = $hoy->copy()->startOfWeek()->toDateString();
-            $hasta = $hoy->copy()->endOfWeek()->toDateString();
-        } else {
-            $desde = $datos['desde'] ?? $datos['hasta'];
-            $hasta = $datos['hasta'] ?? $datos['desde'];
-        }
+        $datos = $reportePeriodoRequest->validated();
 
-        return view('reportes.periodo', [
-            'desde' => $desde,
-            'hasta' => $hasta,
-            'rangoSemana' => [
-                'desde' => $hoy->copy()->startOfWeek()->toDateString(),
-                'hasta' => $hoy->copy()->endOfWeek()->toDateString(),
-            ],
-            'rangoMes' => [
-                'desde' => $hoy->copy()->startOfMonth()->toDateString(),
-                'hasta' => $hoy->copy()->endOfMonth()->toDateString(),
-            ],
-            ...$this->service->periodo($desde, $hasta),
-        ]);
+        return view('reportes.periodo', $this->service->prepararPeriodo(
+            $datos['desde'] ?? null,
+            $datos['hasta'] ?? null
+        ));
     }
 }

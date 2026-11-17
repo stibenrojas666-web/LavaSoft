@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Database\Seeders\DatabaseSeeder;
+use App\Models\User;
 use Tests\TestCase;
 
 class ExampleTest extends TestCase
@@ -14,7 +15,9 @@ class ExampleTest extends TestCase
     {
         $this->seed(DatabaseSeeder::class);
 
-        $response = $this->get('/');
+        $adminEmail = config('seguridad.admin.email');
+        $response = $this->actingAs(User::where('email', $adminEmail)->firstOrFail())
+            ->get('/dashboard');
 
         $response->assertOk()
             ->assertSee('Clientes')

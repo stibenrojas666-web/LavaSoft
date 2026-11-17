@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\pagoStoreRequest;
+use App\Http\Requests\PagoStoreRequest;
 use App\Http\Requests\BusquedaIndexRequest;
 use App\Services\PagoService;
 use Illuminate\Http\RedirectResponse;
@@ -14,16 +14,11 @@ class PagoController extends Controller
     {
     }
 
-    public function historial(BusquedaIndexRequest $request): View
+    public function historial(BusquedaIndexRequest $busquedaIndexRequest): View
     {
-        $datos = $request->validated();
-        $buscar = trim((string) ($datos['buscar'] ?? ''));
-        $filtros = array_intersect_key($datos, array_flip(['metodo', 'desde', 'hasta']));
-        return view('pagos.historial', [
-            'pagos' => $this->pagoService->buscarHistorialPagos($buscar, $filtros),
-            'buscar' => $buscar,
-            'filtros' => $filtros,
-        ]);
+        return view('pagos.historial', $this->pagoService->prepararHistorial(
+            $busquedaIndexRequest->validated()
+        ));
     }
 
     public function factura(int $agendaId): View
@@ -31,9 +26,9 @@ class PagoController extends Controller
         return view('pagos.factura', $this->pagoService->obtenerFactura($agendaId));
     }
 
-    public function registrarPago(int $agendaId, pagoStoreRequest $request): RedirectResponse
+    public function registrarPago(int $agendaId, PagoStoreRequest $pagoStoreRequest): RedirectResponse
     {
-        $this->pagoService->registrarPago($agendaId, $request->validated());
+        $this->pagoService->registrarPago($agendaId, $pagoStoreRequest->validated());
 
         return redirect()->route('agenda.factura', $agendaId)
             ->with('success', 'Pago registrado y cita marcada como terminada.');
@@ -45,5 +40,10 @@ class PagoController extends Controller
 
         return redirect()->route('agenda.factura', $agendaId)
             ->with('success', 'Factura enviada al correo registrado del cliente.');
+    }
+
+        public function facturaPublica(int $agendaId): View
+    {
+        return view('pagos.factura-publica', $this->pagoService->obtenerFacturaPublica($agendaId));
     }
 }

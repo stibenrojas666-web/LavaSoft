@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Repositories\DashboardRepository;
+use App\Repositories\Contracts\DashboardRepositoryInterface as DashboardRepository;
 use Illuminate\Support\Carbon;
 
 class DashboardService
@@ -29,6 +29,15 @@ class DashboardService
         }
 
         $topServicios = $this->dashboardRepository->topServicios();
+        $ultimasCitas = $this->dashboardRepository->ultimasCitas();
+        $ultimasCitas->each(function ($cita): void {
+            $nombreCliente = trim(($cita->cliente->nombreCliente ?? '').' '.($cita->cliente->apellidoCliente ?? ''));
+            $cita->setAttribute('clienteNombreCompleto', $nombreCliente !== '' ? $nombreCliente : 'Sin cliente');
+            $cita->setRelation('vehiculosResumen', $cita->agendaServicios->groupBy('vehiculoId')->map(fn ($lineas) => [
+                'vehiculo' => $lineas->first()->vehiculo,
+                'servicios' => $lineas->pluck('servicio.nombre')->filter()->implode(', '),
+            ])->values());
+        });
 
         return [
             'serviciosHoy' => $this->dashboardRepository->serviciosHoy($hoy),
@@ -43,7 +52,8 @@ class DashboardService
             'citasPorDia' => $citasPorDia,
             'serviciosLabels' => $topServicios->map(fn ($servicio) => $servicio->servicio->nombre ?? 'N/A'),
             'serviciosValues' => $topServicios->pluck('total'),
-            'ultimasCitas' => $this->dashboardRepository->ultimasCitas(),
+            'serviciosValuesTotal' => (float) $topServicios->sum('total'),
+            'ultimasCitas' => $ultimasCitas,
         ];
     }
 }

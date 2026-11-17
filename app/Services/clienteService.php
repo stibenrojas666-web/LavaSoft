@@ -2,12 +2,12 @@
 
 namespace App\Services;
 
-use App\Repositories\clienteRepository;
+use App\Repositories\Contracts\ClienteRepositoryInterface as ClienteRepository;
 
-class clienteService {
-    private clienteRepository $clienteRepository;
+class ClienteService {
+    private ClienteRepository $clienteRepository;
 
-    public function __construct(clienteRepository $clienteRepository)
+    public function __construct(ClienteRepository $clienteRepository)
     {
         $this->clienteRepository = $clienteRepository;
     }
@@ -19,6 +19,13 @@ class clienteService {
     public function buscar(string $texto)
     {
         return $this->clienteRepository->buscar($texto);
+    }
+
+    public function prepararListado(array $datos): array
+    {
+        $buscar = trim((string) ($datos['buscar'] ?? ''));
+
+        return ['clientes' => $this->buscar($buscar), 'buscar' => $buscar];
     }
      public function guardar(array $datos){
         return $this->clienteRepository->guardar($datos);

@@ -6,6 +6,7 @@ use App\Http\Requests\ConfiguracionLavaderoRequest;
 use App\Services\ConfiguracionLavaderoService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class ConfiguracionLavaderoController extends Controller
 {
@@ -18,10 +19,22 @@ class ConfiguracionLavaderoController extends Controller
         return view('configuracion.edit', ['configuracion' => $this->service->obtener()]);
     }
 
-    public function update(ConfiguracionLavaderoRequest $request): RedirectResponse
+    public function logo(): BinaryFileResponse
     {
-        $datos = $request->safe()->except('logo');
-        $this->service->actualizar($datos, $request->file('logo'));
+        $ruta = $this->service->rutaLogoVisible();
+        abort_unless($ruta, 404);
+
+        return response()->file($ruta, [
+            'Cache-Control' => 'public, max-age=0, must-revalidate',
+        ]);
+    }
+
+    public function update(ConfiguracionLavaderoRequest $configuracionLavaderoRequest): RedirectResponse
+    {
+        $this->service->actualizar(
+            $configuracionLavaderoRequest->validated(),
+            $configuracionLavaderoRequest->file('logo')
+        );
 
         return redirect()->route('configuracion.edit')->with('success', 'Configuración del lavadero actualizada.');
     }

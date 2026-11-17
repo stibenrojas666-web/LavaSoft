@@ -28,7 +28,7 @@ class AgendaStoreRequest extends FormRequest
             'clienteId'      => 'required|exists:clientes,id',
             'fecha'          => 'required|date|after_or_equal:today',
             'hora'           => 'required|date_format:H:i',
-            'estado'         => ['required', Rule::in(['pendiente', 'confirmada', 'cancelada', 'terminada'])],
+            'estado'         => ['required', Rule::in(['pendiente', 'confirmada', 'cancelada'])],
             'tipoDeAtencion' => ['required', Rule::in(['Por orden de llegada', 'Por cita agendada'])],
             'vehiculos' => ['required', 'array', 'min:1'],
             'vehiculos.*.vehiculoId' => ['required', 'integer', 'exists:vehiculos,id'],

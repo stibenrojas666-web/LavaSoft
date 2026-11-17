@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\tipoVehiculo;
+use App\Models\TipoVehiculo;
 use Illuminate\Database\Seeder;
 
 class TipoVehiculoSeeder extends Seeder
@@ -18,7 +18,7 @@ class TipoVehiculoSeeder extends Seeder
             'carro grande',
             'otros',
         ] as $nombre) {
-            tipoVehiculo::firstOrCreate(['nombre' => $nombre]);
+            TipoVehiculo::firstOrCreate(['nombre' => $nombre]);
         }
     }
 }

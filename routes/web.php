@@ -18,6 +18,14 @@ use App\Http\Middleware\NoCacheHeaders;
 
 
 
+Route::get('factura/{agendaId}', [PagoController::class, 'facturaPublica'])
+    ->whereNumber('agendaId')
+    ->name('factura.publica')
+    ->middleware(['signed', NoCacheHeaders::class]);
+
+Route::get('lavadero/logo', [ConfiguracionLavaderoController::class, 'logo'])
+    ->name('lavadero.logo');
+
 Route::middleware(['auth', NoCacheHeaders::class])->group(function () {
 
     Route::get('/dashboard', [DashboardController::class, 'index'])
@@ -47,7 +55,10 @@ Route::middleware(['auth', NoCacheHeaders::class])->group(function () {
         ->name('pagos.historial')->middleware('modulo:pagos');
     Route::resource('precioServicio', PrecioServicioController::class)->middleware('modulo:precioServicio');
     Route::resource('turnos', TurnoController::class)->middleware('modulo:turnos');
-    Route::resource('agendaServicio', AgendaServiciosController::class)->middleware('modulo:agendaServicio');
+    Route::get('agendaServicio', [AgendaServiciosController::class, 'index'])
+        ->name('agendaServicio.index')->middleware('modulo:agendaServicio');
+    Route::get('agendaServicio/{id}', [AgendaServiciosController::class, 'show'])
+        ->whereNumber('id')->name('agendaServicio.show')->middleware('modulo:agendaServicio');
 
     Route::middleware('can:' . config('seguridad.permiso_admin'))
         ->prefix('configuracion')

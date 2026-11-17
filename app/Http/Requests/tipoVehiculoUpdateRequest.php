@@ -4,8 +4,9 @@ namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
-class tipoVehiculoUpdateRequest extends FormRequest
+class TipoVehiculoUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,13 +24,14 @@ class tipoVehiculoUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nombre' => 'required|string|max:30',
+         'nombre' => ['required', 'string', 'max:30', Rule::unique('tipo_vehiculos', 'nombre')->ignore($this->route('tipoVehiculo'))],
         ];
     }
 
     public function messages(): array
     {
         return [
+            'nombre.unique' => 'Ya existe un tipo de vehículo con ese nombre.',
             'nombre.required' => 'El nombre es obligatorio.',
             'nombre.string' => 'El campo Nombre debe ser una cadena de texto.',
             'nombre.max' => 'El nombre no puede superar los 30 caracteres.',

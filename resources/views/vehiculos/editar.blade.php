@@ -1,152 +1,179 @@
 @extends('layouts.app')
 
-@section('title')
-    Editar Vehículo
-@endsection
+@section('title', 'Editar vehículo')
+@section('page-title', 'Editar vehículo')
 
 @section('content')
+<div class="mx-auto max-w-5xl px-4 py-6">
 
-<x-card>
+    <x-module-header
+        title="Editar vehículo"
+        description="Actualiza la información del vehículo registrado."
+        icon="car"
+    />
 
-    <div class="flex items-center justify-between mb-6">
-        <h1 class="text-3xl font-bold text-cyan-700">
-            ✏️ Editar Vehículo
-        </h1>
-
-        <a href="{{ route('vehiculos.index') }}"
-            class="text-sm text-cyan-600 hover:text-cyan-800 font-medium">
-            ← Volver al listado
-        </a>
-    </div>
-
-    <form action="{{ route('vehiculos.update', $vehiculo->id) }}" method="POST" novalidate>
+    <form
+        action="{{ route('vehiculos.update', $vehiculo->id) }}"
+        method="POST"
+        novalidate
+        class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
+    >
         @csrf
         @method('PUT')
 
-        {{-- Cliente --}}
-        <div class="mb-4">
-            <label for="clienteID" class="block text-gray-700 font-semibold mb-1">Cliente</label>
+        <div class="border-b border-slate-100 px-6 py-5">
+            <div class="flex items-center gap-3">
+                <span class="grid h-10 w-10 place-items-center rounded-xl bg-cyan-50 text-lg">
+                    🚗
+                </span>
 
-            <select name="clienteID" id="clienteID"
-                class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-400 @error('clienteID') border-red-500 @enderror">
-
-                <option value="">Seleccione un cliente</option>
-
-                @foreach($cliente as $c)
-                    <option value="{{ $c->id }}"
-                        {{ old('clienteID', $vehiculo->clienteID) == $c->id ? 'selected' : '' }}>
-                        {{ $c->nombreCliente }} {{ $c->apellidoCliente }}
-                    </option>
-                @endforeach
-            </select>
-
-            @error('clienteID')
-                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-            @enderror
+                <div>
+                    <h2 class="text-sm font-bold text-slate-800">Información del vehículo</h2>
+                    <p class="mt-0.5 text-xs text-slate-500">Modifica los datos de identificación y características.</p>
+                </div>
+            </div>
         </div>
 
-        {{-- Tipo de vehículo --}}
-        <div class="mb-4">
-            <label for="tipoVehiculoId" class="block text-gray-700 font-semibold mb-1">Tipo de Vehículo</label>
+        <div class="px-6 py-6">
+            <div class="grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">
 
-            <select name="tipoVehiculoId" id="tipoVehiculoId"
-                class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-400 @error('tipoVehiculoId') border-red-500 @enderror">
+                <div class="sm:col-span-2">
+                    <label for="clienteID" class="mb-1.5 block text-xs font-semibold text-slate-600">
+                        Cliente propietario
+                    </label>
 
-                <option value="">Seleccione un tipo</option>
+                    <select
+                        name="clienteID"
+                        id="clienteID"
+                        class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-700 outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/10 @error('clienteID') border-red-400 @enderror"
+                    >
+                        <option value="">Seleccione un cliente</option>
 
-                @foreach($tipoVehiculo as $tv)
-                    <option value="{{ $tv->id }}"
-                        {{ old('tipoVehiculoId', $vehiculo->tipoVehiculoId) == $tv->id ? 'selected' : '' }}>
-                        {{ $tv->nombre }}
-                    </option>
-                @endforeach
-            </select>
+                        @foreach($cliente as $c)
+                            <option value="{{ $c->id }}" {{ old('clienteID', $vehiculo->clienteID) == $c->id ? 'selected' : '' }}>
+                                {{ $c->nombreCliente }} {{ $c->apellidoCliente }}
+                            </option>
+                        @endforeach
+                    </select>
 
-            @error('tipoVehiculoId')
-                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-            @enderror
+                    @error('clienteID')
+                        <p class="mt-1.5 text-xs font-medium text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label for="tipoVehiculoId" class="mb-1.5 block text-xs font-semibold text-slate-600">
+                        Tipo de vehículo
+                    </label>
+
+                    <select
+                        name="tipoVehiculoId"
+                        id="tipoVehiculoId"
+                        class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-700 outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/10 @error('tipoVehiculoId') border-red-400 @enderror"
+                    >
+                        <option value="">Seleccione un tipo</option>
+
+                        @foreach($tipoVehiculo as $tv)
+                            <option value="{{ $tv->id }}" {{ old('tipoVehiculoId', $vehiculo->tipoVehiculoId) == $tv->id ? 'selected' : '' }}>
+                                {{ $tv->nombre }}
+                            </option>
+                        @endforeach
+                    </select>
+
+                    @error('tipoVehiculoId')
+                        <p class="mt-1.5 text-xs font-medium text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label for="placa" class="mb-1.5 block text-xs font-semibold text-slate-600">
+                        Placa
+                    </label>
+
+                    <input
+                        type="text"
+                        name="placa"
+                        id="placa"
+                        value="{{ old('placa', $vehiculo->placa) }}"
+                        placeholder="ABC123"
+                        autocomplete="off"
+                        class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm uppercase text-slate-700 outline-none transition placeholder:normal-case placeholder:text-slate-400 focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/10 @error('placa') border-red-400 @enderror"
+                    >
+
+                    @error('placa')
+                        <p class="mt-1.5 text-xs font-medium text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label for="modelo" class="mb-1.5 block text-xs font-semibold text-slate-600">
+                        Modelo
+                    </label>
+
+                    <input
+                        type="text"
+                        name="modelo"
+                        id="modelo"
+                        value="{{ old('modelo', $vehiculo->modelo) }}"
+                        placeholder="Ej. Toyota Corolla"
+                        class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/10 @error('modelo') border-red-400 @enderror"
+                    >
+
+                    @error('modelo')
+                        <p class="mt-1.5 text-xs font-medium text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label for="color" class="mb-1.5 block text-xs font-semibold text-slate-600">
+                        Color
+                    </label>
+
+                    <input
+                        type="text"
+                        name="color"
+                        id="color"
+                        value="{{ old('color', $vehiculo->color) }}"
+                        placeholder="Ej. Rojo"
+                        class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/10 @error('color') border-red-400 @enderror"
+                    >
+
+                    @error('color')
+                        <p class="mt-1.5 text-xs font-medium text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label for="estado" class="mb-1.5 block text-xs font-semibold text-slate-600">
+                        Estado del vehículo
+                    </label>
+
+                    <select
+                        name="estado"
+                        id="estado"
+                        class="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-700 outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/10 @error('estado') border-red-400 @enderror"
+                    >
+                        <option value="Activo" {{ old('estado', $vehiculo->estado) == 'Activo' ? 'selected' : '' }}>Activo</option>
+                        <option value="Inactivo" {{ old('estado', $vehiculo->estado) == 'Inactivo' ? 'selected' : '' }}>Inactivo</option>
+                    </select>
+
+                    @error('estado')
+                        <p class="mt-1.5 text-xs font-medium text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+            </div>
         </div>
 
-        {{-- Placa --}}
-        <div class="mb-4">
-            <label for="placa" class="block text-gray-700 font-semibold mb-1">Placa</label>
+        <div class="flex flex-col-reverse justify-end gap-3 border-t border-slate-100 bg-slate-50/70 px-6 py-4 sm:flex-row">
+            <a href="{{ route('vehiculos.index') }}" class="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-100">Cancelar</a>
 
-            <input type="text" name="placa" id="placa"
-                value="{{ old('placa', $vehiculo->placa) }}"
-                placeholder="ABC123"
-                class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-400 @error('placa') border-red-500 @enderror">
-
-            @error('placa')
-                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-            @enderror
-        </div>
-
-        {{-- Modelo --}}
-        <div class="mb-4">
-            <label for="modelo" class="block text-gray-700 font-semibold mb-1">Modelo</label>
-
-            <input type="text" name="modelo" id="modelo"
-                value="{{ old('modelo', $vehiculo->modelo) }}"
-                placeholder="Toyota Corolla"
-                class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-400 @error('modelo') border-red-500 @enderror">
-
-            @error('modelo')
-                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-            @enderror
-        </div>
-
-        {{-- Color --}}
-        <div class="mb-4">
-            <label for="color" class="block text-gray-700 font-semibold mb-1">Color</label>
-
-            <input type="text" name="color" id="color"
-                value="{{ old('color', $vehiculo->color) }}"
-                placeholder="Rojo"
-                class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-400 @error('color') border-red-500 @enderror">
-
-            @error('color')
-                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-            @enderror
-        </div>
-
-        {{-- Estado --}}
-        <div class="mb-6">
-            <label for="estado" class="block text-gray-700 font-semibold mb-1">Estado</label>
-
-            <select name="estado" id="estado"
-                class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-400 @error('estado') border-red-500 @enderror">
-
-                <option value="Activo"
-                    {{ old('estado', $vehiculo->estado) == 'Activo' ? 'selected' : '' }}>
-                    Activo
-                </option>
-
-                <option value="Inactivo"
-                    {{ old('estado', $vehiculo->estado) == 'Inactivo' ? 'selected' : '' }}>
-                    Inactivo
-                </option>
-            </select>
-
-            @error('estado')
-                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-            @enderror
-        </div>
-
-        {{-- Botones --}}
-        <div class="flex justify-end gap-2">
-            <a href="{{ route('vehiculos.index') }}"
-                class="bg-gray-500 hover:bg-gray-700 text-white font-semibold px-4 py-2 rounded-lg shadow">
-                Cancelar
-            </a>
-
-            <button type="submit"
-                class="bg-cyan-600 hover:bg-cyan-800 text-white font-semibold px-4 py-2 rounded-lg shadow">
-                💾 Guardar cambios
+            <button
+                type="submit"
+                class="inline-flex items-center justify-center gap-2 rounded-xl bg-cyan-700 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-cyan-800 focus:outline-none focus:ring-4 focus:ring-cyan-500/20"
+            >
+                Guardar cambios
             </button>
         </div>
-
     </form>
-
-</x-card>
-
+</div>
 @endsection

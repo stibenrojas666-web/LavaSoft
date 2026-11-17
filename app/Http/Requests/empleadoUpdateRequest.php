@@ -6,7 +6,8 @@ use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class empleadoUpdateRequest extends FormRequest
+
+class EmpleadoUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -26,11 +27,12 @@ class empleadoUpdateRequest extends FormRequest
         return [
             'nombre' => 'required|string|max:20',
             'apellido' => 'required|string|max:20',
-            'identificacion' => 'required|string|max:20',
+            'identificacion' => ['required', 'string', 'max:20', Rule::unique('empleados', 'identificacion')->ignore($this->route('empleado'))],
             'telefono' => 'required|string|max:15',
             'rh' => ['required', Rule::in(config('empleado.tiposSangre'))],
             'eps' => 'required|string|max:50',
             'estado' => 'required|boolean',
+            'porcentajeComision' => ['required', 'numeric', 'min:0', 'max:100'],
         ];
     }
 
@@ -56,6 +58,10 @@ class empleadoUpdateRequest extends FormRequest
             'eps.max' => 'La EPS no puede superar los 50 caracteres.',
             'estado.required' => 'El estado es obligatorio.',
             'estado.boolean' => 'El estado seleccionado no es válido.',
+            'porcentajeComision.required' => 'El porcentaje de comisión es obligatorio.',
+            'porcentajeComision.numeric' => 'El porcentaje debe ser un número.',
+            'porcentajeComision.min' => 'La comisión no puede ser menor que 0%.',
+            'porcentajeComision.max' => 'La comisión no puede superar el 100%.',
         ];
     }
 }

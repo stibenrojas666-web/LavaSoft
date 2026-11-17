@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\clienteService;
+use App\Services\ClienteService;
 use App\Http\Requests\ClienteStoreRequest;
 use App\Http\Requests\ClienteUpdateRequest;
 use App\Http\Requests\BusquedaIndexRequest;
@@ -10,9 +10,9 @@ use App\Http\Requests\BusquedaIndexRequest;
 
 class ClientesController extends Controller
 {
-    private clienteService $clientesService;
+    private ClienteService $clientesService;
 
-    public function __construct(clienteService $clientesService)
+    public function __construct(ClienteService $clientesService)
     {
         $this->clientesService = $clientesService;
     }
@@ -20,11 +20,11 @@ class ClientesController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(BusquedaIndexRequest $request)
+    public function index(BusquedaIndexRequest $busquedaIndexRequest)
     {
-        $buscar = trim((string) $request->validated('buscar', ''));
-        $clientes = $this->clientesService->buscar($buscar);
-        return view('clientes.index', compact('clientes', 'buscar'));
+        return view('clientes.index', $this->clientesService->prepararListado(
+            $busquedaIndexRequest->validated()
+        ));
     }
 
     /**
@@ -38,10 +38,9 @@ class ClientesController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(ClienteStoreRequest $request)
+    public function store(ClienteStoreRequest $clienteStoreRequest)
     {
-        $datos = $request->validated();
-        $this->clientesService->guardar($datos);
+        $this->clientesService->guardar($clienteStoreRequest->validated());
         return redirect()->route('clientes.index')->with('success', 'Cliente creado correctamente.');
 
     }
@@ -70,9 +69,9 @@ class ClientesController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(int $id, clienteUpdateRequest $request)
+    public function update(int $id, ClienteUpdateRequest $clienteUpdateRequest)
 {
-    $this->clientesService->actualizar($id, $request->validated());
+    $this->clientesService->actualizar($id, $clienteUpdateRequest->validated());
 
     return redirect()->route('clientes.index')
         ->with('success', 'Cliente actualizado');

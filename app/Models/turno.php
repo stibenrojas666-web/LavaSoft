@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class turno extends Model
+class Turno extends Model
 {
     protected $table = 'turnos';
     protected $fillable =[
@@ -12,6 +12,6 @@ class turno extends Model
     ];
     public function empleado()
     {
-        return $this->belongsTo(empleado::class, 'empleado_id');
+        return $this->belongsTo(Empleado::class, 'empleado_id');
     }
 }
