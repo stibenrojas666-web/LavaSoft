@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Seguridad;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ActualizarContrasenaRequest;
 use App\Http\Requests\RecuperacionCodigoRequest;
 use App\Http\Requests\VerificarCodigoRequest;
-use App\Http\Requests\ActualizarContrasenaRequest;
 use App\Services\Seguridad\RecuperacionContrasenaService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -13,9 +13,7 @@ use Illuminate\View\View;
 
 class RecuperacionContrasenaController extends Controller
 {
-    public function __construct(private RecuperacionContrasenaService $recuperacionService)
-    {
-    }
+    public function __construct(private RecuperacionContrasenaService $recuperacionService) {}
 
     public function mostrarSolicitud(): View
     {

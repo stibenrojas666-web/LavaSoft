@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class Cliente extends Model
 {
@@ -16,7 +16,10 @@ class Cliente extends Model
         'apellidoCliente',
         'telefonoCliente',
         'emailCliente',
+        'activo',
     ];
+
+    protected $casts = ['activo' => 'boolean'];
 
     public function vehiculo()
     {

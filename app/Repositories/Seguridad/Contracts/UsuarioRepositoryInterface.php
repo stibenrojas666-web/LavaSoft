@@ -4,6 +4,7 @@ namespace App\Repositories\Seguridad\Contracts;
 
 /**
  * Contrato de acceso a datos para UsuarioRepository.
+ *
  * @method mixed buscarPorEmail(...$arguments)
  * @method mixed buscarPorId(...$arguments)
  * @method mixed crear(...$arguments)
@@ -14,6 +15,4 @@ namespace App\Repositories\Seguridad\Contracts;
  * @method mixed buscarConRoles(...$arguments)
  * @method mixed sincronizarRoles(...$arguments)
  */
-interface UsuarioRepositoryInterface
-{
-}
+interface UsuarioRepositoryInterface {}

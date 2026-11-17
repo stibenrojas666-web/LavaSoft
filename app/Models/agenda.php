@@ -18,6 +18,11 @@ class Agenda extends Model
         'tipoDeAtencion',
     ];
 
+    public function getReferenciaAttribute(): string
+    {
+        return str_pad((string) $this->getKey(), 7, '0', STR_PAD_LEFT);
+    }
+
     public function empleado()
     {
         return $this->belongsTo(Empleado::class, 'empleadoId');
@@ -43,5 +48,4 @@ class Agenda extends Model
         return $this->belongsToMany(Vehiculo::class, 'agenda_servicios', 'agendaId', 'vehiculoId')
             ->distinct();
     }
-
 }

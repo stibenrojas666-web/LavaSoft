@@ -71,7 +71,7 @@
         </div>
 
         <div class="lavasoft-table-shell overflow-x-auto">
-            <table class="lavasoft-table min-w-[850px] text-left text-sm">
+            <table data-datatable data-server-paginated="true" class="lavasoft-table min-w-full text-left text-sm">
                 <thead>
                     <tr>
                         <th>ID</th>
@@ -92,7 +92,7 @@
 
                             <td>
                                 @if($as->agenda)
-                                    <p class="font-bold text-slate-800">Cita #{{ $as->agenda->id }}</p>
+                                    <p class="font-bold text-slate-800">Cita #{{ $as->agenda->referencia }}</p>
                                     <p class="mt-1 text-xs text-slate-500">
                                         {{ \Carbon\Carbon::parse($as->agenda->fecha)->format('d/m/Y') }}
                                         · {{ substr($as->agenda->hora, 0, 5) }}

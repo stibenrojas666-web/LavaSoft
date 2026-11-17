@@ -4,6 +4,7 @@ namespace App\Repositories\Contracts;
 
 /**
  * Contrato de acceso a datos para TipoVehiculoRepository.
+ *
  * @method mixed listarTodo(...$arguments)
  * @method mixed buscar(...$arguments)
  * @method mixed guardar(...$arguments)
@@ -12,6 +13,4 @@ namespace App\Repositories\Contracts;
  * @method mixed buscarPorId(...$arguments)
  * @method mixed actualizar(...$arguments)
  */
-interface TipoVehiculoRepositoryInterface
-{
-}
+interface TipoVehiculoRepositoryInterface {}

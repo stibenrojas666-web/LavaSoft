@@ -49,7 +49,7 @@ class AuditarRutas extends Command
 
             $filas[] = [
                 $metodos,
-                '/' . ltrim($ruta->uri(), '/'),
+                '/'.ltrim($ruta->uri(), '/'),
                 $ruta->getName() ?? '-',
                 $conSesion ? 'Sí' : 'NO',
                 $conPermiso ? 'Sí' : 'NO',
@@ -63,7 +63,7 @@ class AuditarRutas extends Command
         }
 
         $this->table(['Método', 'URI', 'Nombre', 'Sesión', 'Permiso'], $filas);
-        $this->warn($pendientes . ' ruta(s) sin sesión o sin permiso.');
+        $this->warn($pendientes.' ruta(s) sin sesión o sin permiso.');
 
         return self::SUCCESS;
     }
@@ -112,7 +112,7 @@ class AuditarRutas extends Command
             }
 
             foreach ($clases as $clase) {
-                if ($item === $clase || str_starts_with($item, $clase . ':')) {
+                if ($item === $clase || str_starts_with($item, $clase.':')) {
                     return true;
                 }
             }

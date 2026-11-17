@@ -25,7 +25,7 @@
                     <option value="">Seleccione una cita</option>
                     @forelse($agenda as $a)
                         <option value="{{ $a->id }}" @selected((string) request('agendaId') === (string) $a->id)>
-                            #{{ $a->id }} · {{ \Carbon\Carbon::parse($a->fecha)->format('d/m/Y') }}
+                            #{{ $a->referencia }} · {{ \Carbon\Carbon::parse($a->fecha)->format('d/m/Y') }}
                             · {{ substr($a->hora, 0, 5) }} · {{ $a->cliente->nombreCliente ?? 'N/A' }}
                         </option>
                     @empty
@@ -39,7 +39,7 @@
 
             @if($agendaSeleccionada)
                 <div class="mb-6 rounded-2xl border border-cyan-100 bg-cyan-50 p-5">
-                    <h2 class="font-bold text-slate-900">Servicios de la cita #{{ $agendaSeleccionada->id }}</h2>
+                    <h2 class="font-bold text-slate-900">Servicios de la cita #{{ $agendaSeleccionada->referencia }}</h2>
                     <p class="mt-1 text-sm text-slate-600">
                         {{ $agendaSeleccionada->cliente->nombreCliente ?? 'Cliente' }}
                         · {{ $agendaSeleccionada->agendaServicios->pluck('vehiculo.placa')->filter()->unique()->implode(', ') ?: 'Vehículo' }}

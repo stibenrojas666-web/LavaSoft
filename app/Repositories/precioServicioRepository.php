@@ -2,16 +2,16 @@
 
 namespace App\Repositories;
 
-use App\Repositories\Contracts\PrecioServicioRepositoryInterface;
-
 use App\Models\PrecioServicio;
+use App\Repositories\Contracts\PrecioServicioRepositoryInterface;
 use App\Support\TextoBusqueda;
 
-class PrecioServicioRepository implements PrecioServicioRepositoryInterface {
+class PrecioServicioRepository implements PrecioServicioRepositoryInterface
+{
     public function listarTodo()
     {
         return PrecioServicio::query()
-            ->select(['id','servicio_id','tipo_vehiculo_id','modalidad','precio','duracionMinutos',])
+            ->select(['id', 'servicio_id', 'tipo_vehiculo_id', 'modalidad', 'precio', 'duracionMinutos'])
             ->with(['servicio:id,nombre,estado', 'tipoVehiculo:id,nombre'])
             ->whereHas('servicio', fn ($query) => $query->where('estado', true))
             ->get();
@@ -20,17 +20,17 @@ class PrecioServicioRepository implements PrecioServicioRepositoryInterface {
     public function buscar(string $texto, array $filtros = [])
     {
         return TextoBusqueda::aplicar(
-                PrecioServicio::query()
-                    ->select(['id','servicio_id','tipo_vehiculo_id','modalidad','precio','duracionMinutos',])
-                    ->with(['servicio:id,nombre,estado', 'tipoVehiculo:id,nombre'])
-                    ->whereHas('servicio', fn ($query) => $query->where('estado', true)),
-                $texto,
-                fn ($consulta, $termino) => $consulta
-                    ->whereHas('servicio', fn ($servicio) => $servicio->where('nombre', 'like', $termino))
-                    ->orWhereHas('tipoVehiculo', fn ($tipo) => $tipo->where('nombre', 'like', $termino))
-                    ->orWhere('modalidad', 'like', $termino)
-                    ->orWhere('precio', 'like', $termino)
-            )
+            PrecioServicio::query()
+                ->select(['id', 'servicio_id', 'tipo_vehiculo_id', 'modalidad', 'precio', 'duracionMinutos'])
+                ->with(['servicio:id,nombre,estado', 'tipoVehiculo:id,nombre'])
+                ->whereHas('servicio', fn ($query) => $query->where('estado', true)),
+            $texto,
+            fn ($consulta, $termino) => $consulta
+                ->whereHas('servicio', fn ($servicio) => $servicio->where('nombre', 'like', $termino))
+                ->orWhereHas('tipoVehiculo', fn ($tipo) => $tipo->where('nombre', 'like', $termino))
+                ->orWhere('modalidad', 'like', $termino)
+                ->orWhere('precio', 'like', $termino)
+        )
             ->when(($filtros['tipoVehiculoId'] ?? '') !== '', fn ($query) => $query->where('tipo_vehiculo_id', $filtros['tipoVehiculoId']))
             ->when(($filtros['modalidad'] ?? '') !== '', fn ($query) => $query->where('modalidad', $filtros['modalidad']))
             ->orderBy('servicio_id')
@@ -54,13 +54,13 @@ class PrecioServicioRepository implements PrecioServicioRepositoryInterface {
     }
 
     public function buscarPrecio(int $servicioId, int $tipoVehiculoId)
-{
-    return PrecioServicio::where('servicio_id', $servicioId)
-        ->where('tipo_vehiculo_id', $tipoVehiculoId)
-        ->value('precio');
-}
+    {
+        return PrecioServicio::where('servicio_id', $servicioId)
+            ->where('tipo_vehiculo_id', $tipoVehiculoId)
+            ->value('precio');
+    }
 
-    public function buscarConfiguracion(int $servicioId, int $tipoVehiculoId): ?precioServicio
+    public function buscarConfiguracion(int $servicioId, int $tipoVehiculoId): ?PrecioServicio
     {
         return PrecioServicio::where('servicio_id', $servicioId)
             ->where('tipo_vehiculo_id', $tipoVehiculoId)
@@ -71,6 +71,7 @@ class PrecioServicioRepository implements PrecioServicioRepositoryInterface {
     {
         $precioServicio = PrecioServicio::findOrFail($id);
         $precioServicio->update($datos);
+
         return $precioServicio;
     }
 }

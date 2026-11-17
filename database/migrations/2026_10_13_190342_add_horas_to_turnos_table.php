@@ -12,9 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('turnos', function (Blueprint $table) {
-        $table->time('horaInicio')->nullable();
-        $table->time('horaFin')->nullable();
-});
+            $table->time('horaInicio')->nullable();
+            $table->time('horaFin')->nullable();
+        });
     }
 
     /**
@@ -23,7 +23,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('turnos', function (Blueprint $table) {
-        $table->dropColumn(['horaInicio', 'horaFin']);
-});
+            $table->dropColumn(['horaInicio', 'horaFin']);
+        });
     }
 };

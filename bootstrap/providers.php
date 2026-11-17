@@ -2,9 +2,10 @@
 
 use App\Providers\AppServiceProvider;
 use App\Providers\RepositoryServiceProvider;
+use App\Providers\SeguridadServiceProvider;
 
 return [
     AppServiceProvider::class,
     RepositoryServiceProvider::class,
-    App\Providers\SeguridadServiceProvider::class,
+    SeguridadServiceProvider::class,
 ];

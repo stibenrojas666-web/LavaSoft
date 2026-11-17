@@ -10,18 +10,9 @@
 
     <x-module-header
         variant="list"
-        title="Directorio de clientes"
-        description="Consulta y administra la información de tus clientes."
-    >
-        <x-slot:actions>
-            <a href="{{ route('clientes.create') }}" class="cliente-btn-nuevo">
-                <span class="h-4 w-4">
-                    @include('layouts.partials.icons', ['icon' => 'plus'])
-                </span>
-                Nuevo cliente
-            </a>
-        </x-slot:actions>
-    </x-module-header>
+        title="{{ $archivados ? 'Clientes archivados' : 'Directorio de clientes' }}"
+        description="{{ $archivados ? 'Historial de clientes archivados; puedes reactivarlos cuando lo necesites.' : 'Consulta y administra la información de tus clientes.' }}"
+    />
 
     <div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div class="cliente-stat flex items-center gap-4">
@@ -59,7 +50,7 @@
         </div>
     @endif
 
-    <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+    <div id="clientes-listado" class="scroll-mt-24 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
         <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
             <div>
                 <h2 class="text-base font-extrabold text-slate-800">Listado de clientes</h2>
@@ -72,8 +63,14 @@
         </div>
 
         <div class="mb-6">
+            <div class="mb-3 flex gap-2">
+                <a href="{{ route('clientes.index') }}" class="rounded-lg px-3 py-2 text-xs font-bold {{ !$archivados ? 'bg-cyan-800 text-white' : 'bg-slate-100 text-slate-600' }}">Activos</a>
+                @can('eliminar clientes')
+                    <a href="{{ route('clientes.index', ['archivados' => 1]) }}" class="rounded-lg px-3 py-2 text-xs font-bold {{ $archivados ? 'bg-cyan-800 text-white' : 'bg-slate-100 text-slate-600' }}">Archivados</a>
+                @endcan
+            </div>
             <x-list-search
-                :action="route('clientes.index')"
+                :action="route('clientes.index', $archivados ? ['archivados' => 1] : [])"
                 :value="$buscar"
                 placeholder="Nombre, apellido, teléfono o correo"
             />
@@ -92,6 +89,9 @@
                             <h3 class="truncate text-lg font-extrabold text-slate-800">
                                 {{ $cliente->nombreCliente }} {{ $cliente->apellidoCliente }}
                             </h3>
+                            @if($archivados)
+                                <span class="mt-1 inline-flex rounded-full bg-amber-50 px-2 py-1 text-[10px] font-bold uppercase text-amber-800">Archivado</span>
+                            @endif
                             <p class="mt-1 text-xs font-semibold uppercase tracking-wide text-slate-400">
                                 Cliente #{{ $cliente->id }}
                             </p>
@@ -144,6 +144,26 @@
                         </a>
 
                         <div class="flex items-center gap-1">
+                            @if($archivados)
+                            @can('eliminar clientes')
+                            <form data-preserve-scroll action="{{ route('clientes.reactivar', array_merge(['id' => $cliente->id], request()->query())) }}" method="POST" onsubmit="return confirm('¿Reactivar este cliente?')">
+                                @csrf
+                                @method('PATCH')
+                                <button type="submit" class="rounded-xl px-3 py-2 text-xs font-bold text-emerald-700 transition hover:bg-emerald-50">Reactivar</button>
+                            </form>
+                            @endcan
+                            @can(config('seguridad.permiso_admin'))
+                            <form action="{{ route('clientes.destroy', $cliente->id) }}" method="POST"
+                                onsubmit="return confirm('Esta acción elimina también vehículos, citas y pagos del cliente. ¿Continuar definitivamente?')">
+                                @csrf
+                                @method('DELETE')
+                                <input type="hidden" name="modo" value="definitivo">
+                                <button type="submit" class="grid h-9 w-9 place-items-center rounded-xl text-red-600 transition hover:bg-red-50" title="Eliminar definitivamente" aria-label="Eliminar cliente y todos sus datos">
+                                    <span class="h-4 w-4">@include('layouts.partials.icons', ['icon' => 'trash'])</span>
+                                </button>
+                            </form>
+                            @endcan
+                            @else
                             <a
                                 href="{{ route('clientes.edit', $cliente->id) }}"
                                 class="grid h-9 w-9 place-items-center rounded-xl text-blue-700 transition hover:bg-blue-50"
@@ -155,25 +175,37 @@
                                 </span>
                             </a>
 
+                            @can('eliminar clientes')
                             <form
                                 action="{{ route('clientes.destroy', $cliente->id) }}"
                                 method="POST"
-                                onsubmit="return confirm('¿Desea eliminar este cliente?')"
+                                onsubmit="return confirm('¿Archivar este cliente? Su historial y sus vehículos se conservarán.')"
                             >
                                 @csrf
                                 @method('DELETE')
+                                <input type="hidden" name="modo" value="archivar">
 
                                 <button
                                     type="submit"
-                                    class="grid h-9 w-9 place-items-center rounded-xl text-red-600 transition hover:bg-red-50"
-                                    title="Eliminar cliente"
-                                    aria-label="Eliminar cliente"
+                                    class="rounded-xl px-3 py-2 text-xs font-bold text-amber-700 transition hover:bg-amber-50"
+                                    title="Archivar y conservar el historial"
                                 >
-                                    <span class="h-4 w-4">
-                                        @include('layouts.partials.icons', ['icon' => 'trash'])
-                                    </span>
+                                    Archivar
                                 </button>
                             </form>
+                            @endcan
+                            @can(config('seguridad.permiso_admin'))
+                            <form action="{{ route('clientes.destroy', $cliente->id) }}" method="POST"
+                                onsubmit="return confirm('Esta acción elimina también vehículos, citas y pagos del cliente. ¿Continuar definitivamente?')">
+                                @csrf
+                                @method('DELETE')
+                                <input type="hidden" name="modo" value="definitivo">
+                                <button type="submit" class="grid h-9 w-9 place-items-center rounded-xl text-red-600 transition hover:bg-red-50" title="Eliminar definitivamente" aria-label="Eliminar cliente y todos sus datos">
+                                    <span class="h-4 w-4">@include('layouts.partials.icons', ['icon' => 'trash'])</span>
+                                </button>
+                            </form>
+                            @endcan
+                            @endif
                         </div>
                     </div>
                 </article>
@@ -217,5 +249,8 @@
             </div>
         @endif
     </div>
+    @unless($archivados)
+        <x-floating-action :href="route('clientes.create')" label="Nuevo cliente" icon="plus" />
+    @endunless
 </div>
 @endsection

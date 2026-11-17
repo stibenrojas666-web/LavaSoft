@@ -35,13 +35,13 @@ class SeguridadSeeder extends Seeder
             foreach (config('seguridad.modulos', []) as $modulo) {
                 $modulo = mb_strtolower($modulo);
 
-                $acciones = config('seguridad.acciones_por_modulo.' . $modulo)
+                $acciones = config('seguridad.acciones_por_modulo.'.$modulo)
                     ?? config('seguridad.acciones', []);
 
                 foreach ($acciones as $accion) {
                     Permission::firstOrCreate(
                         [
-                            'name' => $accion . ' ' . $modulo,
+                            'name' => $accion.' '.$modulo,
                             'guard_name' => $guard,
                         ],
                         ['modulo' => $modulo]
@@ -110,10 +110,10 @@ class SeguridadSeeder extends Seeder
                 config('seguridad.modulos_recepcionista', [])
             )
                 ->flatMap(fn ($modulo) => collect(
-                    config('seguridad.acciones_por_modulo.' . mb_strtolower($modulo))
+                    config('seguridad.acciones_por_modulo.'.mb_strtolower($modulo))
                         ?? config('seguridad.acciones_recepcionista', [])
                 )->map(
-                    fn ($accion) => $accion . ' ' . mb_strtolower($modulo)
+                    fn ($accion) => $accion.' '.mb_strtolower($modulo)
                 ))
                 ->unique()
                 ->values()
@@ -127,30 +127,30 @@ class SeguridadSeeder extends Seeder
         });
 
         // Buscar el administrador sin modificar su contraseña.
-$modelo = config('auth.providers.users.model');
-$datos = config('seguridad.admin');
+        $modelo = config('auth.providers.users.model');
+        $datos = config('seguridad.admin');
 
-$admin = $modelo::where('email', $datos['email'])->first();
+        $admin = $modelo::where('email', $datos['email'])->first();
 
-if ($admin === null) {
-    if (empty($datos['password'])) {
-        throw new \RuntimeException(
-            'No se puede crear el administrador: configura SEGURIDAD_ADMIN_PASSWORD en el archivo .env.'
+        if ($admin === null) {
+            if (empty($datos['password'])) {
+                throw new \RuntimeException(
+                    'No se puede crear el administrador: configura SEGURIDAD_ADMIN_PASSWORD en el archivo .env.'
+                );
+            }
+
+            $admin = $modelo::create([
+                'name' => $datos['name'],
+                'email' => $datos['email'],
+                'password' => Hash::make($datos['password']),
+            ]);
+        }
+
+        $admin->assignRole(
+            Role::where('name', config('seguridad.rol_admin'))
+                ->where('guard_name', $guard)
+                ->firstOrFail()
         );
-    }
-
-    $admin = $modelo::create([
-        'name' => $datos['name'],
-        'email' => $datos['email'],
-        'password' => Hash::make($datos['password']),
-    ]);
-}
-
-$admin->assignRole(
-    Role::where('name', config('seguridad.rol_admin'))
-        ->where('guard_name', $guard)
-        ->firstOrFail()
-);
 
         app(PermissionRegistrar::class)->forgetCachedPermissions();
     }

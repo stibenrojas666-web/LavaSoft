@@ -4,6 +4,7 @@ namespace App\Repositories\Contracts;
 
 /**
  * Contrato de acceso a datos para ReporteRepository.
+ *
  * @method mixed citasAtendidasEnFecha(...$arguments)
  * @method mixed totalRecaudadoEnFecha(...$arguments)
  * @method mixed citasAtendidasEntre(...$arguments)
@@ -12,7 +13,6 @@ namespace App\Repositories\Contracts;
  * @method mixed comisionesPorEmpleadoEntre(...$arguments)
  * @method mixed totalComisionesEntre(...$arguments)
  * @method mixed mejorEmpleadoEntre(...$arguments)
+ * @method mixed rendimientoPorEmpleadoEntre(...$arguments)
  */
-interface ReporteRepositoryInterface
-{
-}
+interface ReporteRepositoryInterface {}

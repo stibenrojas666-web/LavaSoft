@@ -17,12 +17,12 @@ class RolService
         private RolRepository $rolRepository,
         private UsuarioRepository $usuarioRepository,
         private PermisoService $permisoService,
-    ) {
-    }
+    ) {}
 
     public function prepararFormulario(?int $rolId = null, ?array $permisosAnteriores = null): array
     {
         $rol = $rolId === null ? null : $this->rolRepository->buscarPorId($rolId);
+
         return [
             'rol' => $rol,
             'protegido' => $rol ? $this->esProtegido($rol) : false,
@@ -137,11 +137,11 @@ class RolService
         $activo = (bool) $datos['activo'];
         $permisos = $datos['permissions'] ?? [];
         if ($this->esProtegido($rol) && $nombre !== $rol->name) {
-            throw new Exception('El rol "' . $rol->name . '" está protegido y no se puede renombrar.');
+            throw new Exception('El rol "'.$rol->name.'" está protegido y no se puede renombrar.');
         }
 
         if ($this->esNoDesactivable($rol) && ! $activo) {
-            throw new Exception('El rol "' . $rol->name . '" no se puede desactivar.');
+            throw new Exception('El rol "'.$rol->name.'" no se puede desactivar.');
         }
 
         $this->rolRepository->actualizar($rol, $nombre, $activo, $permisos);
@@ -151,7 +151,7 @@ class RolService
     public function cambiarEstado(Role $rol): bool
     {
         if ($rol->activo && $this->esNoDesactivable($rol)) {
-            throw new Exception('El rol "' . $rol->name . '" no se puede desactivar.');
+            throw new Exception('El rol "'.$rol->name.'" no se puede desactivar.');
         }
 
         $nuevoEstado = ! $rol->activo;
@@ -165,7 +165,7 @@ class RolService
     public function eliminar(Role $rol): void
     {
         if ($this->esProtegido($rol)) {
-            throw new Exception('El rol "' . $rol->name . '" está protegido y no se puede eliminar.');
+            throw new Exception('El rol "'.$rol->name.'" está protegido y no se puede eliminar.');
         }
 
         if ($this->rolRepository->contarUsuarios($rol) > 0) {
@@ -180,15 +180,15 @@ class RolService
     {
         $rolesPorUsuario = $datos['roles'] ?? [];
         $rolesSolicitados = collect($rolesPorUsuario)
-    ->flatten()
-    ->unique()
-    ->values();
+            ->flatten()
+            ->unique()
+            ->values();
 
-$rolesActivos = $this->rolRepository->nombresActivos($rolesSolicitados->all());
+        $rolesActivos = $this->rolRepository->nombresActivos($rolesSolicitados->all());
 
-if ($rolesSolicitados->count() !== count($rolesActivos)) {
-    throw new Exception('No puedes asignar roles inexistentes o inactivos.');
-}
+        if ($rolesSolicitados->count() !== count($rolesActivos)) {
+            throw new Exception('No puedes asignar roles inexistentes o inactivos.');
+        }
         $usuarios = $this->usuarioRepository->listarConRoles();
         $rolAdmin = config('seguridad.rol_admin');
 
@@ -200,7 +200,7 @@ if ($rolesSolicitados->count() !== count($rolesActivos)) {
                 && ! in_array($rolAdmin, $nuevosRoles, true);
 
             if ($seQuitaSuRolAdmin) {
-                throw new Exception('No puedes quitarte tu propio rol de ' . $rolAdmin . '.');
+                throw new Exception('No puedes quitarte tu propio rol de '.$rolAdmin.'.');
             }
         }
 

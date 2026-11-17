@@ -19,7 +19,7 @@ return new class extends Migration
             $table->date('fecha');
             $table->time('hora');
             $table->enum('estado', ['pendiente', 'confirmada', 'cancelada']);
-            $table->enum('tipoDeAtencion', ['Por orden de llegada','Por cita agendada']);
+            $table->enum('tipoDeAtencion', ['Por orden de llegada', 'Por cita agendada']);
             $table->foreign('empleadoId')->references('id')->on('empleados');
             $table->foreign('clienteId')->references('id')->on('clientes');
             $table->foreign('vehiculoId')->references('id')->on('vehiculos');

@@ -37,7 +37,7 @@ class AuthController extends Controller
                 ->onlyInput('email');
         }
 
-                $inicioSesionRequest->session()->regenerate();
+        $inicioSesionRequest->session()->regenerate();
 
         $destino = $this->authService->destinoInicial($inicioSesionRequest->user());
 
@@ -63,5 +63,4 @@ class AuthController extends Controller
 
         return redirect()->route('login');
     }
-
 }

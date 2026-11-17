@@ -11,18 +11,22 @@ return new class extends Migration
     public function up(): void
     {
         // Cada combinación de servicio y vehículo tendrá su duración.
-        Schema::table('precio_servicios', function (Blueprint $table) {
-            $table->unsignedSmallInteger('duracionMinutos')
-                ->default(30)
-                ->after('precio');
-        });
+        if (! Schema::hasColumn('precio_servicios', 'duracionMinutos')) {
+            Schema::table('precio_servicios', function (Blueprint $table) {
+                $table->unsignedSmallInteger('duracionMinutos')
+                    ->default(30)
+                    ->after('precio');
+            });
+        }
 
         // Guardamos la duración aplicada a cada servicio de una cita.
-        Schema::table('agenda_servicios', function (Blueprint $table) {
-            $table->unsignedSmallInteger('duracionMinutos')
-                ->default(30)
-                ->after('Precio');
-        });
+        if (! Schema::hasColumn('agenda_servicios', 'duracionMinutos')) {
+            Schema::table('agenda_servicios', function (Blueprint $table) {
+                $table->unsignedSmallInteger('duracionMinutos')
+                    ->default(30)
+                    ->after('Precio');
+            });
+        }
 
         // Conservamos la duración general que ya tenía cada servicio
         // como valor inicial de las configuraciones existentes.

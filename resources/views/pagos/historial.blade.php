@@ -40,7 +40,7 @@
 
             <div class="mt-6 overflow-hidden rounded-xl border border-slate-200">
                 <div class="overflow-x-auto">
-                    <table class="lavasoft-table min-w-[850px] text-left text-sm">
+                    <table data-datatable data-server-paginated="true" class="lavasoft-table min-w-full text-left text-sm">
                         <thead class="bg-slate-50">
                             <tr class="border-b border-slate-200">
                                 <th class="px-4 py-4 font-semibold text-slate-600">Fecha de pago</th>
@@ -73,7 +73,7 @@
                                     </td>
 
                                     <td class="whitespace-nowrap px-4 py-4">
-                                        <span class="font-semibold text-slate-800">Cita #{{ $agenda->id }}</span>
+                                        <span class="font-semibold text-slate-800">Cita #{{ $agenda->referencia }}</span>
                                         <span class="mt-1 block text-xs text-slate-500">
                                             {{ \Illuminate\Support\Carbon::parse($agenda->fecha)->format('d/m/Y') }}
                                             · {{ substr($agenda->hora, 0, 5) }}

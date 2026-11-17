@@ -14,7 +14,7 @@ trait TieneRolesActivos
     public function roles(): BelongsToMany
     {
         return $this->rolesSinFiltro()
-            ->where(config('permission.table_names.roles') . '.activo', true);
+            ->where(config('permission.table_names.roles').'.activo', true);
     }
 
     public function rolesConInactivos(): BelongsToMany

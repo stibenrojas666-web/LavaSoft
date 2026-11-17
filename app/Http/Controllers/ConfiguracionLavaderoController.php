@@ -10,9 +10,7 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class ConfiguracionLavaderoController extends Controller
 {
-    public function __construct(private ConfiguracionLavaderoService $service)
-    {
-    }
+    public function __construct(private ConfiguracionLavaderoService $service) {}
 
     public function edit(): View
     {

@@ -23,7 +23,7 @@ class TipoVehiculoStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-         'nombre' => ['required', 'string', 'max:30', 'unique:tipo_vehiculos,nombre'],
+            'nombre' => ['required', 'string', 'max:30', 'unique:tipo_vehiculos,nombre'],
         ];
     }
 

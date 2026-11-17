@@ -2,22 +2,22 @@
 
 namespace App\Repositories;
 
-use App\Repositories\Contracts\DashboardRepositoryInterface;
-
 use App\Models\Agenda;
 use App\Models\AgendaServicios;
 use App\Models\Cliente;
 use App\Models\Empleado;
 use App\Models\Pago;
 use App\Models\Vehiculo;
+use App\Repositories\Contracts\DashboardRepositoryInterface;
 use Illuminate\Support\Carbon;
 
-class DashboardRepository implements DashboardRepositoryInterface {
+class DashboardRepository implements DashboardRepositoryInterface
+{
     public function serviciosHoy(Carbon $hoy): int
     {
-         return AgendaServicios::whereHas('agenda', fn ($query) => $query
-        ->whereDate('fecha', $hoy)
-        ->where('estado', '!=', 'cancelada'))->count();
+        return AgendaServicios::whereHas('agenda', fn ($query) => $query
+            ->whereDate('fecha', $hoy)
+            ->where('estado', '!=', 'cancelada'))->count();
     }
 
     public function cajaHoy(Carbon $hoy): float

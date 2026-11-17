@@ -11,9 +11,7 @@ use Illuminate\View\View;
 
 class UsuarioRolController extends Controller
 {
-    public function __construct(private RolService $rolService)
-    {
-    }
+    public function __construct(private RolService $rolService) {}
 
     public function index(): View
     {

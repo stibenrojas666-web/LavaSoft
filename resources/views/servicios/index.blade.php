@@ -69,7 +69,7 @@
             </div>
 
             <div class="lavasoft-table-shell">
-                <table class="lavasoft-table min-w-[750px] text-left text-sm">
+                <table data-datatable data-server-paginated="true" class="lavasoft-table min-w-full text-left text-sm">
                     <thead class="bg-slate-50">
                         <tr class="border-b border-slate-200">
                             <th class="px-4 py-3 font-semibold text-slate-600">Servicio</th>
@@ -81,7 +81,7 @@
 
                     <tbody class="divide-y divide-slate-100">
                         @forelse($servicios as $servicio)
-                            <tr class="transition-colors hover:bg-slate-50/70">
+                            <tr id="servicio-{{ $servicio->id }}" class="scroll-mt-24 transition-colors hover:bg-slate-50/70">
 
                                 <td class="px-4 py-4">
                                     <div class="flex items-center gap-3">
@@ -109,6 +109,7 @@
                                 <td class="px-4 py-4">
                                     <div class="flex items-center gap-3">
                                         <form
+                                            data-preserve-scroll
                                             action="{{ route('servicios.estado', array_merge(['id' => $servicio->id], request()->query())) }}"
                                             method="POST"
                                         >

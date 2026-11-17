@@ -16,8 +16,7 @@ class CuentaService
     public function __construct(
         private UsuarioRepository $usuarioRepository,
         private RolRepository $rolRepository,
-    ) {
-    }
+    ) {}
 
     public function listar(): Collection
     {
@@ -88,7 +87,7 @@ class CuentaService
             && ! in_array($rolAdmin, $roles, true);
 
         if ($seQuitaSuRolAdmin) {
-            throw new Exception('No puedes quitarte tu propio rol de ' . $rolAdmin . '.');
+            throw new Exception('No puedes quitarte tu propio rol de '.$rolAdmin.'.');
         }
 
         if (empty($datos['password'])) {
@@ -115,7 +114,7 @@ class CuentaService
         $esAdmin = $usuario->rolesConInactivos->contains('name', $rolAdmin);
 
         if ($esAdmin && $this->usuarioRepository->contarConRol($rolAdmin) <= 1) {
-            throw new Exception('No puedes eliminar al único usuario con el rol ' . $rolAdmin . '.');
+            throw new Exception('No puedes eliminar al único usuario con el rol '.$rolAdmin.'.');
         }
 
         $this->usuarioRepository->eliminar($usuario);

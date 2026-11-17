@@ -4,11 +4,12 @@ namespace Database\Factories;
 
 use App\Models\Cliente;
 use App\Models\TipoVehiculo;
+use App\Models\Vehiculo;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class VehiculoFactory extends Factory
 {
-    protected $model = \App\Models\Vehiculo::class;
+    protected $model = Vehiculo::class;
 
     public function definition(): array
     {

@@ -16,7 +16,7 @@ class CrearModulo extends Command
         foreach ($this->argument('nombres') as $nombre) {
             $total = $permisoService->crearModulo($nombre);
 
-            $this->info('Módulo "' . $nombre . '": ' . $total . ' permisos listos.');
+            $this->info('Módulo "'.$nombre.'": '.$total.' permisos listos.');
         }
 
         return self::SUCCESS;

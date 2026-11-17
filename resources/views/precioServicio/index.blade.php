@@ -6,18 +6,7 @@
 @section('content')
 <div class="mx-auto w-full max-w-7xl space-y-6">
 
-    <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-        <div>
-            <h1 class="text-2xl font-extrabold tracking-tight text-slate-800">Precios de servicio</h1>
-            <p class="mt-1 text-sm text-slate-500">Administra las tarifas según el servicio y el tipo de vehículo.</p>
-        </div>
-
-        <a href="{{ route('precioServicio.create') }}"
-           class="inline-flex items-center justify-center gap-2 rounded-xl bg-cyan-700 px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-cyan-800">
-            <span class="text-lg">＋</span>
-            Nuevo precio
-        </a>
-    </div>
+    <x-module-header variant="list" title="Precios de servicio" description="Administra las tarifas según el servicio y el tipo de vehículo." />
 
     @if(session('success'))
         <div class="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800">
@@ -126,7 +115,7 @@
             </div>
 
             <div class="overflow-x-auto rounded-xl border border-slate-100">
-                <table class="w-full min-w-[700px] text-left text-sm">
+                <table data-datatable data-server-paginated="true" class="w-full min-w-full text-left text-sm">
                     <thead class="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
                         <tr>
                             <th class="px-5 py-4 font-bold">Servicio</th>
@@ -228,5 +217,6 @@
             @endif
         </div>
     </div>
+    <x-floating-action :href="route('precioServicio.create')" label="Nuevo precio" icon="plus" />
 </div>
 @endsection

@@ -2,13 +2,14 @@
 
 namespace Database\Factories;
 
+use App\Models\PrecioServicio;
 use App\Models\Servicio;
 use App\Models\TipoVehiculo;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class PrecioServicioFactory extends Factory
 {
-    protected $model = \App\Models\PrecioServicio::class;
+    protected $model = PrecioServicio::class;
 
     public function definition(): array
     {

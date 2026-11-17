@@ -2,14 +2,14 @@
 
 namespace App\Repositories;
 
-use App\Repositories\Contracts\ServicioRepositoryInterface;
-
-use App\Models\Servicio;
 use App\Models\AgendaServicios;
 use App\Models\PrecioServicio;
+use App\Models\Servicio;
+use App\Repositories\Contracts\ServicioRepositoryInterface;
 use App\Support\TextoBusqueda;
 
-class ServicioRepository implements ServicioRepositoryInterface {
+class ServicioRepository implements ServicioRepositoryInterface
+{
     public function listarTodo()
     {
         return Servicio::query()
@@ -21,8 +21,8 @@ class ServicioRepository implements ServicioRepositoryInterface {
     public function buscar(string $texto, array $filtros = [])
     {
         return TextoBusqueda::aplicar(Servicio::query()->select(['id', 'nombre', 'descripcion', 'estado']), $texto, fn ($consulta, $termino) => $consulta
-                ->where('nombre', 'like', $termino)
-                ->orWhere('descripcion', 'like', $termino))
+            ->where('nombre', 'like', $termino)
+            ->orWhere('descripcion', 'like', $termino))
             ->when(($filtros['estado'] ?? '') !== '', fn ($query) => $query->where('estado', $filtros['estado'] === 'activo'))
             ->orderBy('nombre')
             ->paginate(10)
@@ -73,6 +73,7 @@ class ServicioRepository implements ServicioRepositoryInterface {
     {
         $servicio = Servicio::findOrFail($id);
         $servicio->update($datos);
+
         return $servicio;
     }
 }

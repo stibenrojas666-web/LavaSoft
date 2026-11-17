@@ -9,7 +9,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        if (!Schema::hasColumn('agenda_servicios', 'vehiculoId')) {
+        if (! Schema::hasColumn('agenda_servicios', 'vehiculoId')) {
             Schema::table('agenda_servicios', function (Blueprint $table) {
                 $table->unsignedBigInteger('vehiculoId')->nullable()->after('agendaId');
             });
@@ -39,7 +39,7 @@ return new class extends Migration
         $indiceAgendaExiste = collect(Schema::getIndexes('agenda_servicios'))
             ->contains(fn (array $indice) => $indice['name'] === 'agenda_servicios_agendaid_index');
 
-        if (!$indiceAgendaExiste) {
+        if (! $indiceAgendaExiste) {
             Schema::table('agenda_servicios', function (Blueprint $table) {
                 // MySQL usa el índice único anterior para respaldar la FK agendaId.
                 // Creamos un índice solo para agendaId antes de reemplazarlo.
@@ -48,8 +48,7 @@ return new class extends Migration
         }
 
         $indices = collect(Schema::getIndexes('agenda_servicios'));
-        $indiceAnterior = $indices->first(fn (array $indice) =>
-            $indice['columns'] === ['agendaId', 'servicioId']
+        $indiceAnterior = $indices->first(fn (array $indice) => $indice['columns'] === ['agendaId', 'servicioId']
         );
         if ($indiceAnterior !== null) {
             Schema::table('agenda_servicios', function (Blueprint $table) use ($indiceAnterior): void {
@@ -98,8 +97,7 @@ return new class extends Migration
             throw new RuntimeException('No se puede revertir: hay citas sin vehículo que no pueden representarse en el esquema anterior.');
         }
 
-        $indiceNuevo = collect(Schema::getIndexes('agenda_servicios'))->first(fn (array $indice) =>
-            $indice['columns'] === ['agendaId', 'vehiculoId', 'servicioId']
+        $indiceNuevo = collect(Schema::getIndexes('agenda_servicios'))->first(fn (array $indice) => $indice['columns'] === ['agendaId', 'vehiculoId', 'servicioId']
         );
         if ($indiceNuevo !== null) {
             Schema::table('agenda_servicios', function (Blueprint $table) use ($indiceNuevo): void {

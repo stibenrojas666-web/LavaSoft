@@ -74,6 +74,17 @@
                     />
                 </div>
 
+                <div class="md:col-span-2 rounded-xl border border-slate-200 bg-slate-50 p-5">
+                    <h3 class="font-bold text-slate-900">Horario de atención</h3>
+                    <p class="mt-1 text-sm text-slate-500">Las citas solo podrán reservarse dentro de estos horarios, considerando la duración del servicio.</p>
+                    <div class="mt-4 grid gap-4 sm:grid-cols-2">
+                        <x-input name="apertura_regular" label="Apertura de lunes a sábado" type="time" :value="substr((string) old('apertura_regular', $configuracion->apertura_regular ?? '07:00'), 0, 5)" />
+                        <x-input name="cierre_regular" label="Cierre de lunes a sábado" type="time" :value="substr((string) old('cierre_regular', $configuracion->cierre_regular ?? '18:00'), 0, 5)" />
+                        <x-input name="apertura_domingo_festivo" label="Apertura de domingos y festivos" type="time" :value="substr((string) old('apertura_domingo_festivo', $configuracion->apertura_domingo_festivo ?? '08:00'), 0, 5)" />
+                        <x-input name="cierre_domingo_festivo" label="Cierre de domingos y festivos" type="time" :value="substr((string) old('cierre_domingo_festivo', $configuracion->cierre_domingo_festivo ?? '13:00'), 0, 5)" />
+                    </div>
+                </div>
+
             </div>
 
             <div class="border-t border-slate-100 pt-6">

@@ -17,7 +17,7 @@
 
             <div class="mb-6 rounded-2xl border border-cyan-100 bg-cyan-50 p-5">
                 <p class="text-xs font-semibold uppercase tracking-wider text-cyan-800">Cita asociada</p>
-                <p class="mt-1 text-lg font-bold text-slate-900">Cita #{{ $pago->agendaId }}</p>
+                <p class="mt-1 text-lg font-bold text-slate-900">Cita #{{ $pago->agenda?->referencia ?? str_pad((string) $pago->agendaId, 7, '0', STR_PAD_LEFT) }}</p>
                 <p class="mt-1 text-sm text-slate-600">
                     {{ $pago->agenda->cliente->nombreCliente ?? 'Cliente' }}
                     · {{ $pago->agenda->agendaServicios->pluck('vehiculo.placa')->filter()->unique()->implode(', ') ?: 'Vehículo' }}

@@ -6,7 +6,10 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class RecuperacionCodigoRequest extends FormRequest
 {
-    public function authorize(): bool { return true; }
+    public function authorize(): bool
+    {
+        return true;
+    }
 
     protected function prepareForValidation(): void
     {

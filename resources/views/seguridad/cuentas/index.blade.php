@@ -16,7 +16,7 @@
 
         <div class="overflow-hidden rounded-xl border border-slate-200">
             <div class="overflow-x-auto">
-                <table class="lavasoft-table min-w-[700px] text-sm">
+                <table data-datatable data-server-paginated="true" class="lavasoft-table min-w-full text-sm">
                     <thead class="bg-slate-50 text-left text-slate-500">
                         <tr>
                             <th class="px-4 py-4">Usuario</th>

@@ -6,18 +6,7 @@
 @section('content')
 <div class="mx-auto w-full max-w-7xl space-y-6">
 
-    <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-        <div>
-            <h1 class="text-2xl font-extrabold tracking-tight text-slate-800">Turnos del equipo</h1>
-            <p class="mt-1 text-sm text-slate-500">Administra los horarios de trabajo de tus empleados.</p>
-        </div>
-
-        <a href="{{ route('turnos.create') }}"
-           class="inline-flex items-center justify-center gap-2 rounded-xl bg-cyan-700 px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-cyan-800">
-            <span class="text-lg">＋</span>
-            Registrar turno
-        </a>
-    </div>
+    <x-module-header variant="list" title="Turnos del equipo" description="Administra los horarios de trabajo de tus empleados." />
 
     @if(session('success'))
         <div class="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800">
@@ -207,9 +196,6 @@
                             Limpiar búsqueda
                         </a>
                     @else
-                        <a href="{{ route('turnos.create') }}" class="mt-4 inline-flex items-center gap-2 rounded-xl bg-cyan-700 px-4 py-2.5 text-sm font-bold text-white hover:bg-cyan-800">
-                            ＋ Registrar turno
-                        </a>
                     @endif
                 </div>
             @endforelse
@@ -221,5 +207,6 @@
             </div>
         @endif
     </div>
+    <x-floating-action :href="route('turnos.create')" label="Registrar turno" icon="plus" />
 </div>
 @endsection

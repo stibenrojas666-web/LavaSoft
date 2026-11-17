@@ -3,20 +3,18 @@
 namespace App\Http\Controllers\Seguridad;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\PermisoStoreRequest;
+use App\Http\Requests\BusquedaIndexRequest;
 use App\Http\Requests\ModuloPermisoStoreRequest;
+use App\Http\Requests\PermisoStoreRequest;
 use App\Http\Requests\PermisoUpdateRequest;
 use App\Services\Seguridad\PermisoService;
-use App\Http\Requests\BusquedaIndexRequest;
 use Exception;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
 class PermisoController extends Controller
 {
-    public function __construct(private PermisoService $permisoService)
-    {
-    }
+    public function __construct(private PermisoService $permisoService) {}
 
     public function index(BusquedaIndexRequest $busquedaIndexRequest): View
     {
@@ -37,7 +35,7 @@ class PermisoController extends Controller
         $total = $this->permisoService->crearModulo($moduloPermisoStoreRequest->validated());
 
         return redirect()->route('seguridad.permisos.index')
-            ->with('success', 'Módulo listo: ' . $total . ' permisos estándar creados o actualizados.');
+            ->with('success', 'Módulo listo: '.$total.' permisos estándar creados o actualizados.');
     }
 
     public function update(PermisoUpdateRequest $permisoUpdateRequest, int $permiso): RedirectResponse

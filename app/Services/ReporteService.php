@@ -7,9 +7,7 @@ use Illuminate\Support\Carbon;
 
 class ReporteService
 {
-    public function __construct(private ReporteRepository $repository)
-    {
-    }
+    public function __construct(private ReporteRepository $repository) {}
 
     public function diario(?string $fecha = null): array
     {
@@ -22,6 +20,7 @@ class ReporteService
             );
         });
         $servicios = $this->repository->totalesPorServicio($fecha, $fecha);
+        $empleados = $this->repository->rendimientoPorEmpleadoEntre($fecha, $fecha);
 
         $totalRecaudado = $this->repository->totalRecaudadoEnFecha($fecha);
         $totalComisiones = $this->repository->totalComisionesEntre($fecha, $fecha);
@@ -35,8 +34,11 @@ class ReporteService
             'totalComisiones' => $totalComisiones,
             'ingresoDespuesComisiones' => $totalRecaudado - $totalComisiones,
 
-            'comisionesPorEmpleado' => $this->repository->comisionesPorEmpleadoEntre($fecha, $fecha),
-            'mejorEmpleado' => $this->repository->mejorEmpleadoEntre($fecha, $fecha),
+            'comisionesPorEmpleado' => $this->comisionesConPorcentaje($fecha, $fecha),
+            'mejorEmpleado' => $empleados->first(),
+            'empleados' => $empleados,
+            'empleadosLabels' => $empleados->map(fn ($fila) => trim($fila->nombre.' '.$fila->apellido))->values(),
+            'empleadosValues' => $empleados->map(fn ($fila) => (float) $fila->totalGenerado)->values(),
 
             'serviciosLabels' => $servicios->map(
                 fn ($fila) => $fila->servicio?->nombre ?? 'Servicio eliminado'
@@ -56,6 +58,7 @@ class ReporteService
         $hastaFecha = Carbon::parse($hasta)->endOfDay();
 
         $servicios = $this->repository->totalesPorServicio($desde, $hasta);
+        $empleados = $this->repository->rendimientoPorEmpleadoEntre($desde, $hasta);
 
         $totalRecaudado = $this->repository->totalRecaudadoEntre(
             $desdeFecha->toDateString(),
@@ -71,8 +74,11 @@ class ReporteService
             'totalComisiones' => $totalComisiones,
             'ingresoDespuesComisiones' => $totalRecaudado - $totalComisiones,
 
-            'comisionesPorEmpleado' => $this->repository->comisionesPorEmpleadoEntre($desde, $hasta),
-            'mejorEmpleado' => $this->repository->mejorEmpleadoEntre($desde, $hasta),
+            'comisionesPorEmpleado' => $this->comisionesConPorcentaje($desde, $hasta),
+            'mejorEmpleado' => $empleados->first(),
+            'empleados' => $empleados,
+            'empleadosLabels' => $empleados->map(fn ($fila) => trim($fila->nombre.' '.$fila->apellido))->values(),
+            'empleadosValues' => $empleados->map(fn ($fila) => (float) $fila->totalGenerado)->values(),
 
             'servicios' => $servicios,
             'totalServicios' => (float) $servicios->sum('total'),
@@ -114,5 +120,15 @@ class ReporteService
             'rangoMes' => $rangoMes,
             ...$this->periodo($desde, $hasta),
         ];
+    }
+
+    private function comisionesConPorcentaje(string $desde, string $hasta)
+    {
+        return $this->repository->comisionesPorEmpleadoEntre($desde, $hasta)
+            ->each(function ($fila): void {
+                $fila->setAttribute('porcentajeEfectivo', (float) $fila->totalPagado > 0
+                    ? ((float) $fila->totalComision / (float) $fila->totalPagado) * 100
+                    : 0);
+            });
     }
 }

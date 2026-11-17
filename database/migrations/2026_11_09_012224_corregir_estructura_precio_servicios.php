@@ -2,20 +2,20 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
     public function up(): void
     {
-        if (!Schema::hasColumn('precio_servicios', 'modalidad')) {
+        if (! Schema::hasColumn('precio_servicios', 'modalidad')) {
             Schema::table('precio_servicios', function (Blueprint $table) {
                 $table->string('modalidad')->default('fijo');
             });
         }
 
-        if (!Schema::hasColumn('precio_servicios', 'duracionMinutos')) {
+        if (! Schema::hasColumn('precio_servicios', 'duracionMinutos')) {
             Schema::table('precio_servicios', function (Blueprint $table) {
                 $table->unsignedSmallInteger('duracionMinutos')->default(30);
             });

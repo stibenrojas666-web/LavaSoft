@@ -8,6 +8,7 @@ use App\Services\AgendaServicioService;
 class AgendaServiciosController extends Controller
 {
     private AgendaServicioService $agendaServicioService;
+
     public function __construct(AgendaServicioService $agendaServicioService)
     {
         $this->agendaServicioService = $agendaServicioService;

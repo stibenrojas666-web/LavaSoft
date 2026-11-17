@@ -2,26 +2,29 @@
 
 namespace App\Repositories;
 
-use App\Repositories\Contracts\ClienteRepositoryInterface;
-
-use App\Models\Cliente;
 use App\Models\Agenda;
+use App\Models\Cliente;
 use App\Models\Vehiculo;
+use App\Repositories\Contracts\ClienteRepositoryInterface;
 use App\Support\TextoBusqueda;
+use Illuminate\Support\Facades\DB;
 
-class ClienteRepository implements ClienteRepositoryInterface {
+class ClienteRepository implements ClienteRepositoryInterface
+{
     public function listarTodo()
     {
         return Cliente::query()
+            ->where('activo', true)
             ->select(['id', 'nombreCliente', 'apellidoCliente'])
             ->orderBy('apellidoCliente')
             ->orderBy('nombreCliente')
             ->get();
     }
 
-    public function buscar(string $texto)
+    public function buscar(string $texto, bool $archivados = false)
     {
         $consulta = Cliente::query()
+            ->where('activo', ! $archivados)
             ->select([
                 'id',
                 'nombreCliente',
@@ -54,6 +57,35 @@ class ClienteRepository implements ClienteRepositoryInterface {
     public function eliminar(int $id)
     {
         return Cliente::destroy($id);
+    }
+
+    public function archivar(int $id): int
+    {
+        return Cliente::whereKey($id)->update(['activo' => false]);
+    }
+
+    public function reactivar(int $id): int
+    {
+        return Cliente::whereKey($id)->update(['activo' => true]);
+    }
+
+    public function eliminarTodo(int $id): bool
+    {
+        return DB::transaction(function () use ($id) {
+            $cliente = Cliente::query()->lockForUpdate()->findOrFail($id);
+            $agendaIds = Agenda::where('clienteId', $id)->pluck('id');
+            $vehiculoIds = Vehiculo::where('clienteID', $id)->pluck('id');
+
+            DB::table('pagos')->whereIn('agendaId', $agendaIds)->delete();
+            DB::table('agenda_servicios')
+                ->whereIn('agendaId', $agendaIds)
+                ->orWhereIn('vehiculoId', $vehiculoIds)
+                ->delete();
+            Agenda::whereIn('id', $agendaIds)->delete();
+            Vehiculo::whereIn('id', $vehiculoIds)->delete();
+
+            return $cliente->delete();
+        });
     }
 
     public function tieneDependencias(int $id): bool

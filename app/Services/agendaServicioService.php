@@ -9,6 +9,7 @@ use Illuminate\Validation\ValidationException;
 class AgendaServicioService
 {
     private AgendaServicioRepository $agendaServicioRepository;
+
     private AgendaService $agendaService;
 
     public function __construct(
@@ -185,7 +186,7 @@ class AgendaServicioService
 
     private function validarVehiculoDelCliente(int $vehiculoId, int $clienteId): void
     {
-        if (!$this->agendaService->vehiculoPerteneceACliente($vehiculoId, $clienteId)) {
+        if (! $this->agendaService->vehiculoPerteneceACliente($vehiculoId, $clienteId)) {
             throw ValidationException::withMessages([
                 'vehiculoId' => 'El vehículo seleccionado no pertenece al cliente de esta cita.',
             ]);

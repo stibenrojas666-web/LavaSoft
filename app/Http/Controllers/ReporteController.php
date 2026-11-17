@@ -9,9 +9,7 @@ use Illuminate\View\View;
 
 class ReporteController extends Controller
 {
-    public function __construct(private ReporteService $service)
-    {
-    }
+    public function __construct(private ReporteService $service) {}
 
     public function diario(ReporteDiarioRequest $reporteDiarioRequest): View
     {

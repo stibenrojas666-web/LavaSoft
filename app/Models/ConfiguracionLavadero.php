@@ -13,6 +13,10 @@ class ConfiguracionLavadero extends Model
         'nit',
         'direccion',
         'telefono',
+        'apertura_regular',
+        'cierre_regular',
+        'apertura_domingo_festivo',
+        'cierre_domingo_festivo',
         'logo_path',
         'mostrar_logo',
     ];

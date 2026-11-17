@@ -5,12 +5,11 @@ namespace App\Services;
 use App\Repositories\Contracts\AgendaRepositoryInterface as AgendaRepository;
 use App\Repositories\Contracts\AgendaServicioRepositoryInterface as AgendaServicioRepository;
 use App\Repositories\Contracts\PrecioServicioRepositoryInterface as PrecioServicioRepository;
-use App\Repositories\Contracts\VehiculoRepositoryInterface as VehiculoRespository;
+use App\Repositories\Contracts\VehiculoRepositoryInterface as VehiculoRepository;
 use App\Support\HorarioLavadero;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
-use Illuminate\Http\Request;
 
 class AgendaService
 {
@@ -18,13 +17,12 @@ class AgendaService
         private AgendaRepository $agendaRepository,
         private AgendaServicioRepository $agendaServicioRepository,
         private PrecioServicioRepository $precioServicioRepository,
-        private VehiculoRespository $vehiculoRepository,
+        private VehiculoRepository $vehiculoRepository,
         private ClienteService $clienteService,
         private EmpleadoService $empleadoService,
         private VehiculoService $vehiculoService,
         private ServicioService $servicioService
-    ) {
-    }
+    ) {}
 
     /** Prepara los datos necesarios para crear o editar una cita. */
     public function prepararFormulario(?int $agendaId = null, ?array $vehiculosAnteriores = null): array
@@ -73,6 +71,26 @@ class AgendaService
         }
 
         return $parametros;
+    }
+
+    public function cambiarEstadoRapido(int $id, string $estado): void
+    {
+        if (! in_array($estado, ['pendiente', 'confirmada', 'cancelada'], true)) {
+            throw ValidationException::withMessages(['estado' => 'El estado seleccionado no es válido.']);
+        }
+
+        $agenda = $this->findById($id);
+        if ($agenda->estado === 'terminada') {
+            throw ValidationException::withMessages(['estado' => 'Una cita terminada no se puede cambiar.']);
+        }
+        if ($estado === 'confirmada' && Carbon::parse($agenda->fecha.' '.$agenda->hora)->isPast()) {
+            throw ValidationException::withMessages(['estado' => 'No se puede confirmar una cita cuya fecha y hora ya pasaron.']);
+        }
+        if ($estado === 'cancelada' && $agenda->pago()->exists()) {
+            throw ValidationException::withMessages(['estado' => 'No se puede cancelar una cita que ya tiene un pago.']);
+        }
+
+        $agenda->update(['estado' => $estado]);
     }
 
     public function getAll()
@@ -225,7 +243,7 @@ class AgendaService
         }
 
         if ($configuracion->modalidad === 'convenir' || $precioAcordadoActivo) {
-            if (!is_numeric($precioAcordado) || (float) $precioAcordado < 0.01 || (float) $precioAcordado > 99999999.99) {
+            if (! is_numeric($precioAcordado) || (float) $precioAcordado < 0.01 || (float) $precioAcordado > 99999999.99) {
                 throw ValidationException::withMessages([
                     'precioAcordado' => 'Escribe el precio acordado para este servicio.',
                 ]);
@@ -244,63 +262,61 @@ class AgendaService
     }
 
     public function calcularDuracionServicio(int $vehiculoId, int $servicioId): int
-{
-    $vehiculo = $this->vehiculoRepository->finById($vehiculoId);
+    {
+        $vehiculo = $this->vehiculoRepository->finById($vehiculoId);
 
-    $configuracion = $this->precioServicioRepository->buscarConfiguracion(
-        $servicioId,
-        (int) $vehiculo->tipoVehiculoId
-    );
+        $configuracion = $this->precioServicioRepository->buscarConfiguracion(
+            $servicioId,
+            (int) $vehiculo->tipoVehiculoId
+        );
 
-    if ($configuracion === null || (int) $configuracion->duracionMinutos < 1) {
-        throw ValidationException::withMessages([
-            'servicioId' => 'No hay una duración válida configurada para este servicio y tipo de vehículo.',
-        ]);
+        if ($configuracion === null || (int) $configuracion->duracionMinutos < 1) {
+            throw ValidationException::withMessages([
+                'servicioId' => 'No hay una duración válida configurada para este servicio y tipo de vehículo.',
+            ]);
+        }
+
+        return (int) $configuracion->duracionMinutos;
     }
-
-    return (int) $configuracion->duracionMinutos;
-}
 
     public function findById(int $id)
     {
         return $this->agendaRepository->findById($id);
     }
 
-    
-/**
- * aca Valida la disponibilidad de una cita usando todas sus líneas de servicios.
- */
-public function validarDisponibilidadDeServicios(int $agendaId, array $lineas): void
-{
-    $agenda = $this->agendaRepository->findById($agendaId);
+    /**
+     * aca Valida la disponibilidad de una cita usando todas sus líneas de servicios.
+     */
+    public function validarDisponibilidadDeServicios(int $agendaId, array $lineas): void
+    {
+        $agenda = $this->agendaRepository->findById($agendaId);
 
-    $lineasValidadas = [];
+        $lineasValidadas = [];
 
-    foreach ($lineas as $indice => $linea) {
-        $lineasValidadas[] = [
-            'vehiculoId' => (int) $linea['vehiculoId'],
-            'servicioId' => (int) $linea['servicioId'],
-            'campoVehiculo' => $linea['campoVehiculo'] ?? "vehiculoId",
-            'campoServicio' => $linea['campoServicio'] ?? "servicioId",
-            'campoPrecio' => $linea['campoPrecio'] ?? "Precio",
+        foreach ($lineas as $indice => $linea) {
+            $lineasValidadas[] = [
+                'vehiculoId' => (int) $linea['vehiculoId'],
+                'servicioId' => (int) $linea['servicioId'],
+                'campoVehiculo' => $linea['campoVehiculo'] ?? 'vehiculoId',
+                'campoServicio' => $linea['campoServicio'] ?? 'servicioId',
+                'campoPrecio' => $linea['campoPrecio'] ?? 'Precio',
+            ];
+        }
+
+        $datos = [
+            'clienteId' => (int) $agenda->clienteId,
+            'empleadoId' => $agenda->empleadoId,
+            'fecha' => (string) $agenda->fecha,
+            'hora' => (string) $agenda->hora,
+            'estado' => $agenda->estado,
         ];
+
+        $this->validarHorarioYDisponibilidad(
+            $datos,
+            $lineasValidadas,
+            $agendaId
+        );
     }
-
-    $datos = [
-        'clienteId' => (int) $agenda->clienteId,
-        'empleadoId' => $agenda->empleadoId,
-        'fecha' => (string) $agenda->fecha,
-        'hora' => (string) $agenda->hora,
-        'estado' => $agenda->estado,
-    ];
-
-    $this->validarHorarioYDisponibilidad(
-        $datos,
-        $lineasValidadas,
-        $agendaId
-    );
-}
-
 
     public function vehiculoPerteneceACliente(int $vehiculoId, int $clienteId): bool
     {
@@ -322,12 +338,12 @@ public function validarDisponibilidadDeServicios(int $agendaId, array $lineas): 
         unset($datos['vehiculos']);
 
         return DB::transaction(function () use ($id, $datos, $lineas) {
-             $actual = $this->agendaRepository->findById($id);
-                if ($actual->estado === 'terminada' || $actual->pago) {
-                    throw ValidationException::withMessages([
-                        'estado' => 'Una cita terminada o pagada ya no se puede modificar.',
-                    ]);
-                }
+            $actual = $this->agendaRepository->findById($id);
+            if ($actual->estado === 'terminada' || $actual->pago) {
+                throw ValidationException::withMessages([
+                    'estado' => 'Una cita terminada o pagada ya no se puede modificar.',
+                ]);
+            }
             $this->validarHorarioYDisponibilidad($datos, $lineas, $id);
             $agenda = $this->agendaRepository->update($id, $datos);
             $this->agendaRepository->quitarLineas($id);
@@ -385,25 +401,25 @@ public function validarDisponibilidadDeServicios(int $agendaId, array $lineas): 
             $vehiculoId = (int) $linea['vehiculoId'];
             $servicioId = (int) $linea['servicioId'];
 
-            if (!$this->agendaRepository->vehiculoPerteneceACliente($vehiculoId, (int) $datos['clienteId'])) {
+            if (! $this->agendaRepository->vehiculoPerteneceACliente($vehiculoId, (int) $datos['clienteId'])) {
                 throw ValidationException::withMessages([
                     $linea['campoVehiculo'] => 'El vehículo seleccionado no pertenece al cliente de esta cita.',
                 ]);
             }
-            if (!$esCancelada) {
-                if (!$this->agendaRepository->vehiculoActivo($vehiculoId)) {
+            if (! $esCancelada) {
+                if (! $this->agendaRepository->vehiculoActivo($vehiculoId)) {
                     throw ValidationException::withMessages([
                         $linea['campoVehiculo'] => 'El vehículo seleccionado está inactivo.',
                     ]);
                 }
-                if (!$this->agendaRepository->servicioActivo($servicioId)) {
+                if (! $this->agendaRepository->servicioActivo($servicioId)) {
                     throw ValidationException::withMessages([
                         $linea['campoServicio'] => 'El servicio seleccionado está inactivo.',
                     ]);
                 }
             }
-             
-            if (!$esCancelada && !isset($vehiculosRevisados[$vehiculoId])) {
+
+            if (! $esCancelada && ! isset($vehiculosRevisados[$vehiculoId])) {
 
                 $minutosVehiculo = $this->minutosDeLineasPorVehiculo(
                     $lineas,
@@ -420,7 +436,7 @@ public function validarDisponibilidadDeServicios(int $agendaId, array $lineas): 
                         $vehiculoId
                     );
 
-                    if (!$tieneVehiculo) {
+                    if (! $tieneVehiculo) {
                         return false;
                     }
 
@@ -432,16 +448,16 @@ public function validarDisponibilidadDeServicios(int $agendaId, array $lineas): 
                     );
                 });
 
-    if ($choca) {
-        throw ValidationException::withMessages([
-            $linea['campoVehiculo'] => 'Ese vehículo ya tiene una cita que se cruza con ese horario.',
-        ]);
-    }
+                if ($choca) {
+                    throw ValidationException::withMessages([
+                        $linea['campoVehiculo'] => 'Ese vehículo ya tiene una cita que se cruza con ese horario.',
+                    ]);
+                }
 
-    $vehiculosRevisados[$vehiculoId] = true;
-}
+                $vehiculosRevisados[$vehiculoId] = true;
+            }
 
-            $par = $vehiculoId . ':' . $servicioId;
+            $par = $vehiculoId.':'.$servicioId;
             if (isset($paresServicio[$par])) {
                 throw ValidationException::withMessages([
                     $linea['campoServicio'] => 'No repitas un servicio dentro del mismo vehículo.',
@@ -455,26 +471,24 @@ public function validarDisponibilidadDeServicios(int $agendaId, array $lineas): 
             return;
         }
 
-                if ($agendaId === null && Carbon::parse("$fecha $hora")->lt(now()->startOfMinute())) {
-         throw ValidationException::withMessages(['hora' => 'La hora ya pasó. Elige una hora posterior a la actual.']);
+        if ($agendaId === null && Carbon::parse("$fecha $hora")->lt(now()->startOfMinute())) {
+            throw ValidationException::withMessages(['hora' => 'La hora ya pasó. Elige una hora posterior a la actual.']);
         }
 
-        if (!HorarioLavadero::permite($fecha, $hora, $minutosNueva)) {
+        if (! HorarioLavadero::permite($fecha, $hora, $minutosNueva)) {
             throw ValidationException::withMessages([
                 'hora' => 'La hora está fuera del horario de atención del lavadero para ese día.',
             ]);
         }
 
-        if (($datos['estado'] ?? null) === 'confirmada' && empty($datos['empleadoId'])) {
-         throw ValidationException::withMessages(['empleadoId' => 'Asigna un empleado antes de confirmar la cita.']);
-        }
-
-        $empleadoId = isset($datos['empleadoId']) ? (int) $datos['empleadoId'] : null;
+        $empleadoId = filled($datos['empleadoId'] ?? null)
+            ? (int) $datos['empleadoId']
+            : null;
         if ($empleadoId === null) {
             return;
         }
 
-        if (!$this->agendaRepository->empleadoActivo($empleadoId)) {
+        if (! $this->agendaRepository->empleadoActivo($empleadoId)) {
             throw ValidationException::withMessages([
                 'empleadoId' => 'Solo se puede asignar una cita a un empleado activo.',
             ]);
@@ -482,73 +496,70 @@ public function validarDisponibilidadDeServicios(int $agendaId, array $lineas): 
 
         $dias = [1 => 'lunes', 2 => 'martes', 3 => 'miercoles', 4 => 'jueves', 5 => 'viernes', 6 => 'sabado', 7 => 'domingo'];
         $dia = $dias[Carbon::parse($fecha)->dayOfWeekIso];
-        $horaCompleta = $hora . ':00';
+        $horaCompleta = $hora.':00';
 
-        if (!$this->agendaRepository->empleadoTieneTurno($empleadoId,$dia,$horaCompleta,$minutosNueva)) {
+        if (! $this->agendaRepository->empleadoTieneTurno($empleadoId, $dia, $horaCompleta, $minutosNueva)) {
             throw ValidationException::withMessages([
                 'empleadoId' => 'El empleado no tiene un turno que cubra ese día y esa hora.',
             ]);
         }
 
-        $choca = $citasDelDia->contains(fn ($cita) =>
-    (int) $cita->empleadoId === $empleadoId
+        $choca = $citasDelDia->contains(fn ($cita) => (int) $cita->empleadoId === $empleadoId
     && $this->seSolapa($hora, $minutosNueva, $cita->hora, $this->minutosDeCita($cita)));
 
-    if ($choca) {
-        throw ValidationException::withMessages([
-            'empleadoId' => 'Ese empleado ya tiene una cita que se cruza con ese horario.',
-        ]);
-    }
-    }
-
-    
-private function guardarLineas(int $agendaId, array $lineas): void
-{
-    foreach ($lineas as $linea) {
-        $vehiculoId = (int) $linea['vehiculoId'];
-        $servicioId = (int) $linea['servicioId'];
-
-        try {
-            $precio = $this->calcularPrecioServicio(
-                $vehiculoId,
-                $servicioId,
-                $linea['precioAcordado'] ?? null,
-                $linea['precioAcordadoActivo'] ?? false
-            );
-
-            $duracion = $this->calcularDuracionServicio(
-                $vehiculoId,
-                $servicioId
-            );
-
-            $this->agendaServicioRepository->keep([
-                'agendaId' => $agendaId,
-                'vehiculoId' => $vehiculoId,
-                'servicioId' => $servicioId,
-                'Precio' => $precio,
-                'duracionMinutos' => $duracion,
-            ]);
-
-        } catch (ValidationException $error) {
-            $errores = $error->errors();
-
-            $campo = array_key_exists('precioAcordado', $errores)
-                ? 'precioAcordado'
-                : 'servicioId';
-
-            $mensaje = collect($errores)->flatten()->first();
-
-            $campoError = $campo === 'precioAcordado'
-                ? $linea['campoPrecio']
-                : $linea['campoServicio'];
-
+        if ($choca) {
             throw ValidationException::withMessages([
-                $campoError => $mensaje ?? 'No se pudo guardar el servicio.',
+                'empleadoId' => 'Ese empleado ya tiene una cita que se cruza con ese horario.',
             ]);
         }
     }
-}
 
+    private function guardarLineas(int $agendaId, array $lineas): void
+    {
+        foreach ($lineas as $linea) {
+            $vehiculoId = (int) $linea['vehiculoId'];
+            $servicioId = (int) $linea['servicioId'];
+
+            try {
+                $precio = $this->calcularPrecioServicio(
+                    $vehiculoId,
+                    $servicioId,
+                    $linea['precioAcordado'] ?? null,
+                    $linea['precioAcordadoActivo'] ?? false
+                );
+
+                $duracion = $this->calcularDuracionServicio(
+                    $vehiculoId,
+                    $servicioId
+                );
+
+                $this->agendaServicioRepository->keep([
+                    'agendaId' => $agendaId,
+                    'vehiculoId' => $vehiculoId,
+                    'servicioId' => $servicioId,
+                    'Precio' => $precio,
+                    'duracionMinutos' => $duracion,
+                ]);
+
+            } catch (ValidationException $error) {
+                $errores = $error->errors();
+
+                $campo = array_key_exists('precioAcordado', $errores)
+                    ? 'precioAcordado'
+                    : 'servicioId';
+
+                $mensaje = collect($errores)->flatten()->first();
+
+                $campoError = $campo === 'precioAcordado'
+                    ? $linea['campoPrecio']
+                    : $linea['campoServicio'];
+
+                throw ValidationException::withMessages([
+                    $campoError => $mensaje ?? 'No se pudo guardar el servicio.',
+                ]);
+            }
+        }
+    }
 
     public function delete(int $id): bool
     {
@@ -558,47 +569,48 @@ private function guardarLineas(int $agendaId, array $lineas): void
 
         return DB::transaction(function () use ($id) {
             $this->agendaRepository->quitarLineas($id);
+
             return $this->agendaRepository->delete($id) > 0;
         });
     }
 
     private function minutosDeLineas(array $lineas): int
-{
-    $total = 0;
+    {
+        $total = 0;
 
-    foreach ($lineas as $linea) {
-        $vehiculo = $this->vehiculoRepository->finById(
-            (int) $linea['vehiculoId']
-        );
+        foreach ($lineas as $linea) {
+            $vehiculo = $this->vehiculoRepository->finById(
+                (int) $linea['vehiculoId']
+            );
 
-        $configuracion = $this->precioServicioRepository->buscarConfiguracion(
-            (int) $linea['servicioId'],
-            (int) $vehiculo->tipoVehiculoId
-        );
+            $configuracion = $this->precioServicioRepository->buscarConfiguracion(
+                (int) $linea['servicioId'],
+                (int) $vehiculo->tipoVehiculoId
+            );
 
-        if ($configuracion === null || (int) $configuracion->duracionMinutos < 1) {
-            throw ValidationException::withMessages([
-                $linea['campoServicio'] => 'Este servicio no tiene una duración configurada para el tipo de vehículo seleccionado.',
-            ]);
+            if ($configuracion === null || (int) $configuracion->duracionMinutos < 1) {
+                throw ValidationException::withMessages([
+                    $linea['campoServicio'] => 'Este servicio no tiene una duración configurada para el tipo de vehículo seleccionado.',
+                ]);
+            }
+
+            $total += (int) $configuracion->duracionMinutos;
         }
 
-        $total += (int) $configuracion->duracionMinutos;
+        return max(30, $total);
     }
 
-    return max(30, $total);
-}
-
     private function minutosDeCita($cita): int
-{
-    return max(
-        30,
-        (int) $cita->agendaServicios->sum(
-            fn ($linea) => $linea->duracionMinutos ?? 30
-        )
-    );
-}
+    {
+        return max(
+            30,
+            (int) $cita->agendaServicios->sum(
+                fn ($linea) => $linea->duracionMinutos ?? 30
+            )
+        );
+    }
 
-   private function seSolapa(string $horaA, int $minA, string $horaB, int $minB): bool
+    private function seSolapa(string $horaA, int $minA, string $horaB, int $minB): bool
     {
         $inicioA = Carbon::createFromFormat('H:i', substr($horaA, 0, 5));
         $inicioB = Carbon::createFromFormat('H:i', substr($horaB, 0, 5));
@@ -608,56 +620,56 @@ private function guardarLineas(int $agendaId, array $lineas): void
     }
 
     private function minutosDeLineasPorVehiculo(
-    array $lineas,
-    int $vehiculoId
-): int {
-    $total = 0;
+        array $lineas,
+        int $vehiculoId
+    ): int {
+        $total = 0;
 
-    foreach ($lineas as $linea) {
+        foreach ($lineas as $linea) {
 
-        if ((int) $linea['vehiculoId'] !== $vehiculoId) {
-            continue;
+            if ((int) $linea['vehiculoId'] !== $vehiculoId) {
+                continue;
+            }
+
+            $vehiculo = $this->vehiculoRepository->finById(
+                $vehiculoId
+            );
+
+            $configuracion = $this->precioServicioRepository->buscarConfiguracion(
+                (int) $linea['servicioId'],
+                (int) $vehiculo->tipoVehiculoId
+            );
+
+            if (
+                $configuracion === null ||
+                (int) $configuracion->duracionMinutos < 1
+            ) {
+                throw ValidationException::withMessages([
+                    $linea['campoServicio'] => 'Este servicio no tiene una duración válida configurada.',
+                ]);
+            }
+
+            $total += (int) $configuracion->duracionMinutos;
         }
 
-        $vehiculo = $this->vehiculoRepository->finById(
+        return max(30, $total);
+    }
+
+    private function minutosDeCitaParaVehiculo(
+        $cita,
+        int $vehiculoId
+    ): int {
+        $lineas = $cita->agendaServicios->where(
+            'vehiculoId',
             $vehiculoId
         );
 
-        $configuracion = $this->precioServicioRepository->buscarConfiguracion(
-            (int) $linea['servicioId'],
-            (int) $vehiculo->tipoVehiculoId
-        );
+        $total = $lineas->sum(function ($linea) {
+            return $linea->duracionMinutos
+                ?? $linea->servicio?->duracionMinutos
+                ?? 30;
+        });
 
-        if (
-            $configuracion === null ||
-            (int) $configuracion->duracionMinutos < 1
-        ) {
-            throw ValidationException::withMessages([
-                $linea['campoServicio'] => 'Este servicio no tiene una duración válida configurada.',
-            ]);
-        }
-
-        $total += (int) $configuracion->duracionMinutos;
+        return max(30, (int) $total);
     }
-
-    return max(30, $total);
-}
-
-private function minutosDeCitaParaVehiculo(
-    $cita,
-    int $vehiculoId
-): int {
-    $lineas = $cita->agendaServicios->where(
-        'vehiculoId',
-        $vehiculoId
-    );
-
-    $total = $lineas->sum(function ($linea) {
-        return $linea->duracionMinutos
-            ?? $linea->servicio?->duracionMinutos
-            ?? 30;
-    });
-
-    return max(30, (int) $total);
-}
 }

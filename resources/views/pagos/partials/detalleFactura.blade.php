@@ -39,7 +39,7 @@
     <section class="grid grid-cols-2 gap-x-6 gap-y-5 border-b border-slate-200 py-6 text-sm">
         <div>
             <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Factura</span>
-            <p class="mt-1 font-bold text-slate-900">Cita #{{ $agenda->id }}</p>
+            <p class="mt-1 font-bold text-slate-900">Cita #{{ $agenda->referencia }}</p>
         </div>
 
         <div class="text-right">

@@ -62,21 +62,20 @@
             @endif
 
             @if (count($filters))
-                <details
-                    class="relative"
-                    @if (collect($filters)->contains(fn ($filter) => ($filter['value'] ?? '') !== ''))
-                        open
-                    @endif
-                >
-                    <summary class="flex min-h-[40px] cursor-pointer list-none items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 transition hover:border-cyan-300 hover:bg-cyan-50 hover:text-cyan-800">
+                <details class="relative" data-dismiss-on-outside>
+                    <summary class="flex min-h-[40px] cursor-pointer list-none items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 transition hover:border-cyan-300 hover:bg-cyan-50 hover:text-cyan-800" aria-label="Mostrar u ocultar filtros">
                         <span class="h-4 w-4 text-cyan-700">
                             @include('layouts.partials.icons', ['icon' => 'filter'])
                         </span>
                         Filtros
+                        @php($filtrosActivos = collect($filters)->filter(fn ($filter) => ($filter['value'] ?? '') !== '')->count())
+                        @if($filtrosActivos)
+                            <span class="rounded-full bg-cyan-100 px-2 py-0.5 text-[10px] font-bold text-cyan-800">{{ $filtrosActivos }}</span>
+                        @endif
                         <span aria-hidden="true">⌄</span>
                     </summary>
 
-                    <div class="lava-filter-popover absolute z-40 mt-2 rounded-2xl border border-slate-200 bg-white p-3 shadow-2xl">
+                    <div class="lava-filter-popover absolute right-0 top-full z-40 mt-2 w-[min(28rem,calc(100vw-2rem))] rounded-2xl border border-slate-200 bg-white p-3 shadow-2xl">
 
                         <div class="mb-4">
                             <h3 class="text-sm font-extrabold text-[#17394d]">Filtrar registros</h3>

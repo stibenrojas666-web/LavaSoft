@@ -193,7 +193,7 @@
     <section class="mt-7">
         <x-card title="Citas recientes" subtitle="Últimas citas registradas" :padding="false">
             <div class="lavasoft-table-shell">
-                <table class="lavasoft-table min-w-[900px]">
+                <table data-datatable data-server-paginated="true" class="lavasoft-table min-w-full">
                     <thead>
                         <tr>
                             <th scope="col">Cliente</th>

@@ -2,8 +2,9 @@
 
 namespace App\Services\Seguridad;
 
-use App\Repositories\Seguridad\Contracts\UsuarioRepositoryInterface as UsuarioRepository;
 use App\Repositories\Seguridad\Contracts\TokenRecuperacionRepositoryInterface as TokenRecuperacionRepository;
+use App\Repositories\Seguridad\Contracts\UsuarioRepositoryInterface as UsuarioRepository;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\RateLimiter;
@@ -12,15 +13,15 @@ use Throwable;
 class RecuperacionContrasenaService
 {
     private const VIGENCIA_MINUTOS = 10;
+
     private const MAX_INTENTOS = 5;
+
     private const ESPERA_REENVIO = 60;
 
     public function __construct(
         private UsuarioRepository $usuarioRepository,
         private TokenRecuperacionRepository $tokenRepository
-    )
-    {
-    }
+    ) {}
 
     public function solicitarCodigo(string $email, string $ip): string
     {
@@ -73,7 +74,7 @@ class RecuperacionContrasenaService
         $codigoVencido = ! $registro
             || ! $registro->created_at
             || now()->greaterThan(
-                \Illuminate\Support\Carbon::parse($registro->created_at)
+                Carbon::parse($registro->created_at)
                     ->addMinutes(self::VIGENCIA_MINUTOS)
             );
 

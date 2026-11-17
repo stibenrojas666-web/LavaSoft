@@ -47,7 +47,7 @@
 
                     @foreach($agenda as $a)
                         <option value="{{ $a->id }}" {{ old('agendaId') == $a->id ? 'selected' : '' }}>
-                            #{{ $a->id }} - {{ \Carbon\Carbon::parse($a->fecha)->format('d/m/Y') }}
+                            #{{ $a->referencia }} - {{ \Carbon\Carbon::parse($a->fecha)->format('d/m/Y') }}
                             {{ substr($a->hora, 0, 5) }} - {{ $a->cliente->nombreCliente ?? 'N/A' }}
                         </option>
                     @endforeach

@@ -8,21 +8,20 @@ return new class extends Migration
 {
     public function up(): void
     {
-        if (!Schema::hasColumn('agenda_servicios', 'vehiculoId')) {
+        if (! Schema::hasColumn('agenda_servicios', 'vehiculoId')) {
             Schema::table('agenda_servicios', function (Blueprint $table) {
                 $table->unsignedBigInteger('vehiculoId')->nullable();
             });
         }
 
-        if (!Schema::hasColumn('agenda_servicios', 'duracionMinutos')) {
+        if (! Schema::hasColumn('agenda_servicios', 'duracionMinutos')) {
             Schema::table('agenda_servicios', function (Blueprint $table) {
                 $table->unsignedSmallInteger('duracionMinutos')->default(30);
             });
         }
 
         $indices = collect(Schema::getIndexes('agenda_servicios'));
-        $indiceAnterior = $indices->first(fn (array $indice) =>
-            $indice['unique'] && $indice['columns'] === ['agendaId', 'servicioId']
+        $indiceAnterior = $indices->first(fn (array $indice) => $indice['unique'] && $indice['columns'] === ['agendaId', 'servicioId']
         );
         if ($indiceAnterior !== null) {
             Schema::table('agenda_servicios', function (Blueprint $table) use ($indiceAnterior): void {
@@ -31,10 +30,9 @@ return new class extends Migration
         }
 
         $indices = collect(Schema::getIndexes('agenda_servicios'));
-        $indiceNuevoExiste = $indices->contains(fn (array $indice) =>
-            $indice['unique'] && $indice['columns'] === ['agendaId', 'vehiculoId', 'servicioId']
+        $indiceNuevoExiste = $indices->contains(fn (array $indice) => $indice['unique'] && $indice['columns'] === ['agendaId', 'vehiculoId', 'servicioId']
         );
-        if (!$indiceNuevoExiste) {
+        if (! $indiceNuevoExiste) {
             Schema::table('agenda_servicios', function (Blueprint $table): void {
                 $table->unique(
                     ['agendaId', 'vehiculoId', 'servicioId'],

@@ -3,12 +3,12 @@
 namespace App\Repositories\Seguridad;
 
 use App\Repositories\Seguridad\Contracts\RolRepositoryInterface;
-
+use App\Support\TextoBusqueda;
 use Illuminate\Database\Eloquent\Collection;
 use Spatie\Permission\Models\Role;
-use App\Support\TextoBusqueda;
 
-class RolRepository implements RolRepositoryInterface {
+class RolRepository implements RolRepositoryInterface
+{
     public function buscarPorId(int $id): Role
     {
         return Role::query()->findOrFail($id);

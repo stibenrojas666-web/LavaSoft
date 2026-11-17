@@ -14,18 +14,20 @@ use Throwable;
 
 class ConfiguracionLavaderoService
 {
-    public function __construct(private ConfiguracionLavaderoRepository $repository)
-    {
-    }
+    public function __construct(private ConfiguracionLavaderoRepository $repository) {}
 
     public function obtener(): ConfiguracionLavadero
     {
-        if (!Schema::hasTable('configuracion_lavadero')) {
+        if (! Schema::hasTable('configuracion_lavadero')) {
             return new ConfiguracionLavadero([
                 'nombre' => config('lavadero.nombre', 'LavaSoft'),
                 'nit' => config('lavadero.nit'),
                 'direccion' => config('lavadero.direccion'),
                 'telefono' => config('lavadero.telefono'),
+                'apertura_regular' => config('lavadero.apertura_regular', '07:00'),
+                'cierre_regular' => config('lavadero.cierre_regular', '18:00'),
+                'apertura_domingo_festivo' => config('lavadero.apertura_domingo_festivo', '08:00'),
+                'cierre_domingo_festivo' => config('lavadero.cierre_domingo_festivo', '13:00'),
                 'mostrar_logo' => true,
             ]);
         }
@@ -36,7 +38,7 @@ class ConfiguracionLavaderoService
             fn () => $this->repository->obtener()->getAttributes()
         );
 
-        return (new ConfiguracionLavadero())->forceFill($atributos);
+        return (new ConfiguracionLavadero)->forceFill($atributos);
     }
 
     public function rutaLogoVisible(): ?string
@@ -53,7 +55,8 @@ class ConfiguracionLavaderoService
 
     public function actualizar(array $datos, ?UploadedFile $logo = null): ConfiguracionLavadero
     {
-        unset($datos['logo']);
+        $eliminarLogo = filter_var($datos['eliminar_logo'] ?? false, FILTER_VALIDATE_BOOLEAN);
+        unset($datos['logo'], $datos['eliminar_logo']);
         $actual = $this->repository->obtener();
         $rutaAnterior = $actual->logo_path;
         $mostrarLogo = filter_var($datos['mostrar_logo'] ?? false, FILTER_VALIDATE_BOOLEAN);
@@ -69,7 +72,7 @@ class ConfiguracionLavaderoService
         if ($rutaNueva !== null) {
             $datos['logo_path'] = $rutaNueva;
             $datos['mostrar_logo'] = true;
-        } elseif (!$mostrarLogo) {
+        } elseif ($eliminarLogo) {
             $datos['logo_path'] = null;
         }
 
@@ -83,7 +86,7 @@ class ConfiguracionLavaderoService
             throw $error;
         }
 
-        if (($rutaNueva !== null || !$mostrarLogo) && $rutaAnterior !== null) {
+        if (($rutaNueva !== null || $eliminarLogo) && $rutaAnterior !== null) {
             Storage::disk('public')->delete($rutaAnterior);
         }
 

@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\EmpleadoService;
+use App\Http\Requests\BusquedaIndexRequest;
 use App\Http\Requests\EmpleadoStoreRequest;
 use App\Http\Requests\EmpleadoUpdateRequest;
-use App\Http\Requests\BusquedaIndexRequest;
+use App\Services\EmpleadoService;
+use Illuminate\Http\Request;
 
 class EmpleadoController extends Controller
 {
@@ -37,11 +38,10 @@ class EmpleadoController extends Controller
     public function store(EmpleadoStoreRequest $empleadoStoreRequest)
     {
         $this->empleadoService->guardar($empleadoStoreRequest->validated());
+
         return redirect()->route('empleados.index')->with('success', 'Empleado creado correctamente.');
 
     }
-
-    
 
     /**
      * Display the specified resource.
@@ -57,6 +57,7 @@ class EmpleadoController extends Controller
     public function edit(int $id)
     {
         $empleado = $this->empleadoService->buscarPorId($id);
+
         return view('empleados.editar', compact('empleado'));
     }
 
@@ -64,16 +65,17 @@ class EmpleadoController extends Controller
      * Update the specified resource in storage.
      */
     public function update(EmpleadoUpdateRequest $empleadoUpdateRequest, int $id)
-{
-    $this->empleadoService->actualizar($id, $empleadoUpdateRequest->validated());
-    return redirect()->route('empleados.index')->with('success', 'Empleado actualizado correctamente.');
-}
+    {
+        $this->empleadoService->actualizar($id, $empleadoUpdateRequest->validated());
 
-    public function cambiarEstado(int $id)
+        return redirect()->route('empleados.index')->with('success', 'Empleado actualizado correctamente.');
+    }
+
+    public function cambiarEstado(Request $request, int $id)
     {
         $activo = $this->empleadoService->cambiarEstado($id);
 
-        return redirect()->route('empleados.index')->with(
+        return redirect()->to(route('empleados.index', $request->query()).'#empleado-'.$id)->with(
             'success',
             $activo ? 'Empleado activado correctamente.' : 'Empleado desactivado correctamente.'
         );
@@ -84,9 +86,10 @@ class EmpleadoController extends Controller
      */
     public function destroy(int $id)
     {
-        if (!$this->empleadoService->eliminar($id)) {
+        if (! $this->empleadoService->eliminar($id)) {
             return redirect()->route('empleados.index')->with('error', 'No se puede eliminar el empleado porque tiene citas o turnos relacionados.');
         }
+
         return redirect()->route('empleados.index')->with('success', 'Empleado eliminado correctamente.');
     }
 }
