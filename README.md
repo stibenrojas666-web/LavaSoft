@@ -1,103 +1,135 @@
-LavaSoft
+# LavaSoft
 
-software para la gestión administrativa de lavaderos. Permite llevar el control de clientes, vehículos, servicios, agenda, empleados y pagos desde un solo lugar, en lugar de usar cuadernos o Excel.
+Sistema de gestión para lavaderos de vehículos. Permite llevar el control de clientes, vehículos, servicios, agenda, empleados y pagos desde un solo lugar, en lugar de usar cuadernos o Excel.
 
-Es un proyecto de formación del SENA (CATA, Málaga, Santander), desarrollado con metodología Scrum. Está hecho con Laravel y pensado para correr de forma local, sin depender de internet ni de APIs externas.
+Es un proyecto de formación del SENA (CATA, Málaga, Santander), desarrollado con metodología Scrum. Se ejecuta de forma local. Para enviar correos de facturas o recuperación de contraseña se necesita conexión a internet y configurar el servicio de correo.
 
-¿Qué problema resuelve?
+## ¿Qué problema resuelve?
 
-En un lavadero, el mismo servicio cuesta distinto según el vehículo (moto, carro, camioneta/turbo), los turnos cambian y los pagos pueden ser en efectivo, tarjeta o transferencia. LavaSoft organiza todo eso:
+En un lavadero, el precio de un servicio puede variar según el vehículo, los turnos cambian y los pagos se hacen en efectivo, tarjeta o transferencia. LavaSoft organiza esa información:
 
-Quién es el cliente y qué vehículos tiene.
-Qué servicios se ofrecen y cuánto cuesta cada uno según el tipo de vehículo.
-Qué citas hay agendadas y qué empleado las atiende.
-Qué se pagó, cómo y si el cliente pidió factura.
-Módulos
-Clientes y vehículos: registro de clientes, los vehículos de cada uno y su historial de servicios.
-Servicios y precios: catálogo de servicios con un precio distinto según el tipo de vehículo (moto, carro, camioneta/turbo).
-Agenda: citas por orden de llegada o agendadas, con estados (pendiente, confirmada, cancelada) y disponibilidad de los empleados.
-Empleados y turnos: personal del lavadero y los turnos que atiende cada uno.
-Pagos: pagos por cita (efectivo, tarjeta o transferencia), comisiones de los empleados y facturas cuando el cliente la pide.
-Reportes y configuración: consultas del negocio y ajustes generales del lavadero.
-Usuarios, roles y permisos: inicio de sesión con rol Administrador o Recepcionista/Empleado, y cada uno ve solo lo que su rol permite.
-Requisitos
+- Los clientes y sus vehículos.
+- Los servicios disponibles y sus precios según el tipo de vehículo.
+- Las citas y los empleados asignados.
+- Los pagos, sus métodos y las facturas solicitadas.
 
-La forma más fácil de correr el proyecto es con Laragon (Windows), que ya incluye todo lo necesario:
+## Módulos
 
-PHP 8.3 o superior
-MySQL
-Composer 2
-Node.js y npm
+- **Clientes y vehículos:** registro de clientes, sus vehículos y el historial de servicios.
+- **Servicios y precios:** catálogo de servicios con precios según el tipo de vehículo.
+- **Agenda:** citas por orden de llegada o previamente agendadas, sus estados y la disponibilidad de empleados.
+- **Empleados y turnos:** registro del personal y sus horarios de atención.
+- **Pagos:** pagos por cita, métodos de pago, comisiones y facturas.
+- **Reportes y configuración:** consultas del negocio y ajustes generales del lavadero.
+- **Usuarios, roles y permisos:** acceso al sistema según el rol y los permisos asignados.
 
-Si no usas Laragon, instala esas cuatro cosas por separado. PHP debe tener activadas las extensiones PDO, mbstring, openssl, tokenizer, XML, ctype, curl, fileinfo y gd (Laragon ya las trae activas).
+## Requisitos
 
-Instalación
-Abre Laragon, inicia los servicios (Iniciar todo) y abre su terminal. Clona el proyecto dentro de C:\laragon\www.
-Crea una base de datos vacía en MySQL llamada lavasoft (puedes hacerlo desde HeidiSQL, que viene con Laragon).
-Instala las dependencias de PHP:
-bash
+En Windows se puede usar [Laragon](https://laragon.org/), que facilita la instalación y configuración del entorno.
+
+- PHP 8.3 o superior.
+- MySQL.
+- Composer 2.
+- Node.js y npm.
+- Extensiones de PHP: PDO, mbstring, openssl, tokenizer, XML, ctype, curl, fileinfo y gd.
+
+Si no usas Laragon, instala estos componentes por separado y verifica que las extensiones de PHP estén activas.
+
+## Instalación
+
+1. Abre Laragon, selecciona **Iniciar todo** y abre su terminal.
+2. Clona el proyecto dentro de `C:\laragon\www`.
+3. Crea una base de datos vacía llamada `lavasoft` en MySQL. Puedes hacerlo desde HeidiSQL, incluido con Laragon.
+4. Desde la carpeta del proyecto, instala las dependencias y crea el archivo de configuración:
+
+```powershell
 composer install
-Crea tu archivo de configuración:
-bash
-copy .env.example .env
-Abre .env y configura la conexión a la base de datos y los datos del administrador (nombre, correo y una contraseña segura):
-env
+Copy-Item .env.example .env
+```
+
+5. Abre `.env` y configura la conexión a la base de datos:
+
+```dotenv
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
 DB_DATABASE=lavasoft
 DB_USERNAME=root
 DB_PASSWORD=
+```
 
-En Laragon el usuario por defecto es root y la contraseña va vacía. Si cambiaste alguno de esos datos, ajústalos aquí.
+En una instalación predeterminada de Laragon, el usuario de MySQL suele ser `root` y la contraseña queda vacía. Si configuraste otros datos, usa esos valores.
 
-Genera la clave de la app, instala y compila el frontend, y crea las tablas con datos iniciales:
-bash
+6. Prepara la aplicación y crea las tablas con los datos iniciales:
+
+```powershell
 php artisan key:generate
 npm install
 npm run build
 php artisan migrate --seed
-Levanta el servidor:
-bash
+```
+
+7. Inicia el servidor local:
+
+```powershell
 php artisan serve
+```
 
-Abre http://127.0.0.1:8000 e inicia sesión con el administrador que definiste en .env.
+Abre <http://127.0.0.1:8000> en el navegador e inicia sesión con una cuenta creada para el sistema.
 
-Cuidado: nunca subas el archivo .env a GitHub. Y no uses php artisan migrate:fresh en una base con datos reales: borra todas las tablas.
+> No subas el archivo `.env` a GitHub: puede contener contraseñas y otros datos privados. No ejecutes `php artisan migrate:fresh` en una base de datos con información que quieras conservar, porque elimina sus tablas.
 
-¿Y si no tengo MySQL?
+### Usar SQLite
 
-Como alternativa para pruebas rápidas puedes usar SQLite: pon DB_CONNECTION=sqlite y DB_DATABASE=database/database.sqlite en .env, y crea el archivo vacío (New-Item -ItemType File -Path database/database.sqlite -Force en PowerShell, o touch database/database.sqlite en Linux/Mac). El proyecto se desarrolló con MySQL.
+SQLite puede servir para hacer pruebas rápidas. En `.env`, configura:
 
-Estructura del proyecto
+```dotenv
+DB_CONNECTION=sqlite
+DB_DATABASE=database/database.sqlite
+```
 
-El código sigue una arquitectura por capas para que cada cosa esté en su lugar:
+Crea el archivo vacío de la base de datos desde PowerShell:
 
-Carpeta	Para qué sirve
-resources/views	Vistas Blade (pantallas, layouts y componentes)
-app/Http/Controllers	Reciben la petición y devuelven la respuesta
-app/Http/Requests	Validan los datos que llegan de los formularios
-app/Services	Reglas de negocio
-app/Repositories	Acceso a la base de datos (con sus contratos en Contracts)
-app/Providers/RepositoryServiceProvider.php	Conecta cada contrato con su repositorio
-app/Models	Modelos Eloquent (las tablas como clases)
-database/migrations, seeders, factories	Estructura de la base de datos y datos de prueba
+```powershell
+New-Item -ItemType File -Path database/database.sqlite -Force
+```
 
-El flujo normal es: ruta → controlador → request (valida) → service (lógica) → repository (base de datos).
+El proyecto se desarrolló principalmente con MySQL.
 
-Las rutas internas requieren iniciar sesión y revisan los permisos del usuario. Además, Laravel protege los formularios con CSRF y guarda las contraseñas cifradas.
+## Estructura del proyecto
 
-Pruebas
-bash
-php artisan test            # corre las pruebas
-vendor/bin/pint --test      # revisa el estilo del código
-php artisan route:list      # lista las rutas disponibles
-php artisan migrate:status  # muestra qué migraciones se han corrido
+El código está organizado por capas para mantener separadas las pantallas, las reglas del sistema y el acceso a la base de datos.
 
-Las pruebas usan una base SQLite en memoria, así que no tocan los datos de tu MySQL.
+| Carpeta o archivo | Uso |
+| --- | --- |
+| `resources/views` | Vistas Blade, layouts y componentes |
+| `app/Http/Controllers` | Reciben las solicitudes y preparan las respuestas |
+| `app/Http/Requests` | Validan los datos de los formularios |
+| `app/Services` | Contienen las reglas y procesos del sistema |
+| `app/Repositories` | Organizan el acceso a la base de datos |
+| `app/Repositories/Contracts` | Definen los contratos de los repositorios |
+| `app/Providers/RepositoryServiceProvider.php` | Relaciona cada contrato con su repositorio |
+| `app/Models` | Modelos de Eloquent |
+| `database/migrations` | Cambios en la estructura de la base de datos |
+| `database/seeders` y `database/factories` | Datos iniciales y datos para pruebas |
 
-Trabajo en equipo
-Equipo: Caren Valentina Páez Sandoval y Brayan Fajardo.
-Metodología: Scrum, con sprints, daily y sprint review.
-Git: cada integrante trabaja en su propia rama y luego se integra a Dev. Antes de hacer commit, revisa con git status que no se cuelen .env, vendor, node_modules ni la base local.
-Documentación: el seguimiento está en docs/SEGUIMIENTO_SCRUM.md y la matriz de cumplimiento en docs/MATRIZ_CUMPLIMIENTO_AP5.md.
+El flujo habitual es: **ruta → controlador → validación → servicio → repositorio → base de datos**.
+
+Las rutas internas requieren iniciar sesión y verifican los permisos del usuario. Laravel también protege los formularios contra solicitudes CSRF y cifra las contraseñas.
+
+## Pruebas y comandos útiles
+
+```powershell
+php artisan test
+vendor/bin/pint --test
+php artisan route:list
+php artisan migrate:status
+```
+
+Las pruebas usan SQLite en memoria, por lo que no modifican la base de datos MySQL local.
+
+## Trabajo en equipo
+
+Cada integrante trabaja en su propia rama y, cuando termina sus cambios, se integra en `Dev`. Antes de hacer un commit, se revisa con `git status` que no se hayan agregado archivos privados o pesados, como `.env`, `vendor`, `node_modules` o bases de datos locales.
+
+El equipo también lleva el seguimiento del proyecto utilizando la metodología del scrum en su propio documento.
