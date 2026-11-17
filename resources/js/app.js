@@ -19,6 +19,24 @@ window.FullCalendar = Calendar;
 
 Alpine.start();
 
+document.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-password-toggle]');
+    if (!button) return;
+
+    const input = document.getElementById(button.dataset.passwordToggle);
+    if (!input) return;
+
+    const mostrar = input.type === 'password';
+    input.type = mostrar ? 'text' : 'password';
+    button.setAttribute('aria-pressed', String(mostrar));
+    button.setAttribute('aria-label', mostrar ? 'Ocultar contraseña' : 'Mostrar contraseña');
+    button.setAttribute('title', mostrar ? 'Ocultar contraseña' : 'Mostrar contraseña');
+    const ojoAbierto = button.querySelector('[data-password-eye]');
+    const ojoCerrado = button.querySelector('[data-password-eye-off]');
+    if (ojoAbierto) ojoAbierto.style.display = mostrar ? 'none' : 'block';
+    if (ojoCerrado) ojoCerrado.style.display = mostrar ? 'block' : 'none';
+});
+
 // Initialize components on DOM ready
 document.addEventListener('DOMContentLoaded', () => {
     // Map imports

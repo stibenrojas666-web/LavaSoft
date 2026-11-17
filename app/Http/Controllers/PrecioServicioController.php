@@ -3,34 +3,23 @@
 namespace App\Http\Controllers;
 
 use App\Services\PrecioServicioService;
-use App\Services\ServicioService;
-use App\Services\TipoVehiculoService;
 use App\Http\Requests\PrecioServicioStoreRequest;
 use App\Http\Requests\PrecioServicioUpdateRequest;
 use App\Http\Requests\BusquedaIndexRequest;
 
 class PrecioServicioController extends Controller 
 {
-    private PrecioServicioService $precioServicioService;
-    private ServicioService $servicioService;
-    private TipoVehiculoService $tipoVehiculoService;
-
-    public function __construct(PrecioServicioService $precioServicioService, ServicioService $servicioService, TipoVehiculoService $tipoVehiculoService)
+    public function __construct(private PrecioServicioService $precioServicioService)
     {
-        $this->precioServicioService = $precioServicioService;
-        $this->servicioService = $servicioService;
-        $this->tipoVehiculoService = $tipoVehiculoService;
     }
     /**
      * Display a listing of the resource.
      */
     public function index(BusquedaIndexRequest $busquedaIndexRequest)
     {
-        $datosListado = $this->precioServicioService->prepararListado(
+        return view('precioServicio.index', $this->precioServicioService->prepararIndiceConOpciones(
             $busquedaIndexRequest->validated()
-        );
-        $tipoVehiculosOpciones = $this->tipoVehiculoService->opcionesParaFiltro();
-        return view('precioServicio.index', [...$datosListado, 'tipoVehiculosOpciones' => $tipoVehiculosOpciones]);
+        ));
     }
 
     /**
@@ -38,10 +27,10 @@ class PrecioServicioController extends Controller
      */
     public function create()
     {
-        $servicios = $this->servicioService->listarActivosConPrecios();
-        $tipoVehiculos = $this->tipoVehiculoService->listarTodo();
-        $duraciones = $this->precioServicioService->opcionesDuracion((int) old('duracionMinutos', 30));
-        return view('precioServicio.crear', compact('servicios', 'tipoVehiculos', 'duraciones'));
+        return view('precioServicio.crear', $this->precioServicioService->prepararFormulario(
+            null,
+            (int) old('duracionMinutos', 30)
+        ));
     }
 
     /**
@@ -66,12 +55,10 @@ class PrecioServicioController extends Controller
      */
     public function edit(int $id)
     {
-        $precioServicio = $this->precioServicioService->buscarPorId($id);
-        $servicios = $this->servicioService->listarActivosConPrecios();
-        $tipoVehiculos = $this->tipoVehiculoService->listarTodo();
-        $duracionActual = (int) old('duracionMinutos', $precioServicio->duracionMinutos ?? 30);
-        $duraciones = $this->precioServicioService->opcionesDuracion($duracionActual);
-        return view('precioServicio.editar', compact('precioServicio', 'servicios', 'tipoVehiculos', 'duraciones', 'duracionActual'));
+        return view('precioServicio.editar', $this->precioServicioService->prepararFormulario(
+            $id,
+            old('duracionMinutos') === null ? null : (int) old('duracionMinutos')
+        ));
     }
 
     /**

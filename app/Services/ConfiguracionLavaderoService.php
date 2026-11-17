@@ -39,6 +39,18 @@ class ConfiguracionLavaderoService
         return (new ConfiguracionLavadero())->forceFill($atributos);
     }
 
+    public function rutaLogoVisible(): ?string
+    {
+        $configuracion = $this->obtener();
+        $disco = Storage::disk('public');
+
+        if (! $configuracion->mostrar_logo || ! $configuracion->logo_path || ! $disco->exists($configuracion->logo_path)) {
+            return null;
+        }
+
+        return $disco->path($configuracion->logo_path);
+    }
+
     public function actualizar(array $datos, ?UploadedFile $logo = null): ConfiguracionLavadero
     {
         $eliminarLogo = filter_var($datos['eliminar_logo'] ?? false, FILTER_VALIDATE_BOOLEAN);
@@ -51,7 +63,7 @@ class ConfiguracionLavaderoService
 
         if ($logo !== null && $rutaNueva === false) {
             throw ValidationException::withMessages([
-                'logo' => 'No se pudo guardar el logo. Revisa que el archivo pese menos de 2 MB e inténtalo de nuevo.',
+                'logo' => 'No se pudo guardar el logo. Revisa que el archivo pese menos de 10 MB e inténtalo de nuevo.',
             ]);
         }
 

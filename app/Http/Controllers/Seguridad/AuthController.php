@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Seguridad;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
+use App\Services\ConfiguracionLavaderoService;
 use App\Services\Seguridad\AuthService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -11,11 +12,16 @@ use Illuminate\View\View;
 
 class AuthController extends Controller
 {
-    public function __construct(private AuthService $authService) {}
+    public function __construct(
+        private AuthService $authService,
+        private ConfiguracionLavaderoService $configuracionService
+    ) {}
 
     public function showLoginForm(): View
     {
-        return view('seguridad.login');
+        return view('seguridad.login', [
+            'configuracion' => $this->configuracionService->obtener(),
+        ]);
     }
 
     public function login(LoginRequest $inicioSesionRequest): RedirectResponse

@@ -6,21 +6,53 @@
     <title>Factura de servicio #{{ $agenda->id }}</title>
     @vite(['resources/css/app.css'])
     <style>
-        @page { margin: 5mm; }
+        @page {
+            size: A4;
+            margin: 10mm;
+        }
+
         @media print {
-            .no-imprimir { display: none !important; }
-            body { background: #fff !important; }
+            .no-imprimir {
+                display: none !important;
+            }
+
+            body {
+                background: #fff !important;
+                padding: 0 !important;
+            }
+
+            .factura-publica-contenedor {
+                max-width: none !important;
+                padding: 0 !important;
+            }
+
+            .factura-publica-papel {
+                border: 0 !important;
+                box-shadow: none !important;
+            }
         }
     </style>
 </head>
-<body class="bg-slate-100 py-6">
-    <div class="mx-auto w-full max-w-[34rem] px-3">
-        <div class="no-imprimir mb-3 flex justify-end">
-            <button type="button" onclick="window.print()" class="rounded-lg bg-cyan-700 px-4 py-2 text-sm font-semibold text-white hover:bg-cyan-800">Imprimir o guardar PDF</button>
+<body class="min-h-screen bg-slate-100 py-6 sm:py-10">
+    <main class="factura-publica-contenedor mx-auto w-full max-w-2xl px-3 sm:px-5">
+        <div class="no-imprimir mb-5 flex items-center justify-between gap-3">
+            <div>
+                <p class="text-sm font-bold text-slate-800">Comprobante de servicio</p>
+                <p class="text-xs text-slate-500">Factura de la cita #{{ $agenda->id }}</p>
+            </div>
+
+            <button
+                type="button"
+                onclick="window.print()"
+                class="rounded-xl bg-cyan-800 px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-cyan-900"
+            >
+                Imprimir o guardar PDF
+            </button>
         </div>
-        <div class="rounded-lg bg-white shadow">
+
+        <div class="factura-publica-papel overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl">
             @include('pagos.partials.detalleFactura')
         </div>
-    </div>
+    </main>
 </body>
 </html>

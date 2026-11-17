@@ -26,11 +26,10 @@ class CuentaController extends Controller
 
     public function create(): View
     {
-        return view('seguridad.cuentas.form', [
-            'usuario' => null,
-            'roles' => $this->cuentaService->listarRoles(),
-            'seleccionados' => old('roles', []),
-        ]);
+        return view('seguridad.cuentas.form', $this->cuentaService->prepararFormulario(
+            null,
+            old('roles', [])
+        ));
     }
 
     public function store(CuentaStoreRequest $cuentaStoreRequest): RedirectResponse
@@ -42,13 +41,10 @@ class CuentaController extends Controller
 
     public function edit(string $cuenta): View
     {
-        $usuario = $this->cuentaService->buscar($cuenta);
-
-        return view('seguridad.cuentas.form', [
-            'usuario' => $usuario,
-            'roles' => $this->cuentaService->listarRoles(),
-            'seleccionados' => old('roles', $this->cuentaService->rolesSeleccionados($usuario)),
-        ]);
+        return view('seguridad.cuentas.form', $this->cuentaService->prepararFormulario(
+            $cuenta,
+            old('roles')
+        ));
     }
 
     public function update(CuentaUpdateRequest $cuentaUpdateRequest, string $cuenta): RedirectResponse

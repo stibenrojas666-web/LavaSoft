@@ -10,6 +10,7 @@ use App\Support\HorarioLavadero;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Http\Request;
 
 class AgendaService
 {
@@ -17,8 +18,61 @@ class AgendaService
         private AgendaRepository $agendaRepository,
         private AgendaServicioRepository $agendaServicioRepository,
         private PrecioServicioRepository $precioServicioRepository,
-        private VehiculoRespository $vehiculoRepository
+        private VehiculoRespository $vehiculoRepository,
+        private ClienteService $clienteService,
+        private EmpleadoService $empleadoService,
+        private VehiculoService $vehiculoService,
+        private ServicioService $servicioService
     ) {
+    }
+
+    /** Prepara los datos necesarios para crear o editar una cita. */
+    public function prepararFormulario(?int $agendaId = null, ?array $vehiculosAnteriores = null): array
+    {
+        $agenda = $agendaId === null ? null : $this->findById($agendaId);
+        $cliente = $this->clienteService->listarTodo();
+        $empleado = $agenda?->empleado ? collect([$agenda->empleado]) : collect();
+        $vehiculosIncluidos = $agenda ? $this->vehiculosDeAgenda($agenda) : [];
+        $vehiculo = $this->vehiculoService->listarParaAgenda($vehiculosIncluidos);
+        $serviciosPrecios = $this->servicioService->catalogoActivosConPrecios();
+        $bloquesIniciales = $this->bloquesIniciales($agenda, $vehiculosAnteriores, $serviciosPrecios);
+
+        return compact('agenda', 'cliente', 'empleado', 'vehiculo', 'serviciosPrecios', 'bloquesIniciales');
+    }
+
+    /** Conserva vista, filtros y paginación al regresar desde una acción de Agenda. */
+    public function parametrosRetorno(array $entrada): array
+    {
+        $permitidos = ['vista', 'mes', 'fecha', 'desde', 'hasta', 'buscar', 'estado', 'orden', 'page'];
+        $parametros = [];
+
+        foreach ($permitidos as $clave) {
+            $valor = $entrada['_return_'.$clave] ?? $entrada[$clave] ?? null;
+            if (is_scalar($valor) && (string) $valor !== '') {
+                $parametros[$clave] = (string) $valor;
+            }
+        }
+
+        if (isset($parametros['vista']) && ! in_array($parametros['vista'], ['lista', 'calendario'], true)) {
+            unset($parametros['vista']);
+        }
+
+        return $parametros;
+    }
+
+    public function parametrosRetornoTrasGuardar(array $entrada, array $datos): array
+    {
+        $parametros = $this->parametrosRetorno($entrada);
+        if (($parametros['vista'] ?? null) !== 'lista' && isset($datos['fecha'])) {
+            $fecha = Carbon::parse($datos['fecha']);
+            $parametros = array_merge($parametros, [
+                'vista' => 'calendario',
+                'mes' => $fecha->format('Y-m'),
+                'fecha' => $fecha->toDateString(),
+            ]);
+        }
+
+        return $parametros;
     }
 
     public function getAll()
@@ -496,7 +550,7 @@ private function guardarLineas(int $agendaId, array $lineas): void
 }
 
 
-        public function delete(int $id): bool
+    public function delete(int $id): bool
     {
         if ($this->agendaRepository->tienePago($id)) {
             return false;

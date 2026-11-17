@@ -105,8 +105,9 @@ class RecuperacionContrasenaService
             return false;
         }
 
-        $usuario->password = Hash::make($contrasena);
-        $usuario->save();
+        $this->usuarioRepository->actualizar($usuario, [
+            'password' => Hash::make($contrasena),
+        ]);
 
         try {
             Mail::raw(

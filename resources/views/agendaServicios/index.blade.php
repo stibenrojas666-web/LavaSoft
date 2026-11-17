@@ -1,162 +1,68 @@
-
 @extends('layouts.app')
 
 @section('title', 'Historial de citas')
 @section('page-title', 'Historial de citas')
 
-@push('styles')
-<style>
-    .as-page { color: #183445; }
-    .as-hero {
-        position: relative;
-        overflow: hidden;
-        border-radius: 24px;
-        padding: 28px;
-        color: white;
-        background: linear-gradient(120deg, #0b2a3a 0%, #10546b 58%, #0891b2 100%);
-        box-shadow: 0 14px 35px rgba(11,42,58,.16);
-    }
-    .as-hero::after {
-        content: "";
-        position: absolute;
-        width: 210px;
-        height: 210px;
-        right: -55px;
-        top: -100px;
-        border: 30px solid rgba(255,255,255,.08);
-        border-radius: 50%;
-    }
-    .as-stat {
-        border: 1px solid #e1edf2;
-        border-radius: 18px;
-        background: white;
-        padding: 18px;
-        box-shadow: 0 7px 22px rgba(11,42,58,.045);
-    }
-    .as-panel {
-        overflow: hidden;
-        border: 1px solid #e1edf2;
-        border-radius: 20px;
-        background: white;
-        box-shadow: 0 9px 26px rgba(11,42,58,.055);
-    }
-    .as-icon {
-        display: grid;
-        width: 42px;
-        height: 42px;
-        flex: 0 0 auto;
-        place-items: center;
-        border-radius: 14px;
-        background: rgba(255,255,255,.14);
-        color: white;
-    }
-    .as-action {
-        display: inline-grid;
-        width: 36px;
-        height: 36px;
-        place-items: center;
-        border-radius: 11px;
-        transition: .2s ease;
-    }
-    .as-view { background: #e8f8fc; color: #087c9b; }
-    .as-view:hover { background: #c9f0f8; transform: translateY(-2px); }
-    .as-action svg { width: 17px; height: 17px; }
-    @media(max-width:640px) {
-        .as-hero { padding: 22px; }
-    }
-</style>
-@endpush
-
 @section('content')
+<div class="mx-auto w-full max-w-7xl space-y-6">
 
-<div class="as-page space-y-6">
+    <x-module-header
+        variant="list"
+        title="Historial de citas"
+        description="Consulta los servicios asociados a cada cita, sus vehículos y precios."
+    />
 
-    {{-- ENCABEZADO PRINCIPAL --}}
-    <section class="as-hero">
-        <div class="relative z-10 flex flex-wrap items-center justify-between gap-5">
-            <div>
-                <div class="mb-3 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold text-cyan-100">
-                    <span class="h-2 w-2 rounded-full bg-cyan-300"></span>
-                    Historial de citas
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div class="flex items-center gap-4">
+                <span class="grid h-12 w-12 place-items-center rounded-xl bg-cyan-50 p-3 text-cyan-800">
+                    @include('layouts.partials.icons', ['icon' => 'clipboard-list'])
+                </span>
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">Registros del historial</p>
+                    <p class="mt-1 text-2xl font-bold text-slate-900">{{ $agendaServicio->total() }}</p>
                 </div>
-
-                <h1 class="text-2xl font-extrabold tracking-tight sm:text-3xl">
-                    Historial de citas
-                </h1>
-
-                <p class="mt-2 max-w-xl text-sm leading-6 text-cyan-50/85">
-                    Consulta los servicios registrados para cada cita, junto con sus vehículos y precios.
-                </p>
             </div>
+        </div>
 
-            <div class="as-icon">
-                @include('layouts.partials.icons', ['icon' => 'clipboard-list'])
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div class="flex items-center gap-4">
+                <span class="grid h-12 w-12 place-items-center rounded-xl bg-blue-50 p-3 text-blue-700">
+                    @include('layouts.partials.icons', ['icon' => 'calendar'])
+                </span>
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">Registros en esta página</p>
+                    <p class="mt-1 text-2xl font-bold text-slate-900">{{ $agendaServicio->count() }}</p>
+                </div>
             </div>
+        </div>
+    </div>
+
+    <section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div class="border-b border-slate-100 px-5 py-5 sm:px-6">
+            <h2 class="font-bold text-slate-800">Buscar y filtrar</h2>
+            <p class="mt-1 text-sm text-slate-500">Busca por cita, placa, cliente, estado o fecha.</p>
+        </div>
+
+        <div class="p-5 sm:p-6">
+            <x-list-search
+                :action="route('agendaServicio.index')"
+                :value="$buscar"
+                placeholder="Cita, placa, cliente o servicio"
+                :filters="[
+                    ['name' => 'estado', 'label' => 'Estado de la cita', 'options' => ['' => 'Todos', 'pendiente' => 'Pendiente', 'confirmada' => 'Confirmada', 'terminada' => 'Terminada', 'cancelada' => 'Cancelada'], 'value' => $filtros['estado'] ?? ''],
+                    ['name' => 'desde', 'label' => 'Desde', 'type' => 'date', 'value' => $filtros['desde'] ?? ''],
+                    ['name' => 'hasta', 'label' => 'Hasta', 'type' => 'date', 'value' => $filtros['hasta'] ?? ''],
+                ]"
+            />
         </div>
     </section>
 
-    {{-- INDICADOR DE REGISTROS --}}
-    <section class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div class="as-stat flex items-center gap-4">
-            <div class="grid h-12 w-12 place-items-center rounded-2xl bg-cyan-50 text-cyan-700">
-                @include('layouts.partials.icons', ['icon' => 'clipboard-list'])
-            </div>
+    <section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 px-5 py-5 sm:px-6">
             <div>
-                <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">
-                    Registros del historial
-                </p>
-                <p class="mt-1 text-2xl font-extrabold text-slate-800">
-                    {{ $agendaServicio->total() }}
-                </p>
-            </div>
-        </div>
-
-        <div class="as-stat flex items-center gap-4">
-            <div class="grid h-12 w-12 place-items-center rounded-2xl bg-blue-50 text-blue-700">
-                @include('layouts.partials.icons', ['icon' => 'calendar'])
-            </div>
-            <div>
-                <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">
-                    Registros en esta página
-                </p>
-                <p class="mt-1 text-2xl font-extrabold text-slate-800">
-                    {{ $agendaServicio->count() }}
-                </p>
-            </div>
-        </div>
-    </section>
-
-    {{-- BÚSQUEDA Y FILTROS --}}
-    <section class="as-panel p-4 sm:p-5">
-        <div class="mb-4">
-            <h2 class="text-base font-bold text-slate-800">Buscar y filtrar</h2>
-            <p class="mt-1 text-xs text-slate-500">
-                Busca por cita, placa, cliente, estado o fecha.
-            </p>
-        </div>
-
-        <x-list-search
-            :action="route('agendaServicio.index')"
-            :value="$buscar"
-            placeholder="Cita, placa, cliente o servicio"
-            :filters="[
-                ['name' => 'estado', 'label' => 'Estado de la cita', 'options' => ['' => 'Todos', 'pendiente' => 'Pendiente', 'confirmada' => 'Confirmada', 'terminada' => 'Terminada', 'cancelada' => 'Cancelada'], 'value' => $filtros['estado'] ?? ''],
-                ['name' => 'desde', 'label' => 'Desde', 'type' => 'date', 'value' => $filtros['desde'] ?? ''],
-                ['name' => 'hasta', 'label' => 'Hasta', 'type' => 'date', 'value' => $filtros['hasta'] ?? ''],
-            ]"
-        />
-    </section>
-
-    {{-- TABLA DE SERVICIOS --}}
-    <section class="as-panel">
-        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 px-5 py-5">
-            <div>
-                <h2 class="text-base font-bold text-slate-800">
-                    Servicios registrados por cita
-                </h2>
-                <p class="mt-1 text-xs text-slate-500">
-                    Información de los servicios vinculados a las citas.
-                </p>
+                <h2 class="font-bold text-slate-800">Servicios registrados por cita</h2>
+                <p class="mt-1 text-sm text-slate-500">Información de los servicios vinculados a las citas.</p>
             </div>
 
             <span class="rounded-full bg-cyan-50 px-3 py-1.5 text-xs font-bold text-cyan-800">
@@ -165,7 +71,7 @@
         </div>
 
         <div class="lavasoft-table-shell overflow-x-auto">
-            <table class="as-table lavasoft-table min-w-[850px]">
+            <table class="lavasoft-table min-w-[850px] text-left text-sm">
                 <thead>
                     <tr>
                         <th>ID</th>
@@ -178,19 +84,15 @@
                 </thead>
 
                 <tbody>
-                    @forelse ($agendaServicio as $as)
+                    @forelse($agendaServicio as $as)
                         <tr>
                             <td>
-                                <span class="font-bold text-slate-400">
-                                    #{{ $as->id }}
-                                </span>
+                                <span class="font-bold text-slate-400">#{{ $as->id }}</span>
                             </td>
 
                             <td>
                                 @if($as->agenda)
-                                    <p class="font-bold text-slate-800">
-                                        Cita #{{ $as->agenda->id }}
-                                    </p>
+                                    <p class="font-bold text-slate-800">Cita #{{ $as->agenda->id }}</p>
                                     <p class="mt-1 text-xs text-slate-500">
                                         {{ \Carbon\Carbon::parse($as->agenda->fecha)->format('d/m/Y') }}
                                         · {{ substr($as->agenda->hora, 0, 5) }}
@@ -216,37 +118,38 @@
                             </td>
 
                             <td>
-                                <span class="font-extrabold text-emerald-700">
+                                <span class="font-bold text-emerald-700">
                                     ${{ number_format($as->Precio, 2) }}
                                 </span>
                             </td>
 
                             <td class="text-center">
-                                <a href="{{ route('agendaServicio.show', $as->id) }}"
-                                   class="as-action as-view"
-                                   title="Ver detalle del registro"
-                                   aria-label="Ver detalle del registro #{{ $as->id }}">
-                                    @include('layouts.partials.icons', ['icon' => 'eye'])
+                                <a
+                                    href="{{ route('agendaServicio.show', $as->id) }}"
+                                    class="inline-grid h-9 w-9 place-items-center rounded-lg bg-cyan-50 text-cyan-800 transition hover:bg-cyan-100"
+                                    title="Ver detalle del registro"
+                                    aria-label="Ver detalle del registro #{{ $as->id }}"
+                                >
+                                    <span class="h-4 w-4">
+                                        @include('layouts.partials.icons', ['icon' => 'eye'])
+                                    </span>
                                 </a>
                             </td>
-
                         </tr>
                     @empty
                         <tr>
                             <td colspan="6" class="px-5 py-14 text-center">
-                                <div class="mx-auto flex max-w-sm flex-col items-center">
-                                    <div class="mb-4 grid h-16 w-16 place-items-center rounded-2xl bg-cyan-50 text-cyan-700">
-                                        @include('layouts.partials.icons', ['icon' => 'clipboard-list'])
-                                    </div>
+                                <span class="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-cyan-50 p-3 text-cyan-700">
+                                    @include('layouts.partials.icons', ['icon' => 'clipboard-list'])
+                                </span>
 
-                                    <p class="font-bold text-slate-800">
-                                        {{ $buscar !== '' ? 'No encontramos resultados' : 'Todavía no hay servicios asociados' }}
-                                    </p>
+                                <p class="mt-4 font-bold text-slate-800">
+                                    {{ $buscar !== '' ? 'No encontramos resultados' : 'Todavía no hay servicios asociados' }}
+                                </p>
 
-                                    <p class="mt-2 text-sm text-slate-500">
-                                        Los servicios vinculados a las citas aparecerán aquí.
-                                    </p>
-                                </div>
+                                <p class="mt-2 text-sm text-slate-500">
+                                    Los servicios vinculados a las citas aparecerán aquí.
+                                </p>
                             </td>
                         </tr>
                     @endforelse
@@ -262,5 +165,4 @@
     </section>
 
 </div>
-
 @endsection

@@ -6,21 +6,12 @@ use App\Http\Requests\VehiculoStoreRequest;
 use App\Http\Requests\VehiculoUpdateRequest;
 use App\Http\Requests\VehiculoIndexRequest;
 use App\Services\VehiculoService;
-use App\Services\ClienteService;
-use App\Services\TipoVehiculoService;
 
 /**use App\Services\*/
 class VehiculoController extends Controller
 {
-    private VehiculoService $vehiculoService;
-    private ClienteService $clienteService;
-    private TipoVehiculoService $tipoVehiculoService;
-
-    public function __construct(VehiculoService $vehiculoService, ClienteService $clienteService, TipoVehiculoService $tipoVehiculoService)
+    public function __construct(private VehiculoService $vehiculoService)
     {
-        $this->vehiculoService = $vehiculoService;
-        $this->clienteService = $clienteService;
-        $this->tipoVehiculoService = $tipoVehiculoService;
     }
 
     /**
@@ -28,9 +19,7 @@ class VehiculoController extends Controller
      */
     public function index(VehiculoIndexRequest $vehiculoIndexRequest)
     {
-        $datosListado = $this->vehiculoService->prepararListado($vehiculoIndexRequest->validated());
-        $tipoVehiculosOpciones = $this->tipoVehiculoService->opcionesParaFiltro();
-        return view('vehiculos.index', [...$datosListado, 'tipoVehiculosOpciones' => $tipoVehiculosOpciones]);
+        return view('vehiculos.index', $this->vehiculoService->prepararIndiceConOpciones($vehiculoIndexRequest->validated()));
     }
 
     public function cambiarEstado(int $id)
@@ -48,10 +37,7 @@ class VehiculoController extends Controller
      */
     public function create()
     {
-        $cliente = $this->clienteService->listarTodo();
-        $tipoVehiculo = $this->tipoVehiculoService->listarTodo();
-
-        return view('vehiculos.crear', compact('cliente','tipoVehiculo'));
+        return view('vehiculos.crear', $this->vehiculoService->prepararFormulario());
     }
 
     /**
@@ -76,10 +62,7 @@ class VehiculoController extends Controller
      */
     public function edit(int $id)
     {
-        $vehiculo = $this->vehiculoService->findById($id);
-        $cliente = $this->clienteService->listarTodo();
-        $tipoVehiculo = $this->tipoVehiculoService->listarTodo();
-        return view('vehiculos.editar',compact('vehiculo','cliente','tipoVehiculo'));
+        return view('vehiculos.editar', $this->vehiculoService->prepararFormulario($id));
 
         }
 

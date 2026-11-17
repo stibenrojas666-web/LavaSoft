@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Services\TurnoService;
-use App\Services\EmpleadoService;
 use App\Http\Requests\TurnoStoreRequest;
 use App\Http\Requests\TurnoUpdateRequest;
 use App\Http\Requests\BusquedaIndexRequest;
@@ -12,12 +11,8 @@ use App\Http\Requests\BusquedaIndexRequest;
 class TurnoController extends Controller
 {
 
-private TurnoService $turnoService;
-private EmpleadoService $empleadoService;
-public function __construct(TurnoService $turnoService, EmpleadoService $empleadoService)
+public function __construct(private TurnoService $turnoService)
 {
-    $this->turnoService = $turnoService;
-    $this->empleadoService = $empleadoService;
 }
     /**
      * Display a listing of the resource.
@@ -34,8 +29,7 @@ public function __construct(TurnoService $turnoService, EmpleadoService $emplead
      */
     public function create()
     {
-        $empleados = $this->empleadoService->listarTodo();
-        return view('turno.crear', compact('empleados'));
+        return view('turno.crear', $this->turnoService->prepararFormulario());
     }
 
     /**
@@ -60,9 +54,7 @@ public function __construct(TurnoService $turnoService, EmpleadoService $emplead
      */
     public function edit(int $id)
     {
-        $turno = $this->turnoService->buscarPorId($id);
-        $empleados = $this->empleadoService->listarTodo();
-        return view('turno.editar', compact('turno', 'empleados'));
+        return view('turno.editar', $this->turnoService->prepararFormulario($id));
     }
 
     /**

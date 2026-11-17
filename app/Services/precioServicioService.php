@@ -8,9 +8,31 @@ class PrecioServicioService
 {
     private PrecioServicioRepository $precioServicioRepository;
     
-    public function __construct(PrecioServicioRepository $precioServicioRepository)
+    public function __construct(
+        PrecioServicioRepository $precioServicioRepository,
+        private ServicioService $servicioService,
+        private TipoVehiculoService $tipoVehiculoService
+    )
 {
     $this->precioServicioRepository = $precioServicioRepository;    
+}
+
+public function prepararIndiceConOpciones(array $datos): array
+{
+    return $this->prepararListado($datos) + [
+        'tipoVehiculosOpciones' => $this->tipoVehiculoService->opcionesParaFiltro(),
+    ];
+}
+
+public function prepararFormulario(?int $precioServicioId = null, ?int $duracionAnterior = null): array
+{
+    $precioServicio = $precioServicioId === null ? null : $this->buscarPorId($precioServicioId);
+    $servicios = $this->servicioService->listarActivosConPrecios();
+    $tipoVehiculos = $this->tipoVehiculoService->listarTodo();
+    $duracionActual = $duracionAnterior ?? (int) ($precioServicio->duracionMinutos ?? 30);
+    $duraciones = $this->opcionesDuracion($duracionActual);
+
+    return compact('precioServicio', 'servicios', 'tipoVehiculos', 'duraciones', 'duracionActual');
 }
 
 public function listarTodo(){

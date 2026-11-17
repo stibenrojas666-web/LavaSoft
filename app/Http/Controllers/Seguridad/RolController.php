@@ -6,19 +6,16 @@ namespace App\Http\Controllers\Seguridad;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RolStoreRequest;
 use App\Http\Requests\RolUpdateRequest;
-use App\Services\Seguridad\PermisoService;
 use App\Services\Seguridad\RolService;
 use App\Http\Requests\BusquedaIndexRequest;
 use Exception;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
-use Spatie\Permission\Models\Role;
 
 class RolController extends Controller
 {
     public function __construct(
         private RolService $rolService,
-        private PermisoService $permisoService,
     ) {
     }
 
@@ -31,13 +28,10 @@ class RolController extends Controller
 
     public function create(): View
     {
-        return view('seguridad.roles.form', [
-            'rol' => null,
-            'protegido' => false,
-            'noDesactivable' => false,
-            'permisos' => $this->permisoService->listar(),
-            'seleccionados' => old('permissions', []),
-        ]);
+        return view('seguridad.roles.form', $this->rolService->prepararFormulario(
+            null,
+            old('permissions', [])
+        ));
     }
 
     public function store(RolStoreRequest $rolStoreRequest): RedirectResponse
@@ -47,21 +41,18 @@ class RolController extends Controller
         return redirect()->route('seguridad.roles.index')->with('success', 'Rol creado correctamente.');
     }
 
-    public function edit(Role $rol): View
+    public function edit(int $rol): View
     {
-        return view('seguridad.roles.form', [
-            'rol' => $rol,
-            'protegido' => $this->rolService->esProtegido($rol),
-            'noDesactivable' => $this->rolService->esNoDesactivable($rol),
-            'permisos' => $this->permisoService->listar(),
-            'seleccionados' => old('permissions', $this->rolService->permisosSeleccionados($rol)),
-        ]);
+        return view('seguridad.roles.form', $this->rolService->prepararFormulario(
+            $rol,
+            old('permissions')
+        ));
     }
 
-    public function update(RolUpdateRequest $rolUpdateRequest, Role $rol): RedirectResponse
+    public function update(RolUpdateRequest $rolUpdateRequest, int $rol): RedirectResponse
     {
         try {
-            $this->rolService->actualizar($rol, $rolUpdateRequest->validated());
+            $this->rolService->actualizarPorId($rol, $rolUpdateRequest->validated());
         } catch (Exception $e) {
             return back()->withInput()->with('error', $e->getMessage());
         }
@@ -69,21 +60,21 @@ class RolController extends Controller
         return redirect()->route('seguridad.roles.index')->with('success', 'Rol actualizado correctamente.');
     }
 
-    public function estado(Role $rol): RedirectResponse
+    public function estado(int $rol): RedirectResponse
     {
         try {
-            $activo = $this->rolService->cambiarEstado($rol);
+            $resultado = $this->rolService->cambiarEstadoPorId($rol);
         } catch (Exception $e) {
             return back()->with('error', $e->getMessage());
         }
 
-        return back()->with('success', 'El rol "' . $rol->name . '" quedó ' . ($activo ? 'activo' : 'inactivo') . '.');
+        return back()->with('success', 'El rol "' . $resultado['nombre'] . '" quedó ' . ($resultado['activo'] ? 'activo' : 'inactivo') . '.');
     }
 
-    public function destroy(Role $rol): RedirectResponse
+    public function destroy(int $rol): RedirectResponse
     {
         try {
-            $this->rolService->eliminar($rol);
+            $this->rolService->eliminarPorId($rol);
         } catch (Exception $e) {
             return back()->with('error', $e->getMessage());
         }

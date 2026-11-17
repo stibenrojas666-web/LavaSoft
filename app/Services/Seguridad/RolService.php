@@ -16,7 +16,38 @@ class RolService
     public function __construct(
         private RolRepository $rolRepository,
         private UsuarioRepository $usuarioRepository,
+        private PermisoService $permisoService,
     ) {
+    }
+
+    public function prepararFormulario(?int $rolId = null, ?array $permisosAnteriores = null): array
+    {
+        $rol = $rolId === null ? null : $this->rolRepository->buscarPorId($rolId);
+        return [
+            'rol' => $rol,
+            'protegido' => $rol ? $this->esProtegido($rol) : false,
+            'noDesactivable' => $rol ? $this->esNoDesactivable($rol) : false,
+            'permisos' => $this->permisoService->listar(),
+            'seleccionados' => $permisosAnteriores ?? ($rol ? $this->permisosSeleccionados($rol) : []),
+        ];
+    }
+
+    public function actualizarPorId(int $id, array $datos): void
+    {
+        $this->actualizar($this->rolRepository->buscarPorId($id), $datos);
+    }
+
+    public function cambiarEstadoPorId(int $id): array
+    {
+        $rol = $this->rolRepository->buscarPorId($id);
+        $activo = $this->cambiarEstado($rol);
+
+        return ['activo' => $activo, 'nombre' => $rol->name];
+    }
+
+    public function eliminarPorId(int $id): void
+    {
+        $this->eliminar($this->rolRepository->buscarPorId($id));
     }
 
     public function listar(): Collection
@@ -70,6 +101,14 @@ class RolService
             $usuario->setAttribute('rolesBloqueados', $usuario->is($usuarioActual)
                 && in_array($rolAdministrador, $rolesAsignados, true) ? [$rolAdministrador] : []);
         });
+    }
+
+    public function prepararAsignacionRoles(Authenticatable $usuarioActual): array
+    {
+        return [
+            'usuarios' => $this->usuariosConRolesParaListado($usuarioActual),
+            'roles' => $this->listar(),
+        ];
     }
 
     public function esProtegido(Role $rol): bool

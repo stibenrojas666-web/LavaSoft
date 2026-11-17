@@ -1,71 +1,228 @@
 @extends('layouts.app')
 
-
 @section('title', 'Configuración del lavadero')
 @section('page-title', 'Configuración del lavadero')
 
 @section('content')
-    <div class="mx-auto max-w-5xl space-y-5">
-    <x-module-header title="Configuración del lavadero" description="Actualiza los datos y la identidad visual del negocio." icon="cog" :back-url="route('dashboard.index')" />
-    <x-card title="Datos del negocio" subtitle="Esta información aparecerá en el menú y en las facturas.">
-        <form action="{{ route('configuracion.update') }}" method="POST" enctype="multipart/form-data" class="space-y-5">
+<div class="mx-auto max-w-5xl space-y-6 px-4 py-6">
+
+    <x-module-header
+        title="Configuración del lavadero"
+        description="Administra los datos generales y la identidad visual de tu negocio."
+        icon="cog"
+    />
+
+    @if(session('success'))
+        <div class="flex items-start gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800">
+            <span class="font-bold">✓</span>
+            <p>{{ session('success') }}</p>
+        </div>
+    @endif
+
+    @if($errors->any())
+        <div class="rounded-xl border border-red-200 bg-red-50 p-4">
+            <p class="font-semibold text-red-800">Hay algunos datos que debes revisar:</p>
+            <ul class="mt-2 list-inside list-disc space-y-1 text-sm text-red-700">
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
+    <x-card
+        title="Datos del negocio"
+        subtitle="Esta información aparecerá en el menú y en las facturas."
+    >
+        <form
+            action="{{ route('configuracion.update') }}"
+            method="POST"
+            enctype="multipart/form-data"
+            class="space-y-6"
+        >
             @csrf
             @method('PUT')
 
-            <x-input name="nombre" label="Nombre del lavadero" :value="old('nombre', $configuracion->nombre)" />
-            <x-input name="nit" label="NIT" :value="old('nit', $configuracion->nit)" />
-            <x-input name="direccion" label="Dirección" :value="old('direccion', $configuracion->direccion)" />
-            <x-input name="telefono" label="Teléfono" type="tel" :value="old('telefono', $configuracion->telefono)" />
+            <div class="grid gap-5 md:grid-cols-2">
 
-            <label for="mostrar_logo" class="flex items-start gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4">
-                <input id="mostrar_logo" name="mostrar_logo" type="checkbox" value="1"
-                    @checked(old('mostrar_logo', $configuracion->mostrar_logo))
-                    class="mt-1 h-4 w-4 rounded border-slate-300 text-cyan-600 focus:ring-cyan-500">
-                <span>
-                    <span class="block text-sm font-medium text-slate-800">Mostrar logo</span>
-                    <span class="mt-1 block text-sm text-slate-500">Al desmarcar y guardar, se ocultará del menú y de las facturas. El archivo se conservará.</span>
-                </span>
-            </label>
-            @error('mostrar_logo')<p class="-mt-4 text-sm text-red-600">{{ $message }}</p>@enderror
+                <div class="md:col-span-2">
+                    <x-input
+                        name="nombre"
+                        label="Nombre del lavadero"
+                        :value="old('nombre', $configuracion->nombre)"
+                    />
+                </div>
 
-            <div>
-                <label for="logo" class="mb-1.5 block text-sm font-medium text-slate-700">Logo (JPG, PNG o WEBP; máximo 2 MB)</label>
-                <input id="logo" name="logo" type="file" accept="image/jpeg,image/png,image/webp"
-                    class="block w-full rounded-lg border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-700">
-                @error('logo')<p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>@enderror
+                <x-input
+                    name="nit"
+                    label="NIT"
+                    :value="old('nit', $configuracion->nit)"
+                />
+
+                <x-input
+                    name="telefono"
+                    label="Teléfono"
+                    type="tel"
+                    :value="old('telefono', $configuracion->telefono)"
+                />
+
+                <div class="md:col-span-2">
+                    <x-input
+                        name="direccion"
+                        label="Dirección"
+                        :value="old('direccion', $configuracion->direccion)"
+                    />
+                </div>
+
             </div>
 
-            @if($configuracion->logo_path)
-                <label for="eliminar_logo" class="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-4">
-                    <input id="eliminar_logo" name="eliminar_logo" type="checkbox" value="1"
-                        @checked(old('eliminar_logo'))
-                        class="mt-1 h-4 w-4 rounded border-red-300 text-red-600 focus:ring-red-500">
+            <div class="border-t border-slate-100 pt-6">
+                <div class="mb-4">
+                    <h3 class="font-bold text-slate-900">Identidad visual</h3>
+                    <p class="mt-1 text-sm text-slate-500">
+                        Configura el logo que se mostrará en el menú y en las facturas.
+                    </p>
+                </div>
+
+                <label
+                    for="mostrar_logo"
+                    class="flex cursor-pointer items-start gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4 transition hover:border-cyan-200 hover:bg-cyan-50/40"
+                >
+                    <input
+                        id="mostrar_logo"
+                        name="mostrar_logo"
+                        type="checkbox"
+                        value="1"
+                        @checked(old('mostrar_logo', $configuracion->mostrar_logo))
+                        class="mt-1 h-4 w-4 rounded border-slate-300 text-cyan-700 focus:ring-cyan-600"
+                    >
+
                     <span>
-                        <span class="block text-sm font-medium text-red-800">Eliminar logo guardado</span>
-                        <span class="mt-1 block text-sm text-red-700">Solo se borrará al marcar esta opción y guardar. Si subes otro logo, reemplazará el actual.</span>
+                        <span class="block text-sm font-semibold text-slate-800">
+                            Mostrar logo
+                        </span>
+                        <span class="mt-1 block text-sm text-slate-500">
+                            Si desactivas esta opción y guardas, el logo dejará de aparecer en el menú y en las facturas.
+                        </span>
                     </span>
                 </label>
-                @error('eliminar_logo')<p class="-mt-4 text-sm text-red-600">{{ $message }}</p>@enderror
-            @endif
 
-            <div class="flex items-center gap-4 rounded-xl border border-slate-200 bg-slate-50 p-4">
-                @if($configuracion->logo_path)
-                    <img src="{{ asset('storage/' . ltrim($configuracion->logo_path, '/')) }}"
-                        alt="Logo actual de {{ $configuracion->nombre }}" class="h-16 w-16 rounded-lg bg-white object-contain p-2">
-                @else
-                    <div class="flex h-16 w-16 items-center justify-center rounded-lg border border-dashed border-slate-300 text-xs text-slate-400">Sin logo</div>
-                @endif
-                <div>
-                    <p class="font-semibold text-slate-800">{{ $configuracion->logo_path ? 'Logo actual' : 'Sin logo cargado' }}</p>
-                    <p class="text-sm text-slate-500">{{ $configuracion->mostrar_logo ? 'Visible en el menú y las facturas.' : 'Guardado, pero oculto.' }} Desmarcar “Mostrar logo” solo lo oculta.</p>
+                @error('mostrar_logo')
+                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                @enderror
+
+                <div class="mt-5">
+                    <label
+                        for="logo"
+                        class="mb-2 block text-sm font-semibold text-slate-700"
+                    >
+                        Logo del negocio
+                    </label>
+
+                    <div class="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-5 transition hover:border-cyan-400">
+                        <input
+                            id="logo"
+                            name="logo"
+                            type="file"
+                            accept="image/*,.svg,.ico"
+                            class="block w-full cursor-pointer text-sm text-slate-600 file:mr-4 file:rounded-lg file:border-0 file:bg-cyan-800 file:px-4 file:py-2.5 file:text-sm file:font-semibold file:text-white hover:file:bg-cyan-900"
+                        >
+
+                        <p class="mt-3 text-xs text-slate-500">
+                            Formatos permitidos: JPG, PNG, WEBP, GIF, SVG, BMP e ICO. Tamaño máximo: 10 MB.
+                        </p>
+
+                        @error('logo')
+                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+
+                <div class="mt-5 flex flex-col gap-4 rounded-xl border border-slate-200 bg-white p-4 sm:flex-row sm:items-center">
+                    <div id="logo-preview-container" class="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
+                        @if($configuracion->mostrar_logo && $configuracion->logo_path)
+                            <img
+                                id="logo-preview"
+                                src="{{ route('lavadero.logo', ['v' => $configuracion->updated_at?->timestamp ?? 0]) }}"
+                                alt="Logo actual de {{ $configuracion->nombre }}"
+                                class="h-full w-full object-contain p-2"
+                            >
+                        @else
+                            <div id="logo-preview-empty" class="flex flex-col items-center gap-2 text-slate-400">
+                                <svg
+                                    class="h-8 w-8"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="1.5"
+                                    aria-hidden="true"
+                                >
+                                    <rect x="3" y="3" width="18" height="18" rx="3"/>
+                                    <circle cx="8.5" cy="8.5" r="1.5"/>
+                                    <path d="m21 15-5-5L5 21"/>
+                                </svg>
+                                <span class="text-xs font-medium">Sin logo</span>
+                            </div>
+                        @endif
+                    </div>
+
+                    <div>
+                        <p class="font-semibold text-slate-800">
+                            {{ $configuracion->mostrar_logo && $configuracion->logo_path ? 'Logo actual' : 'No hay un logo cargado' }}
+                        </p>
+
+                        <p class="mt-1 text-sm text-slate-500">
+                            @if($configuracion->mostrar_logo && $configuracion->logo_path)
+                                Este es el archivo de imagen que está guardado actualmente.
+                            @else
+                                Selecciona una imagen para establecer el logo de tu negocio.
+                            @endif
+                        </p>
+
+                        @if($configuracion->mostrar_logo && $configuracion->logo_path)
+                            <p class="mt-2 text-xs font-medium text-cyan-800">
+                                Puedes seleccionar otro archivo para reemplazarlo.
+                            </p>
+                        @endif
+                    </div>
                 </div>
             </div>
 
-            <div class="flex justify-end gap-2 border-t border-slate-100 pt-4">
-                <x-button variant="secondary" :href="route('dashboard.index')">Cancelar</x-button>
-                <x-button variant="cyan" type="submit">Guardar configuración</x-button>
+            <div class="flex flex-col-reverse justify-end gap-3 border-t border-slate-100 pt-5 sm:flex-row">
+                <x-button variant="secondary" :href="route('dashboard.index')">
+                    Cancelar
+                </x-button>
+                <x-button
+                    variant="cyan"
+                    type="submit"
+                >
+                    Guardar configuración
+                </x-button>
             </div>
         </form>
     </x-card>
-    </div>
+
+</div>
+
+<script>
+    document.getElementById('logo')?.addEventListener('change', function () {
+        const archivo = this.files?.[0];
+        if (!archivo) return;
+
+        const contenedor = this.closest('form')?.querySelector('#logo-preview-container');
+        if (!contenedor) return;
+
+        let vista = contenedor.querySelector('#logo-preview');
+        if (!vista) {
+            contenedor.querySelector('#logo-preview-empty')?.remove();
+            vista = document.createElement('img');
+            vista.id = 'logo-preview';
+            vista.alt = 'Vista previa del logo seleccionado';
+            vista.className = 'h-full w-full object-contain p-2';
+            contenedor.appendChild(vista);
+        }
+
+        vista.src = URL.createObjectURL(archivo);
+    });
+</script>
 @endsection
